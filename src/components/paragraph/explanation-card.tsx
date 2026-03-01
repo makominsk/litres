@@ -1,5 +1,4 @@
 'use client'
-import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useAudioPlayer } from '@/hooks/use-audio-player'
 
@@ -19,15 +18,7 @@ interface ExplanationCardProps {
 }
 
 export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps) {
-  const { play, isPlaying, isLoading } = useAudioPlayer()
-  const didAutoPlay = useRef(false)
-
-  useEffect(() => {
-    if (didAutoPlay.current) return
-    didAutoPlay.current = true
-    play(result.explanation)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const { play, stop, isPlaying, isLoading, isError } = useAudioPlayer()
 
   const scoreColor =
     result.score >= 80 ? 'var(--olive)' :
@@ -73,25 +64,46 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
             {result.score} / 100 баллов
           </div>
         </div>
-        {/* Кнопка озвучки */}
-        <button
-          onClick={() => play(result.explanation)}
-          disabled={isLoading}
-          style={{
-            marginLeft: 'auto',
-            background: 'var(--parchment-dark)',
-            border: '1.5px solid var(--parchment-deep)',
-            borderRadius: '8px',
-            padding: '6px 10px',
-            fontSize: '16px',
-            cursor: isLoading ? 'wait' : 'pointer',
-            opacity: isLoading ? 0.7 : 1,
-          }}
-          title="Озвучить пояснение"
-        >
-          {isLoading ? '⏳' : isPlaying ? '⏸️' : '🔊'}
-        </button>
       </div>
+
+      {/* Кнопка озвучки — крупная, заметная */}
+      <motion.button
+        onClick={() => isPlaying ? stop() : play(result.explanation)}
+        disabled={isLoading}
+        animate={isLoading ? {} : isPlaying ? {} : { scale: [1, 1.03, 1] }}
+        transition={{ repeat: isPlaying ? 0 : Infinity, duration: 2 }}
+        style={{
+          width: '100%',
+          padding: '14px 16px',
+          background: isError
+            ? 'rgba(199,91,57,0.08)'
+            : isPlaying
+            ? 'rgba(74,124,142,0.15)'
+            : 'linear-gradient(135deg, rgba(74,124,142,0.12), rgba(74,124,142,0.06))',
+          border: `1.5px solid ${isError ? 'var(--terracotta)' : 'rgba(74,124,142,0.4)'}`,
+          borderRadius: '12px',
+          cursor: isLoading ? 'wait' : 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 10,
+          fontFamily: 'var(--font-body)',
+          fontSize: '14px',
+          fontWeight: 600,
+          color: isError ? 'var(--terracotta)' : 'var(--sky)',
+        }}
+      >
+        <span style={{ fontSize: 20 }}>
+          {isLoading ? '⏳' : isPlaying ? '⏸️' : isError ? '⚠️' : '🔊'}
+        </span>
+        {isLoading
+          ? 'Загружаю аудио...'
+          : isPlaying
+          ? 'Пауза'
+          : isError
+          ? 'Ошибка — нажми ещё раз'
+          : 'Слушать пояснение учителя'}
+      </motion.button>
 
       {/* Пояснение */}
       <div className="parchment-card p-4">

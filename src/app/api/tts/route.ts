@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { synthesizeSpeech, hashText } from '@/lib/elevenlabs'
 import { getAudioCache, setAudioCache, supabase } from '@/lib/supabase'
 
+export const maxDuration = 60
+
 const MAX_TEXT_LENGTH = 1000
 
 export async function POST(req: NextRequest) {
@@ -26,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     // 3. Загружаем в Supabase Storage
     const fileName = `${textHash}.mp3`
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('audio-cache')
       .upload(fileName, audioBuffer, {
         contentType: 'audio/mpeg',
@@ -35,13 +37,10 @@ export async function POST(req: NextRequest) {
 
     if (uploadError) {
       console.error('[/api/tts] Storage upload error:', uploadError)
-      // Возвращаем аудио напрямую если хранилище недоступно
-      return new NextResponse(audioBuffer, {
-        headers: {
-          'Content-Type': 'audio/mpeg',
-          'Cache-Control': 'public, max-age=86400',
-        },
-      })
+      // Возвращаем аудио как base64 data URL если хранилище недоступно
+      const base64 = Buffer.from(audioBuffer).toString('base64')
+      const audioUrl = `data:audio/mpeg;base64,${base64}`
+      return NextResponse.json({ audioUrl, cached: false })
     }
 
     // 4. Получаем публичный URL

@@ -28,7 +28,7 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
   const scoreBg =
     result.score >= 80 ? 'rgba(39,174,96,0.1)' :
     result.score >= 50 ? 'rgba(245,166,35,0.12)' :
-    'rgba(239,68,68,0.08)'
+    'rgba(245,158,11,0.1)'
 
   return (
     <motion.div

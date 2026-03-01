@@ -12,12 +12,12 @@ interface HintButtonProps {
 export function HintButton({ paragraphId, questionIndex, currentLevel, onHintUsed }: HintButtonProps) {
   const [hint, setHint] = useState('')
   const [loading, setLoading] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
+  const [error, setError] = useState(false)
 
   const nextLevel = Math.min(currentLevel + 1, 3) as 1 | 2 | 3
   const isMaxed = currentLevel >= 3
 
-  const levelLabels = {
+  const levelLabels: Record<1 | 2 | 3, string> = {
     1: 'Лёгкая подсказка',
     2: 'Подсказка посильнее',
     3: 'Полный ответ',
@@ -26,6 +26,7 @@ export function HintButton({ paragraphId, questionIndex, currentLevel, onHintUse
   async function requestHint() {
     if (isMaxed || loading) return
     setLoading(true)
+    setError(false)
     try {
       const res = await fetch('/api/hint', {
         method: 'POST',
@@ -33,11 +34,16 @@ export function HintButton({ paragraphId, questionIndex, currentLevel, onHintUse
         body: JSON.stringify({ paragraphId, questionIndex, hintLevel: nextLevel }),
       })
       const data = await res.json()
-      setHint(data.hint)
+      const hintText: string = data.hint
+      if (!hintText) {
+        setError(true)
+        return
+      }
+      setHint(hintText)
       onHintUsed(nextLevel)
-      setIsOpen(true)
     } catch (err) {
       console.error(err)
+      setError(true)
     } finally {
       setLoading(false)
     }
@@ -63,17 +69,28 @@ export function HintButton({ paragraphId, questionIndex, currentLevel, onHintUse
           display: 'flex',
           alignItems: 'center',
           gap: 6,
+          width: '100%',
         }}
       >
-        {loading ? '⏳' : '💡'}
-        {loading ? 'Думаю...' : isMaxed ? 'Все подсказки использованы' : levelLabels[nextLevel]}
+        <span>{loading ? '⏳' : '💡'}</span>
+        <span>
+          {loading ? 'Думаю...' : isMaxed ? 'Все подсказки использованы' : levelLabels[nextLevel]}
+        </span>
         {!isMaxed && !loading && (
-          <span style={{ opacity: 0.6, fontSize: '10px' }}>({nextLevel}/3)</span>
+          <span style={{ opacity: 0.6, fontSize: '10px', marginLeft: 'auto' }}>
+            {nextLevel}/3
+          </span>
         )}
       </button>
 
+      {error && (
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--terracotta)', paddingLeft: 4 }}>
+          Не удалось загрузить подсказку. Попробуй ещё раз.
+        </p>
+      )}
+
       <AnimatePresence>
-        {isOpen && hint && (
+        {hint && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
@@ -83,12 +100,25 @@ export function HintButton({ paragraphId, questionIndex, currentLevel, onHintUse
               border: '1.5px solid rgba(201,151,58,0.35)',
               borderRadius: '10px',
               padding: '12px 14px',
+              overflow: 'hidden',
             }}
           >
-            <div style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--gold)', fontWeight: 700, marginBottom: 6 }}>
+            <div style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: '11px',
+              color: 'var(--gold)',
+              fontWeight: 700,
+              marginBottom: 6,
+            }}>
               💡 Подсказка {currentLevel} из 3
             </div>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink)', lineHeight: 1.6 }}>
+            <p style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: '13px',
+              color: 'var(--ink)',
+              lineHeight: 1.6,
+              margin: 0,
+            }}>
               {hint}
             </p>
           </motion.div>

@@ -90,8 +90,8 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
 
   return (
     <div className="space-y-3">
-      {/* Переключатель режимов */}
-      <div className="flex gap-2">
+      {/* Переключатель режимов — по центру */}
+      <div className="flex justify-center gap-2">
         <button
           onClick={() => switchMode('voice')}
           style={{
@@ -100,14 +100,14 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
             color: mode === 'voice' ? '#FDF6EC' : 'var(--ink-muted)',
             border: '1.5px solid var(--parchment-deep)',
             borderRadius: '8px',
-            padding: '6px 14px',
+            padding: '6px 18px',
             fontSize: '12px',
             fontWeight: 600,
             cursor: 'pointer',
             transition: 'all 0.15s',
           }}
         >
-          🎙️ Голос (Whisper)
+          🎙️ Голос
         </button>
         <button
           onClick={() => switchMode('text')}
@@ -117,7 +117,7 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
             color: mode === 'text' ? '#FDF6EC' : 'var(--ink-muted)',
             border: '1.5px solid var(--parchment-deep)',
             borderRadius: '8px',
-            padding: '6px 14px',
+            padding: '6px 18px',
             fontSize: '12px',
             fontWeight: 600,
             cursor: 'pointer',
@@ -128,17 +128,17 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
         </button>
       </div>
 
-      {/* Кнопка микрофона */}
+      {/* Кнопка микрофона — по центру */}
       {mode === 'voice' && (
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col items-center gap-2 py-1">
           <motion.button
             onClick={handleVoiceToggle}
             disabled={busyNotRecording}
             whileTap={{ scale: 0.93 }}
             animate={isRecording ? { scale: [1, 1.07, 1], transition: { repeat: Infinity, duration: 1.1 } } : {}}
             style={{
-              width: 56,
-              height: 56,
+              width: 64,
+              height: 64,
               borderRadius: '50%',
               background: isRecording
                 ? 'var(--terracotta)'
@@ -146,22 +146,20 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
                 ? 'rgba(201,151,58,0.25)'
                 : 'var(--parchment-dark)',
               border: `2px solid ${isRecording ? '#a03a20' : 'var(--parchment-deep)'}`,
-              fontSize: 24,
+              fontSize: 28,
               cursor: busyNotRecording ? 'not-allowed' : 'pointer',
               opacity: disabled ? 0.5 : 1,
-              flexShrink: 0,
               transition: 'background 0.2s, border-color 0.2s',
             }}
           >
             {isTranscribing ? '⏳' : isRecording ? '⏹️' : '🎙️'}
           </motion.button>
-
-          <p style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-muted)', fontSize: 12, lineHeight: 1.5 }}>
+          <p style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-muted)', fontSize: 11, textAlign: 'center', lineHeight: 1.4 }}>
             {isRecording
-              ? '🔴 Говори... нажми ещё раз чтобы остановить'
+              ? '🔴 Говори… нажми ещё раз чтобы остановить'
               : isTranscribing
               ? 'Распознаю речь...'
-              : 'Нажми на микрофон и говори по-русски'}
+              : 'Нажми и говори по-русски'}
           </p>
         </div>
       )}

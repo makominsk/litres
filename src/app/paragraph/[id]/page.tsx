@@ -255,20 +255,13 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="parchment-card p-4"
+          className="parchment-card p-4 text-center"
         >
           <h1
-            style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)', fontSize: '16px', fontWeight: 700 }}
+            style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)', fontSize: '17px', fontWeight: 700 }}
           >
             {para.title}
           </h1>
-          {para.summary && (
-            <p
-              style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-muted)', fontSize: '12px', marginTop: 4, lineHeight: 1.5 }}
-            >
-              {para.summary.slice(0, 200)}...
-            </p>
-          )}
         </motion.div>
 
         {/* Карта событий */}

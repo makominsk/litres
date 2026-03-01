@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateContent } from '@/lib/gemini'
+import { generateContent } from '@/lib/openai'
 import { buildEvaluatePrompt } from '@/lib/prompts'
 
 // Allow up to 30s on Vercel (Pro plan) or 10s (Hobby)

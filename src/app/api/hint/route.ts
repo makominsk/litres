@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateContent } from '@/lib/gemini'
+import { generateContent } from '@/lib/openai'
 import { buildHintPrompt } from '@/lib/prompts'
 import textbook from '@/data/textbook.json'
 

@@ -48,35 +48,35 @@ export function SectionCard({
             }}
           />
 
-          <div className="relative p-5 pb-4">
-            {/* Эмодзи + заголовок */}
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <div className="text-4xl mb-2 filter drop-shadow-sm">{emoji}</div>
-                <h2
-                  style={{ fontFamily: 'var(--font-heading)', color: '#FDF6EC' }}
-                  className="text-lg font-bold leading-tight"
-                >
-                  {title}
-                </h2>
-                <p
-                  style={{ color: 'rgba(253,246,236,0.75)', fontFamily: 'var(--font-body)' }}
-                  className="text-xs mt-0.5"
-                >
-                  {subtitle}
-                </p>
-              </div>
+          <div className="relative p-4 pb-4">
+            {/* Бейдж с количеством параграфов */}
+            <div className="flex justify-between items-start mb-3">
+              <div className="text-3xl filter drop-shadow-sm">{emoji}</div>
               <div
                 style={{
                   background: 'rgba(253,246,236,0.2)',
                   color: '#FDF6EC',
                   fontFamily: 'var(--font-body)',
                 }}
-                className="text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap"
+                className="text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap"
               >
                 {paragraphCount} §
               </div>
             </div>
+
+            {/* Заголовок */}
+            <h2
+              style={{ fontFamily: 'var(--font-heading)', color: '#FDF6EC' }}
+              className="text-base font-bold leading-tight mb-0.5"
+            >
+              {title}
+            </h2>
+            <p
+              style={{ color: 'rgba(253,246,236,0.7)', fontFamily: 'var(--font-body)' }}
+              className="text-xs mb-4 leading-snug"
+            >
+              {subtitle}
+            </p>
 
             {/* Прогресс */}
             <div>
@@ -91,12 +91,12 @@ export function SectionCard({
                   style={{ color: '#FDF6EC', fontFamily: 'var(--font-body)' }}
                   className="text-xs font-bold"
                 >
-                  {completedCount} / {paragraphCount}
+                  {completedCount}/{paragraphCount}
                 </span>
               </div>
               <div
-                className="h-2 rounded-full overflow-hidden"
-                style={{ background: 'rgba(61,43,31,0.2)' }}
+                className="h-1.5 rounded-full overflow-hidden"
+                style={{ background: 'rgba(61,43,31,0.25)' }}
               >
                 <motion.div
                   className="h-full rounded-full"
@@ -107,14 +107,6 @@ export function SectionCard({
                 />
               </div>
             </div>
-          </div>
-
-          {/* Стрелка */}
-          <div
-            className="absolute right-4 top-1/2 -translate-y-1/2 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
-            style={{ color: '#FDF6EC' }}
-          >
-            →
           </div>
         </div>
       </Link>

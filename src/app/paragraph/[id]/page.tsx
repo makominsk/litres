@@ -163,11 +163,11 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
               §{paragraphId} · {para.title}
             </p>
 
-            <div className="flex flex-col gap-3 w-full">
-              <Link href={`/paragraph/${paragraphId}/quiz`}>
+            <div className="grid grid-cols-2 gap-3 w-full">
+              <Link href={`/paragraph/${paragraphId}/quiz`} className="col-span-2">
                 <button className="btn-terracotta w-full py-3.5 text-sm font-bold"
                   style={{ fontFamily: 'var(--font-body)' }}>
-                  📝 Пройти тест по датам
+                  📝 Тест по датам
                 </button>
               </Link>
               <Link href={`/paragraph/${paragraphId}/review`}>
@@ -176,7 +176,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                     width: '100%',
                     padding: '12px',
                     fontFamily: 'var(--font-body)',
-                    fontSize: '14px',
+                    fontSize: '13px',
                     fontWeight: 600,
                     background: 'rgba(74,124,142,0.1)',
                     border: '1.5px solid rgba(74,124,142,0.35)',
@@ -185,7 +185,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                     cursor: 'pointer',
                   }}
                 >
-                  🔄 Повторить ошибки
+                  🔄 Ошибки
                 </button>
               </Link>
               <Link href={`/section/${sectionId}`}>
@@ -194,7 +194,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                     width: '100%',
                     padding: '12px',
                     fontFamily: 'var(--font-body)',
-                    fontSize: '14px',
+                    fontSize: '13px',
                     fontWeight: 600,
                     background: 'var(--parchment-dark)',
                     border: '1.5px solid var(--parchment-deep)',
@@ -203,7 +203,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                     cursor: 'pointer',
                   }}
                 >
-                  ← Вернуться к разделу
+                  ← Раздел
                 </button>
               </Link>
             </div>

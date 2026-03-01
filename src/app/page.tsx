@@ -188,7 +188,7 @@ export default function HomePage() {
         </div>
 
         {/* Карточки разделов */}
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {SECTIONS.map((section, i) => {
             const paraIds = getSectionParaIds(section.id)
             const { completed } = getSectionProgress(paraIds)

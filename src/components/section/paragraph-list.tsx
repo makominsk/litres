@@ -25,7 +25,7 @@ export function ParagraphList({ paragraphs }: ParagraphListProps) {
   const getParaProgress = useAppStore((s) => s.getParaProgress)
 
   return (
-    <div className="space-y-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       {paragraphs.map((para, i) => {
         const { answered, correct } = getParaProgress(para.id)
         const medal = getMedalEmoji(correct, answered)

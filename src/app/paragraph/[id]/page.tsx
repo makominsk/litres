@@ -316,9 +316,19 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
               </p>
             </div>
 
-            {/* Если нет результата — показываем ввод и подсказки */}
+            {/* Если нет результата — показываем подсказки и ввод */}
             {!result && (
               <div className="space-y-3">
+                {/* Подсказка — вверху, перед полем ввода */}
+                {!isEvaluating && (
+                  <HintButton
+                    paragraphId={paragraphId}
+                    questionIndex={questionIndex}
+                    currentLevel={hintLevel}
+                    onHintUsed={setHintLevel}
+                  />
+                )}
+
                 <VoiceInput onSubmit={handleAnswerSubmit} disabled={isEvaluating} />
 
                 {isEvaluating && (
@@ -332,15 +342,6 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                       Проверяю твой ответ...
                     </p>
                   </motion.div>
-                )}
-
-                {!isEvaluating && (
-                  <HintButton
-                    paragraphId={paragraphId}
-                    questionIndex={questionIndex}
-                    currentLevel={hintLevel}
-                    onHintUsed={setHintLevel}
-                  />
                 )}
               </div>
             )}

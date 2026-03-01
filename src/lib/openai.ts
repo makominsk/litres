@@ -1,15 +1,20 @@
 import OpenAI from 'openai'
 import { SYSTEM_PROMPT } from './prompts'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-})
-
 // gpt-4o-mini: fast, cheap (~$0.001/request), high rate limits, perfect for education apps
 const MODEL = 'gpt-4o-mini'
 
+// Lazy initialization — client created only at request time, not during build
+let _client: OpenAI | null = null
+function getClient() {
+  if (!_client) {
+    _client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
+  }
+  return _client
+}
+
 export async function generateContent(prompt: string): Promise<string> {
-  const response = await openai.chat.completions.create({
+  const response = await getClient().chat.completions.create({
     model: MODEL,
     messages: [
       {

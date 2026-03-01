@@ -49,9 +49,21 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
   const para = textbook.paragraphs[id as keyof typeof textbook.paragraphs]
   if (!para) notFound()
 
-  const [questionIndex, setQuestionIndex] = useState(0)
+  const answers = useAppStore((s) => s.answers)
+
+  // Начинаем с первого неотвеченного вопроса
+  const firstUnanswered = (() => {
+    const answeredIndices = new Set(
+      answers.filter((a) => a.paragraphId === paragraphId).map((a) => a.questionIndex)
+    )
+    const idx = para.questions.findIndex((_, i) => !answeredIndices.has(i))
+    return idx === -1 ? 0 : idx
+  })()
+
+  const [questionIndex, setQuestionIndex] = useState(firstUnanswered)
   const [result, setResult] = useState<EvaluateResult | null>(null)
   const [isEvaluating, setIsEvaluating] = useState(false)
+  const [evalError, setEvalError] = useState(false)
   const [hintLevel, setHintLevel] = useState(0)
   const [done, setDone] = useState(false)
   const [showFunFact, setShowFunFact] = useState(true)
@@ -107,6 +119,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
       }
     } catch (err) {
       console.error(err)
+      setEvalError(true)
     } finally {
       setIsEvaluating(false)
     }
@@ -118,6 +131,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
     } else {
       setResult(null)
       setHintLevel(0)
+      setEvalError(false)
       setShowFunFact(true)
       setQuestionIndex((i) => i + 1)
     }
@@ -341,6 +355,39 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                     <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink-muted)', marginTop: 8 }}>
                       Проверяю твой ответ...
                     </p>
+                  </motion.div>
+                )}
+
+                {evalError && !isEvaluating && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    style={{
+                      background: 'rgba(199,91,57,0.1)',
+                      border: '1.5px solid var(--terracotta)',
+                      borderRadius: '12px',
+                      padding: '12px 16px',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--terracotta)' }}>
+                      Не удалось проверить ответ. Попробуй ещё раз.
+                    </p>
+                    <button
+                      onClick={() => setEvalError(false)}
+                      style={{
+                        marginTop: 8,
+                        fontFamily: 'var(--font-body)',
+                        fontSize: '12px',
+                        color: 'var(--terracotta)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                      }}
+                    >
+                      Попробовать снова
+                    </button>
                   </motion.div>
                 )}
               </div>

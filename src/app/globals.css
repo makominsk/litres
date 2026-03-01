@@ -5,42 +5,42 @@
 @custom-variant dark (&:is(.dark *));
 
 /* =============================================
-   Античная тема — переменные
+   Gamified purple theme — переменные
    ============================================= */
 :root {
-  /* Античная палитра */
-  --parchment:     #F5E6D3;
-  --parchment-dark: #E8D4BA;
-  --parchment-deep: #D4B896;
-  --terracotta:    #C75B39;
-  --terracotta-dark: #A8472B;
-  --terracotta-light: #E07555;
-  --ink:           #3D2B1F;
-  --ink-light:     #5C4033;
-  --ink-muted:     #8B6F5E;
-  --olive:         #6B8E23;
-  --olive-dark:    #556B1B;
-  --gold:          #C9973A;
-  --gold-light:    #E8B84B;
-  --sky:           #7BA7BC;
+  /* Основная палитра */
+  --parchment:      #F4F1FE;
+  --parchment-dark: #EAE5FD;
+  --parchment-deep: #C9C0F0;
+  --terracotta:     #5E35D6;
+  --terracotta-dark: #4527A0;
+  --terracotta-light: #7E57C2;
+  --ink:            #1A1A2E;
+  --ink-light:      #2D2D4E;
+  --ink-muted:      #6B7280;
+  --olive:          #27AE60;
+  --olive-dark:     #1E8449;
+  --gold:           #F5A623;
+  --gold-light:     #FFD93D;
+  --sky:            #4361EE;
 
   /* shadcn overrides */
   --radius: 0.75rem;
   --background: var(--parchment);
   --foreground: var(--ink);
-  --card: #FDF6EC;
+  --card: #FFFFFF;
   --card-foreground: var(--ink);
-  --popover: #FDF6EC;
+  --popover: #FFFFFF;
   --popover-foreground: var(--ink);
   --primary: var(--terracotta);
-  --primary-foreground: #FDF6EC;
+  --primary-foreground: #FFFFFF;
   --secondary: var(--parchment-dark);
   --secondary-foreground: var(--ink);
   --muted: var(--parchment-dark);
   --muted-foreground: var(--ink-muted);
   --accent: var(--gold-light);
   --accent-foreground: var(--ink);
-  --destructive: #B91C1C;
+  --destructive: #EF4444;
   --border: var(--parchment-deep);
   --input: var(--parchment-dark);
   --ring: var(--terracotta);
@@ -93,9 +93,6 @@
     color: var(--ink);
     font-family: var(--font-body);
     min-height: 100dvh;
-    /* Зернистая текстура пергамента */
-    background-image:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
   }
 
   h1, h2, h3, h4 {
@@ -105,7 +102,7 @@
 }
 
 /* =============================================
-   Утилиты античной темы
+   Утилиты gamified темы
    ============================================= */
 
 /* Декоративный разделитель */
@@ -114,7 +111,7 @@
   align-items: center;
   gap: 12px;
   color: var(--terracotta);
-  opacity: 0.6;
+  opacity: 0.4;
 }
 .divider-ornament::before,
 .divider-ornament::after {
@@ -124,21 +121,20 @@
   background: linear-gradient(to right, transparent, var(--terracotta), transparent);
 }
 
-/* Карточка пергамент */
+/* Белая карточка */
 .parchment-card {
-  background: linear-gradient(135deg, #FDF6EC 0%, #F5E6D3 100%);
+  background: #FFFFFF;
   border: 1.5px solid var(--parchment-deep);
   border-radius: var(--radius);
   box-shadow:
-    0 2px 8px rgba(61, 43, 31, 0.08),
-    0 1px 2px rgba(61, 43, 31, 0.04),
-    inset 0 1px 0 rgba(255,255,255,0.5);
+    0 2px 12px rgba(94, 53, 214, 0.07),
+    0 1px 3px rgba(94, 53, 214, 0.04);
 }
 
-/* Кнопка терракота */
+/* Кнопка primary (purple) */
 .btn-terracotta {
   background: var(--terracotta);
-  color: #FDF6EC;
+  color: #FFFFFF;
   border-radius: calc(var(--radius) - 2px);
   font-family: var(--font-body);
   font-weight: 700;
@@ -158,8 +154,8 @@
 
 /* Микрофон — пульсация */
 @keyframes mic-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(199,91,57,0.4); }
-  50% { box-shadow: 0 0 0 16px rgba(199,91,57,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(94,53,214,0.4); }
+  50% { box-shadow: 0 0 0 16px rgba(94,53,214,0); }
 }
 .mic-pulsing {
   animation: mic-pulse 1.4s ease-in-out infinite;
@@ -171,7 +167,7 @@
   100% { background-position: 200% center; }
 }
 .medal-gold {
-  background: linear-gradient(105deg, #C9973A 0%, #E8B84B 40%, #C9973A 60%, #A87C2A 100%);
+  background: linear-gradient(105deg, #F5A623 0%, #FFD93D 40%, #F5A623 60%, #D4891A 100%);
   background-size: 200% auto;
   animation: medal-shine 2.5s linear infinite;
   -webkit-background-clip: text;
@@ -183,7 +179,7 @@
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--parchment-dark); }
 ::-webkit-scrollbar-thumb { background: var(--parchment-deep); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--ink-muted); }
+::-webkit-scrollbar-thumb:hover { background: var(--terracotta-light); }
 
 /* Fade-in анимация */
 @keyframes fadeUp {

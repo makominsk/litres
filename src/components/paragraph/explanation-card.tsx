@@ -26,9 +26,9 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
     'var(--terracotta)'
 
   const scoreBg =
-    result.score >= 80 ? 'rgba(107,142,35,0.12)' :
-    result.score >= 50 ? 'rgba(201,151,58,0.12)' :
-    'rgba(199,91,57,0.1)'
+    result.score >= 80 ? 'rgba(39,174,96,0.1)' :
+    result.score >= 50 ? 'rgba(245,166,35,0.12)' :
+    'rgba(239,68,68,0.08)'
 
   return (
     <motion.div
@@ -76,11 +76,11 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
           width: '100%',
           padding: '14px 16px',
           background: isError
-            ? 'rgba(199,91,57,0.08)'
+            ? 'rgba(239,68,68,0.08)'
             : isPlaying
-            ? 'rgba(74,124,142,0.15)'
-            : 'linear-gradient(135deg, rgba(74,124,142,0.12), rgba(74,124,142,0.06))',
-          border: `1.5px solid ${isError ? 'var(--terracotta)' : 'rgba(74,124,142,0.4)'}`,
+            ? 'rgba(67,97,238,0.12)'
+            : 'linear-gradient(135deg, rgba(67,97,238,0.08), rgba(67,97,238,0.04))',
+          border: `1.5px solid ${isError ? '#EF4444' : 'rgba(67,97,238,0.35)'}`,
           borderRadius: '12px',
           cursor: isLoading ? 'wait' : 'pointer',
           display: 'flex',
@@ -90,7 +90,7 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
           fontFamily: 'var(--font-body)',
           fontSize: '14px',
           fontWeight: 600,
-          color: isError ? 'var(--terracotta)' : 'var(--sky)',
+          color: isError ? '#EF4444' : 'var(--sky)',
         }}
       >
         <span style={{ fontSize: 20 }}>
@@ -148,8 +148,8 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
           style={{
-            background: 'rgba(74,124,142,0.08)',
-            border: '1.5px solid rgba(74,124,142,0.3)',
+            background: 'rgba(67,97,238,0.06)',
+            border: '1.5px solid rgba(67,97,238,0.25)',
             borderRadius: '12px',
             padding: '12px 16px',
           }}
@@ -170,13 +170,13 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.4 }}
           style={{
-            background: 'var(--ink)',
+            background: 'linear-gradient(135deg, #4527A0, #5E35D6)',
             borderRadius: '12px',
             padding: '12px 16px',
             textAlign: 'center',
           }}
         >
-          <div style={{ fontFamily: 'var(--font-body)', fontSize: '10px', color: 'var(--ink-muted)', marginBottom: 6, letterSpacing: '0.1em' }}>
+          <div style={{ fontFamily: 'var(--font-body)', fontSize: '10px', color: 'rgba(255,255,255,0.6)', marginBottom: 6, letterSpacing: '0.1em' }}>
             🧠 КАК ЗАПОМНИТЬ
           </div>
           <p style={{ fontFamily: 'var(--font-heading)', fontSize: '14px', color: 'var(--gold-light)', fontStyle: 'italic', lineHeight: 1.5 }}>

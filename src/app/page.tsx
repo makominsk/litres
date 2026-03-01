@@ -12,24 +12,24 @@ const SECTIONS = [
     title: 'Древняя Греция',
     subtitle: 'Демократия, философия, Олимп',
     emoji: '🏛️',
-    colorFrom: '#4A7C8E',
-    colorTo: '#2D5A6B',
+    colorFrom: '#5E35D6',
+    colorTo: '#4527A0',
   },
   {
     id: 'ancient-rome',
     title: 'Древний Рим',
     subtitle: 'Республика, легионы, Колизей',
     emoji: '🦅',
-    colorFrom: '#8B3A2A',
-    colorTo: '#5C2418',
+    colorFrom: '#C62828',
+    colorTo: '#8B0000',
   },
   {
     id: 'germanic-slavic',
     title: 'Германцы и Славяне',
     subtitle: 'Племена, обычаи, переселение',
     emoji: '🌲',
-    colorFrom: '#4A6741',
-    colorTo: '#2E4228',
+    colorFrom: '#1B6CA8',
+    colorTo: '#0D4F7C',
   },
 ]
 
@@ -86,7 +86,7 @@ export default function HomePage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{ background: 'rgba(61,43,31,0.7)', backdropFilter: 'blur(4px)' }}
+            style={{ background: 'rgba(26,26,46,0.75)', backdropFilter: 'blur(4px)' }}
           >
             <motion.div
               initial={{ scale: 0.85, opacity: 0, y: 20 }}

@@ -182,8 +182,8 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                     fontFamily: 'var(--font-body)',
                     fontSize: '13px',
                     fontWeight: 600,
-                    background: 'rgba(74,124,142,0.1)',
-                    border: '1.5px solid rgba(74,124,142,0.35)',
+                    background: 'rgba(67,97,238,0.08)',
+                    border: '1.5px solid rgba(67,97,238,0.3)',
                     borderRadius: '10px',
                     color: 'var(--sky)',
                     cursor: 'pointer',
@@ -200,7 +200,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                     fontFamily: 'var(--font-body)',
                     fontSize: '13px',
                     fontWeight: 600,
-                    background: 'var(--parchment-dark)',
+                    background: '#FFFFFF',
                     border: '1.5px solid var(--parchment-deep)',
                     borderRadius: '10px',
                     color: 'var(--ink)',
@@ -222,7 +222,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
       <Header />
 
       {/* Прогресс параграфа */}
-      <div style={{ background: 'var(--parchment-dark)', borderBottom: '1px solid var(--parchment-deep)' }}>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid var(--parchment-deep)', boxShadow: '0 1px 4px rgba(94,53,214,0.06)' }}>
         <div className="max-w-2xl mx-auto px-4 py-2 flex items-center gap-3">
           <Link
             href={`/section/${sectionId}`}
@@ -291,8 +291,8 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, height: 0 }}
                   style={{
-                    background: 'linear-gradient(135deg, rgba(74,124,142,0.1), rgba(74,124,142,0.05))',
-                    border: '1.5px solid rgba(74,124,142,0.3)',
+                    background: 'linear-gradient(135deg, rgba(67,97,238,0.08), rgba(67,97,238,0.04))',
+                    border: '1.5px solid rgba(67,97,238,0.25)',
                     borderRadius: '12px',
                     padding: '10px 14px',
                   }}
@@ -310,7 +310,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
             {/* Вопрос */}
             <div
               style={{
-                background: 'linear-gradient(135deg, var(--ink) 0%, #5C4033 100%)',
+                background: 'linear-gradient(135deg, #5E35D6 0%, #4527A0 100%)',
                 borderRadius: '14px',
                 padding: '16px',
                 position: 'relative',
@@ -318,7 +318,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
             >
               <div className="flex items-center justify-between mb-2">
                 <div
-                  style={{ fontFamily: 'var(--font-body)', fontSize: '10px', color: 'var(--parchment-deep)', letterSpacing: '0.1em' }}
+                  style={{ fontFamily: 'var(--font-body)', fontSize: '10px', color: 'rgba(255,255,255,0.6)', letterSpacing: '0.1em' }}
                 >
                   ВОПРОС {questionIndex + 1}
                 </div>
@@ -368,14 +368,14 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     style={{
-                      background: 'rgba(199,91,57,0.1)',
-                      border: '1.5px solid var(--terracotta)',
+                      background: 'rgba(239,68,68,0.08)',
+                      border: '1.5px solid #EF4444',
                       borderRadius: '12px',
                       padding: '12px 16px',
                       textAlign: 'center',
                     }}
                   >
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--terracotta)' }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: '#EF4444' }}>
                       Не удалось проверить ответ. Попробуй ещё раз.
                     </p>
                     <button
@@ -384,7 +384,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                         marginTop: 8,
                         fontFamily: 'var(--font-body)',
                         fontSize: '12px',
-                        color: 'var(--terracotta)',
+                        color: '#EF4444',
                         background: 'none',
                         border: 'none',
                         cursor: 'pointer',

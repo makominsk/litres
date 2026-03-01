@@ -167,7 +167,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
             {/* Score bar */}
             <div
               className="h-3 rounded-full overflow-hidden w-full"
-              style={{ background: 'var(--parchment-deep)' }}
+              style={{ background: 'var(--parchment-dark)' }}
             >
               <motion.div
                 className="h-full rounded-full"
@@ -193,10 +193,10 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                   fontFamily: 'var(--font-body)',
                   fontSize: '14px',
                   fontWeight: 600,
-                  background: 'rgba(201,151,58,0.12)',
-                  border: '1.5px solid rgba(201,151,58,0.4)',
+                  background: 'rgba(255,217,61,0.12)',
+                  border: '1.5px solid rgba(255,217,61,0.4)',
                   borderRadius: '10px',
-                  color: 'var(--gold)',
+                  color: '#D4890A',
                   cursor: 'pointer',
                 }}
               >
@@ -210,7 +210,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                     fontFamily: 'var(--font-body)',
                     fontSize: '14px',
                     fontWeight: 600,
-                    background: 'var(--parchment-dark)',
+                    background: '#FFFFFF',
                     border: '1.5px solid var(--parchment-deep)',
                     borderRadius: '10px',
                     color: 'var(--ink)',
@@ -233,7 +233,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
       <Header />
 
       {/* Progress bar */}
-      <div style={{ background: 'var(--parchment-dark)', borderBottom: '1px solid var(--parchment-deep)' }}>
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid var(--parchment-deep)', boxShadow: '0 1px 4px rgba(94,53,214,0.06)' }}>
         <div className="max-w-lg mx-auto px-4 py-2 flex items-center gap-3">
           <Link href={`/paragraph/${paragraphId}`}
             style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)', fontSize: '12px' }}>
@@ -273,7 +273,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
             {/* Date card (the "question") */}
             <div
               style={{
-                background: 'linear-gradient(135deg, var(--ink) 0%, #5C4033 100%)',
+                background: 'linear-gradient(135deg, #5E35D6 0%, #4527A0 100%)',
                 borderRadius: '16px',
                 padding: '24px 20px',
                 textAlign: 'center',
@@ -282,7 +282,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
               <div style={{
                 fontFamily: 'var(--font-body)',
                 fontSize: '10px',
-                color: 'var(--parchment-deep)',
+                color: 'rgba(255,255,255,0.6)',
                 letterSpacing: '0.12em',
                 marginBottom: 16,
               }}>
@@ -290,12 +290,12 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
               </div>
               <div style={{
                 display: 'inline-block',
-                background: 'rgba(199,91,57,0.25)',
-                border: '1.5px solid rgba(199,91,57,0.5)',
+                background: 'rgba(255,217,61,0.2)',
+                border: '1.5px solid rgba(255,217,61,0.6)',
                 borderRadius: '24px',
                 padding: '10px 24px',
                 fontFamily: 'var(--font-heading)',
-                color: 'var(--terracotta)',
+                color: '#FFD93D',
                 fontSize: '20px',
                 fontWeight: 700,
               }}>
@@ -318,23 +318,26 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
               {q.options.map((option, idx) => {
                 const isSelected = selected === idx
                 const isCorrect = idx === q.correctIndex
-                let bg = 'var(--parchment)'
+                let bg = '#FFFFFF'
                 let border = '1.5px solid var(--parchment-deep)'
                 let color = 'var(--ink)'
                 let icon = ''
 
                 if (answered) {
                   if (isCorrect) {
-                    bg = 'rgba(107,142,35,0.12)'
+                    bg = 'rgba(39,174,96,0.1)'
                     border = '2px solid var(--olive)'
                     color = 'var(--ink)'
                     icon = '✓'
                   } else if (isSelected && !isCorrect) {
-                    bg = 'rgba(199,91,57,0.12)'
-                    border = '2px solid var(--terracotta)'
+                    bg = 'rgba(239,68,68,0.08)'
+                    border = '2px solid #EF4444'
                     color = 'var(--ink-muted)'
                     icon = '✗'
                   }
+                } else if (isSelected) {
+                  bg = 'rgba(67,97,238,0.08)'
+                  border = '2px solid var(--sky)'
                 }
 
                 return (
@@ -365,9 +368,9 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                       background: answered && isCorrect
                         ? 'var(--olive)'
                         : answered && isSelected && !isCorrect
-                          ? 'var(--terracotta)'
+                          ? '#EF4444'
                           : 'var(--parchment-deep)',
-                      color: answered && (isCorrect || (isSelected && !isCorrect)) ? '#FDF6EC' : 'var(--ink-muted)',
+                      color: answered && (isCorrect || (isSelected && !isCorrect)) ? '#FFFFFF' : 'var(--ink-muted)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',

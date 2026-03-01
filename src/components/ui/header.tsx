@@ -8,8 +8,8 @@ export function Header() {
   return (
     <header
       style={{
-        background: 'linear-gradient(to bottom, #3D2B1F, #5C4033)',
-        borderBottom: '2px solid #C75B39',
+        background: 'linear-gradient(to bottom, #4527A0, #5E35D6)',
+        borderBottom: '2px solid #7E57C2',
       }}
       className="sticky top-0 z-50 px-4 py-3"
     >
@@ -19,13 +19,13 @@ export function Header() {
           <span className="text-2xl">🏛️</span>
           <div>
             <div
-              style={{ fontFamily: 'var(--font-heading)', color: '#E8D4BA' }}
+              style={{ fontFamily: 'var(--font-heading)', color: '#FFFFFF' }}
               className="text-sm font-bold leading-tight"
             >
               История
             </div>
             <div
-              style={{ fontFamily: 'var(--font-heading)', color: '#C75B39' }}
+              style={{ fontFamily: 'var(--font-heading)', color: '#FFD93D' }}
               className="text-xs leading-tight"
             >
               Древнего мира
@@ -36,9 +36,9 @@ export function Header() {
         {/* Ученик */}
         {student ? (
           <div className="flex items-center gap-2">
-            <span className="text-lg">📜</span>
+            <span className="text-lg">⭐</span>
             <span
-              style={{ color: '#E8D4BA', fontFamily: 'var(--font-body)' }}
+              style={{ color: '#FFFFFF', fontFamily: 'var(--font-body)' }}
               className="text-sm font-semibold"
             >
               {student.nickname}
@@ -46,7 +46,7 @@ export function Header() {
           </div>
         ) : (
           <div
-            style={{ color: '#8B6F5E', fontFamily: 'var(--font-body)' }}
+            style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'var(--font-body)' }}
             className="text-xs"
           >
             5 класс

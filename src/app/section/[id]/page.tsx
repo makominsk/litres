@@ -11,17 +11,17 @@ import textbook from '@/data/textbook.json'
 const SECTION_META: Record<string, { emoji: string; color: string; description: string }> = {
   'ancient-greece': {
     emoji: '🏛️',
-    color: '#4A7C8E',
+    color: '#5E35D6',
     description: '§1 – §16 · Полисы, войны, олимпийские игры, Александр Македонский',
   },
   'ancient-rome': {
     emoji: '🦅',
-    color: '#8B3A2A',
+    color: '#C62828',
     description: '§17 – §29 · Республика, Пунические войны, Цезарь, Империя',
   },
   'germanic-slavic': {
     emoji: '🌲',
-    color: '#4A6741',
+    color: '#1B6CA8',
     description: '§30 – §31 · Быт племён, обычаи, Великое переселение народов',
   },
 }
@@ -33,7 +33,7 @@ export default function SectionPage({ params }: { params: Promise<{ id: string }
   const section = textbook.sections.find((s) => s.id === id)
   if (!section) notFound()
 
-  const meta = SECTION_META[id] ?? { emoji: '📖', color: '#5C4033', description: '' }
+  const meta = SECTION_META[id] ?? { emoji: '📖', color: '#5E35D6', description: '' }
   const paragraphs = section.paragraphs
     .map((num) => textbook.paragraphs[String(num) as keyof typeof textbook.paragraphs])
     .filter(Boolean)
@@ -49,7 +49,7 @@ export default function SectionPage({ params }: { params: Promise<{ id: string }
       <div
         style={{
           background: `linear-gradient(135deg, ${meta.color}dd 0%, ${meta.color}aa 100%)`,
-          borderBottom: '2px solid rgba(61,43,31,0.15)',
+          borderBottom: '2px solid rgba(255,255,255,0.15)',
         }}
         className="px-4 pt-6 pb-8"
       >
@@ -85,7 +85,7 @@ export default function SectionPage({ params }: { params: Promise<{ id: string }
             <div className="flex items-center gap-3">
               <div
                 className="flex-1 h-2.5 rounded-full overflow-hidden"
-                style={{ background: 'rgba(61,43,31,0.25)' }}
+                style={{ background: 'rgba(255,255,255,0.2)' }}
               >
                 <motion.div
                   className="h-full rounded-full"

@@ -6,6 +6,7 @@ interface MapMarker {
   lat: number
   lng: number
   description: string
+  type?: 'city' | 'battle' | 'site'
 }
 
 interface EventMapProps {
@@ -46,7 +47,35 @@ export function EventMap({ markers }: EventMapProps) {
         maxZoom: 10,
       }).addTo(map)
 
-      const icon = L.divIcon({
+      // Inject label styles once
+      if (!document.getElementById('leaflet-label-style')) {
+        const style = document.createElement('style')
+        style.id = 'leaflet-label-style'
+        style.textContent = `
+          .map-label {
+            background: rgba(253,246,236,0.92) !important;
+            border: 1.5px solid #C75B39 !important;
+            border-radius: 6px !important;
+            color: #3D2B1F !important;
+            font-family: 'PT Serif', serif !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            padding: 2px 7px !important;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.18) !important;
+            white-space: nowrap !important;
+          }
+          .map-label.battle-label {
+            border-color: #8B1A1A !important;
+          }
+          .map-label.site-label {
+            border-color: #5C7A3E !important;
+          }
+          .map-label::before { display: none !important; }
+        `
+        document.head.appendChild(style)
+      }
+
+      const cityIcon = L.divIcon({
         className: '',
         html: `<div style="
           width:28px;height:28px;
@@ -61,10 +90,53 @@ export function EventMap({ markers }: EventMapProps) {
         popupAnchor: [0, -30],
       })
 
+      const battleIcon = L.divIcon({
+        className: '',
+        html: `<div style="
+          width:30px;height:30px;
+          display:flex;align-items:center;justify-content:center;
+          background:#8B1A1A;
+          border:2px solid #FDF6EC;
+          border-radius:4px;
+          transform:rotate(45deg);
+          box-shadow:0 2px 6px rgba(0,0,0,0.4);
+          font-size:13px;line-height:1;
+        "><span style="transform:rotate(-45deg);display:block;">⚔</span></div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+        popupAnchor: [0, -20],
+      })
+
+      const siteIcon = L.divIcon({
+        className: '',
+        html: `<div style="
+          width:26px;height:26px;
+          background:#5C7A3E;
+          border:2px solid #FDF6EC;
+          border-radius:50%;
+          box-shadow:0 2px 6px rgba(0,0,0,0.3);
+        "></div>`,
+        iconSize: [26, 26],
+        iconAnchor: [13, 13],
+        popupAnchor: [0, -18],
+      })
+
       markers.forEach((m) => {
+        const isBattle = m.type === 'battle'
+        const isSite = m.type === 'site'
+        const icon = isBattle ? battleIcon : isSite ? siteIcon : cityIcon
+        const labelClass = isBattle ? 'map-label battle-label' : isSite ? 'map-label site-label' : 'map-label'
+        const typeLabel = isBattle ? ' ⚔' : ''
+
         L.marker([m.lat, m.lng], { icon })
           .addTo(map)
-          .bindPopup(`<strong>${m.name}</strong><br/><span style="font-size:12px">${m.description}</span>`)
+          .bindTooltip(m.name + typeLabel, {
+            permanent: true,
+            direction: 'top',
+            offset: [0, isBattle ? -20 : -30],
+            className: labelClass,
+          })
+          .bindPopup(`<strong>${m.name}</strong>${isBattle ? ' <span style="color:#8B1A1A">⚔ битва</span>' : ''}<br/><span style="font-size:12px">${m.description}</span>`)
       })
 
       mapInstanceRef.current = map

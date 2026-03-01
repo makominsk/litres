@@ -9,7 +9,11 @@ export interface QuizQuestion {
 
 // Clean up PDF-extracted event text
 function cleanEvent(raw: string): string {
-  const s = raw.replace(/^[\s\-–—]+/, '').trim()
+  // Strip PDF artifacts (e.g. "ЂР", "ЂД", "Ђ" followed by letter)
+  const deArtifacted = raw.replace(/Ђ[А-ЯA-Z]?/g, '')
+  const s = deArtifacted.replace(/^[\s\-–—]+/, '').trim()
+  // Must start with a capital letter (real sentence)
+  if (!/^[А-ЯA-ZЁ«"0-9]/.test(s)) return ''
   const dot = s.search(/[.!?]/)
   const clean = dot > 20 && dot < 120 ? s.slice(0, dot + 1) : s.slice(0, 100)
   return clean.trim()
@@ -66,21 +70,43 @@ function getAllEvents(excludeParagraphId?: number): string[] {
   return events
 }
 
+// Get events from an expanding ring of adjacent same-section paragraphs
+// Ring 1 = ±1, Ring 2 = ±2, etc. — stops when we have enough distractors
+function getAdjacentPool(paragraphId: number, correct: string): string[] {
+  const sectionParaIds = getSectionParaIds(paragraphId)
+  const pos = sectionParaIds.indexOf(paragraphId)
+  if (pos === -1) return []
+
+  const collected: string[] = []
+  const seen = new Set<string>([correct])
+
+  for (let radius = 1; radius <= 4; radius++) {
+    const ids = [
+      sectionParaIds[pos - radius],
+      sectionParaIds[pos + radius],
+    ].filter((id): id is number => id !== undefined)
+
+    for (const id of ids) {
+      const para = textbook.paragraphs[String(id) as keyof typeof textbook.paragraphs]
+      if (!para?.dates) continue
+      para.dates.forEach((d: { date: string; event: string }) => {
+        const clean = cleanEvent(d.event)
+        if (clean.length > 20 && !seen.has(clean)) {
+          seen.add(clean)
+          collected.push(clean)
+        }
+      })
+    }
+
+    if (collected.length >= 3) break
+  }
+
+  return collected
+}
+
 export function buildQuiz(paragraphId: number): QuizQuestion[] {
   const p = textbook.paragraphs[String(paragraphId) as keyof typeof textbook.paragraphs]
   if (!p?.dates || p.dates.length < 2) return []
-
-  // Primary: same section (excluding current paragraph)
-  const sectionParaIds = getSectionParaIds(paragraphId)
-  const sectionEvents = getEventsFromParagraphs(sectionParaIds, paragraphId)
-
-  // Fallback: two adjacent paragraphs within the same section
-  const posInSection = sectionParaIds.indexOf(paragraphId)
-  const adjacentIds = [
-    sectionParaIds[posInSection - 1],
-    sectionParaIds[posInSection + 1],
-  ].filter((id): id is number => id !== undefined)
-  const adjacentEvents = getEventsFromParagraphs(adjacentIds)
 
   const questions: QuizQuestion[] = []
 
@@ -88,18 +114,11 @@ export function buildQuiz(paragraphId: number): QuizQuestion[] {
     const correct = cleanEvent(d.event)
     if (correct.length < 20) return
 
-    // Pool: section-first, then adjacent only (no global)
-    const sectionPool = sectionEvents.filter((e) => e !== correct)
-    const adjacentPool = adjacentEvents.filter((e) => e !== correct && !sectionPool.includes(e))
-    const pool = [...shuffle(sectionPool), ...shuffle(adjacentPool)]
+    // Pool: expanding ring of adjacent same-section paragraphs (±1, ±2, ±3, ±4)
+    const pool = shuffle(getAdjacentPool(paragraphId, correct))
 
     // Take 3 unique distractors
-    const distractors: string[] = []
-    for (const e of pool) {
-      if (!distractors.includes(e)) distractors.push(e)
-      if (distractors.length === 3) break
-    }
-
+    const distractors = pool.slice(0, 3)
     if (distractors.length < 3) return
 
     const options = shuffle([correct, ...distractors])

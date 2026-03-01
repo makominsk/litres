@@ -4,7 +4,7 @@ import { SYSTEM_PROMPT } from './prompts'
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!)
 
 export const geminiModel = genAI.getGenerativeModel({
-  model: 'gemini-flash-lite-latest',
+  model: 'gemini-2.5-flash',
   systemInstruction: SYSTEM_PROMPT,
   generationConfig: {
     temperature: 0.7,

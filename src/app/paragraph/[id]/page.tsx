@@ -1,6 +1,6 @@
 'use client'
 import { use, useState } from 'react'
-import { notFound, useRouter } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Header } from '@/components/ui/header'
@@ -40,7 +40,6 @@ const FUN_FACTS: Record<string, string[]> = {
 
 export default function ParagraphPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
-  const router = useRouter()
   const student = useAppStore((s) => s.student)
   const saveAnswer = useAppStore((s) => s.saveAnswer)
 
@@ -155,6 +154,24 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                 <button className="btn-terracotta w-full py-3.5 text-sm font-bold"
                   style={{ fontFamily: 'var(--font-body)' }}>
                   📝 Пройти тест по датам
+                </button>
+              </Link>
+              <Link href={`/paragraph/${paragraphId}/review`}>
+                <button
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    background: 'rgba(74,124,142,0.1)',
+                    border: '1.5px solid rgba(74,124,142,0.35)',
+                    borderRadius: '10px',
+                    color: 'var(--sky)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  🔄 Повторить ошибки
                 </button>
               </Link>
               <Link href={`/section/${sectionId}`}>

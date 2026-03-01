@@ -29,6 +29,7 @@ interface AppState {
     completed: number
     total: number
   }
+  getWrongQuestions: (paragraphId: number) => number[]
 }
 
 export const useAppStore = create<AppState>()(
@@ -61,6 +62,13 @@ export const useAppStore = create<AppState>()(
           correct: paraAnswers.filter((a) => a.isCorrect).length,
           total: paraAnswers.length,
         }
+      },
+
+      getWrongQuestions: (paragraphId) => {
+        const { answers } = get()
+        return answers
+          .filter((a) => a.paragraphId === paragraphId && !a.isCorrect)
+          .map((a) => a.questionIndex)
       },
 
       getSectionProgress: (paragraphIds) => {

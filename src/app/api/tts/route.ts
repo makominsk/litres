@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export const maxDuration = 30
 
-const MAX_TEXT_LENGTH = 800
+const MAX_TEXT_LENGTH = 400
 
 export async function POST(req: NextRequest) {
   try {

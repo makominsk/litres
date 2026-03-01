@@ -32,7 +32,8 @@ export function useAudioPlayer() {
 
       if (!res.ok) throw new Error(`TTS HTTP ${res.status}`)
 
-      const blob = await res.blob()
+      const arrayBuffer = await res.arrayBuffer()
+      const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' })
       const blobUrl = URL.createObjectURL(blob)
       blobUrlRef.current = blobUrl
 

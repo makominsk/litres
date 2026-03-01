@@ -1,4 +1,5 @@
 'use client'
+import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useAudioPlayer } from '@/hooks/use-audio-player'
 
@@ -19,6 +20,14 @@ interface ExplanationCardProps {
 
 export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps) {
   const { play, isPlaying, isLoading } = useAudioPlayer()
+  const didAutoPlay = useRef(false)
+
+  useEffect(() => {
+    if (didAutoPlay.current) return
+    didAutoPlay.current = true
+    play(result.explanation)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const scoreColor =
     result.score >= 80 ? 'var(--olive)' :

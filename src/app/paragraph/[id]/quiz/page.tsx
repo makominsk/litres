@@ -239,28 +239,19 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                 fontSize: '10px',
                 color: 'var(--parchment-deep)',
                 letterSpacing: '0.12em',
-                marginBottom: 10,
-              }}>
-                📅 КОГДА ЭТО ПРОИЗОШЛО?
-              </div>
-              <p style={{
-                fontFamily: 'var(--font-heading)',
-                color: '#FDF6EC',
-                fontSize: '14px',
-                lineHeight: 1.6,
                 marginBottom: 16,
               }}>
-                {q.correctEvent}
-              </p>
+                📅 ЧТО ПРОИЗОШЛО В ЭТУ ДАТУ?
+              </div>
               <div style={{
                 display: 'inline-block',
                 background: 'rgba(199,91,57,0.25)',
                 border: '1.5px solid rgba(199,91,57,0.5)',
                 borderRadius: '24px',
-                padding: '6px 18px',
+                padding: '10px 24px',
                 fontFamily: 'var(--font-heading)',
                 color: 'var(--terracotta)',
-                fontSize: '13px',
+                fontSize: '20px',
                 fontWeight: 700,
               }}>
                 {q.date}
@@ -274,7 +265,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
               fontSize: '12px',
               textAlign: 'center',
             }}>
-              Выбери правильное описание события:
+              Выбери, что произошло в эту дату:
             </p>
 
             {/* Options */}

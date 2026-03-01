@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export const maxDuration = 30
+// Edge runtime: no 10-second timeout — streams audio directly from OpenAI to client
+export const runtime = 'edge'
 
-const MAX_TEXT_LENGTH = 400
+const MAX_TEXT_LENGTH = 600
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,9 +34,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'TTS generation failed' }, { status: 500 })
     }
 
-    const audioBuffer = await ttsRes.arrayBuffer()
-
-    return new NextResponse(audioBuffer, {
+    // Pipe OpenAI stream directly to client — no buffering, no timeout
+    return new Response(ttsRes.body, {
       headers: {
         'Content-Type': 'audio/mpeg',
         'Cache-Control': 'public, max-age=3600',

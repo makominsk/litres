@@ -74,10 +74,12 @@ export function buildQuiz(paragraphId: number): QuizQuestion[] {
   const sectionParaIds = getSectionParaIds(paragraphId)
   const sectionEvents = getEventsFromParagraphs(sectionParaIds, paragraphId)
 
-  // Fallback: only two adjacent paragraphs (prev and next)
-  const adjacentIds = [paragraphId - 1, paragraphId + 1].filter(
-    (id) => id >= 1 && id <= 31 && !sectionParaIds.includes(id)
-  )
+  // Fallback: two adjacent paragraphs within the same section
+  const posInSection = sectionParaIds.indexOf(paragraphId)
+  const adjacentIds = [
+    sectionParaIds[posInSection - 1],
+    sectionParaIds[posInSection + 1],
+  ].filter((id): id is number => id !== undefined)
   const adjacentEvents = getEventsFromParagraphs(adjacentIds)
 
   const questions: QuizQuestion[] = []

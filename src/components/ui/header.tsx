@@ -7,49 +7,77 @@ export function Header() {
 
   return (
     <header
-      style={{
-        background: 'linear-gradient(to bottom, #3D2B1F, #5C4033)',
-        borderBottom: '2px solid #C75B39',
-      }}
       className="sticky top-0 z-50 px-4 py-3"
+      style={{
+        background: 'linear-gradient(135deg, #1B2A4A 0%, #2A3D66 100%)',
+        borderBottom: '3px solid var(--amber)',
+      }}
     >
       <div className="max-w-4xl mx-auto flex items-center justify-between">
-        {/* Логотип */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <span className="text-2xl">🏛️</span>
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-lg"
+            style={{
+              background: 'var(--amber)',
+              boxShadow: '0 2px 8px rgba(245,166,35,0.3)',
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B2A4A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12,6 12,12 16,14"/>
+            </svg>
+          </div>
           <div>
             <div
-              style={{ fontFamily: 'var(--font-heading)', color: '#E8D4BA' }}
-              className="text-sm font-bold leading-tight"
+              className="text-sm font-extrabold leading-tight tracking-tight"
+              style={{ color: '#FFFFFF' }}
             >
-              История
+              ИстoriКвест
             </div>
             <div
-              style={{ fontFamily: 'var(--font-heading)', color: '#C75B39' }}
-              className="text-xs leading-tight"
+              className="text-[10px] font-bold leading-tight"
+              style={{ color: 'var(--amber)' }}
             >
-              Древнего мира
+              5 класс
             </div>
           </div>
         </Link>
 
-        {/* Ученик */}
+        {/* Student */}
         {student ? (
-          <div className="flex items-center gap-2">
-            <span className="text-lg">📜</span>
+          <div
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+            style={{
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.15)',
+            }}
+          >
+            <div
+              className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+              style={{
+                background: 'var(--amber)',
+                color: 'var(--navy)',
+              }}
+            >
+              {student.nickname.charAt(0).toUpperCase()}
+            </div>
             <span
-              style={{ color: '#E8D4BA', fontFamily: 'var(--font-body)' }}
-              className="text-sm font-semibold"
+              className="text-xs font-bold"
+              style={{ color: '#FFFFFF' }}
             >
               {student.nickname}
             </span>
           </div>
         ) : (
           <div
-            style={{ color: '#8B6F5E', fontFamily: 'var(--font-body)' }}
-            className="text-xs"
+            className="text-xs font-semibold px-3 py-1 rounded-full"
+            style={{
+              color: 'rgba(255,255,255,0.5)',
+              background: 'rgba(255,255,255,0.05)',
+            }}
           >
-            5 класс
+            История Древнего мира
           </div>
         )}
       </div>

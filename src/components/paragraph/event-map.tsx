@@ -19,11 +19,9 @@ export function EventMap({ markers }: EventMapProps) {
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current || markers.length === 0) return
 
-    // Динамический импорт leaflet (избегаем SSR проблем)
     import('leaflet').then((L) => {
       if (!mapRef.current || mapInstanceRef.current) return
 
-      // Стиль карты
       const link = document.createElement('link')
       link.rel = 'stylesheet'
       link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
@@ -42,7 +40,7 @@ export function EventMap({ markers }: EventMapProps) {
       })
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap',
+        attribution: '\u00a9 OpenStreetMap',
         maxZoom: 10,
       }).addTo(map)
 
@@ -50,11 +48,11 @@ export function EventMap({ markers }: EventMapProps) {
         className: '',
         html: `<div style="
           width:28px;height:28px;
-          background:#C75B39;
-          border:2px solid #FDF6EC;
+          background:#1B2A4A;
+          border:3px solid #F5A623;
           border-radius:50% 50% 50% 0;
           transform:rotate(-45deg);
-          box-shadow:0 2px 6px rgba(0,0,0,0.3);
+          box-shadow:0 2px 8px rgba(0,0,0,0.25);
         "></div>`,
         iconSize: [28, 28],
         iconAnchor: [14, 28],
@@ -82,24 +80,26 @@ export function EventMap({ markers }: EventMapProps) {
 
   return (
     <div
+      className="rounded-2xl overflow-hidden"
       style={{
-        borderRadius: '12px',
-        overflow: 'hidden',
-        border: '1.5px solid var(--parchment-deep)',
-        boxShadow: '0 2px 8px rgba(61,43,31,0.1)',
+        border: '1.5px solid var(--cream-deep)',
+        boxShadow: '0 2px 12px rgba(27,42,74,0.06)',
       }}
     >
       <div
+        className="px-4 py-2.5 flex items-center gap-2"
         style={{
-          background: 'var(--parchment-dark)',
-          padding: '8px 12px',
-          borderBottom: '1px solid var(--parchment-deep)',
-          fontFamily: 'var(--font-body)',
-          fontSize: '11px',
-          color: 'var(--ink-muted)',
+          background: '#FFFFFF',
+          borderBottom: '1px solid var(--cream-deep)',
         }}
       >
-        🗺️ Карта событий параграфа
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+          <circle cx="12" cy="10" r="3" />
+        </svg>
+        <span className="text-xs font-bold" style={{ color: 'var(--navy)' }}>
+          {'Карта событий'}
+        </span>
       </div>
       <div ref={mapRef} style={{ height: '220px', width: '100%' }} />
     </div>

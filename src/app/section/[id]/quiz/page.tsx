@@ -26,10 +26,10 @@ interface QuizItem {
   question: string
 }
 
-const SECTION_META: Record<string, { emoji: string; color: string; name: string }> = {
-  'ancient-greece': { emoji: '🏛️', color: '#4A7C8E', name: 'Древняя Греция' },
-  'ancient-rome': { emoji: '🦅', color: '#8B3A2A', name: 'Древний Рим' },
-  'germanic-slavic': { emoji: '🌲', color: '#4A6741', name: 'Германцы и славяне' },
+const SECTION_META: Record<string, { color: string; name: string }> = {
+  'ancient-greece': { color: '#2563EB', name: 'Древняя Греция' },
+  'ancient-rome': { color: '#DC2626', name: 'Древний Рим' },
+  'germanic-slavic': { color: '#059669', name: 'Германцы и славяне' },
 }
 
 function shuffleArray<T>(arr: T[]): T[] {
@@ -46,7 +46,6 @@ function buildSectionQuiz(sectionId: string, paragraphIds: number[]): QuizItem[]
   paragraphIds.forEach((pid) => {
     const para = textbook.paragraphs[String(pid) as keyof typeof textbook.paragraphs]
     if (!para) return
-    // Take up to 2 questions per paragraph
     para.questions.slice(0, 2).forEach((q, qi) => {
       items.push({
         paragraphId: pid,
@@ -57,14 +56,13 @@ function buildSectionQuiz(sectionId: string, paragraphIds: number[]): QuizItem[]
       })
     })
   })
-  // Shuffle and limit to 10 questions for a manageable quiz
   return shuffleArray(items).slice(0, 10)
 }
 
-function getMedalInfo(score: number): { emoji: string; label: string; color: string } {
-  if (score >= 90) return { emoji: '🥇', label: 'Отлично!', color: 'var(--gold)' }
-  if (score >= 60) return { emoji: '🥈', label: 'Хорошо!', color: '#9CA3AF' }
-  return { emoji: '🥉', label: 'Продолжай учиться!', color: '#CD7F32' }
+function getMedalInfo(score: number): { label: string; color: string; iconColor: string } {
+  if (score >= 90) return { label: 'Отлично!', color: '#D97706', iconColor: '#F5A623' }
+  if (score >= 60) return { label: 'Хорошо!', color: '#6B7280', iconColor: '#9CA3AF' }
+  return { label: 'Продолжай!', color: '#B45309', iconColor: '#D97706' }
 }
 
 export default function SectionQuizPage({ params }: { params: Promise<{ id: string }> }) {
@@ -74,7 +72,7 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
   const section = textbook.sections.find((s) => s.id === id)
   if (!section) notFound()
 
-  const meta = SECTION_META[id] ?? { emoji: '📖', color: '#5C4033', name: section.title }
+  const meta = SECTION_META[id] ?? { color: '#6B7280', name: section.title }
 
   const [questions] = useState<QuizItem[]>(() => buildSectionQuiz(id, section.paragraphs))
   const [current, setCurrent] = useState(0)
@@ -135,58 +133,43 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
     }
   }
 
-  // ─── Done screen ─────────────────────────────────────────────
+  // Done screen
   if (done) {
     return (
-      <div className="min-h-dvh flex flex-col">
+      <div className="min-h-dvh flex flex-col" style={{ background: 'var(--cream)' }}>
         <Header />
         <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 max-w-lg mx-auto w-full text-center">
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', duration: 0.6 }}
-            className="space-y-5"
+            className="flex flex-col gap-5 w-full"
           >
-            <motion.div
-              animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-              style={{ fontSize: 72 }}
+            <div
+              className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto"
+              style={{ background: `${medal.iconColor}18`, border: `2px solid ${medal.iconColor}33` }}
             >
-              {medal.emoji}
-            </motion.div>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill={medal.iconColor} aria-hidden="true">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+            </div>
 
             <div>
-              <h1 style={{
-                fontFamily: 'var(--font-heading)',
-                color: medal.color,
-                fontSize: 26,
-                fontWeight: 800,
-              }}>
+              <h1 className="text-2xl font-extrabold" style={{ color: medal.color }}>
                 {medal.label}
               </h1>
-              <p style={{
-                color: 'var(--ink-muted)',
-                fontFamily: 'var(--font-body)',
-                fontSize: 14,
-                marginTop: 6,
-              }}>
-                {meta.emoji} {meta.name}
+              <p className="text-sm mt-1" style={{ color: 'var(--ink-muted)' }}>
+                {meta.name}
               </p>
-              <p style={{
-                color: 'var(--ink-muted)',
-                fontFamily: 'var(--font-body)',
-                fontSize: 13,
-                marginTop: 4,
-              }}>
-                {correctCount} из {questions.length} верных ответов ({score}%)
+              <p className="text-sm mt-1" style={{ color: 'var(--ink-muted)' }}>
+                {correctCount}{' из '}{questions.length}{' верных ('}{score}{'%)'}
               </p>
             </div>
 
-            {/* Score bar */}
-            <div className="h-3 rounded-full overflow-hidden w-full" style={{ background: 'var(--parchment-deep)' }}>
+            <div className="h-3 rounded-full overflow-hidden w-full" style={{ background: 'var(--cream-dark)' }}>
               <motion.div
                 className="h-full rounded-full"
-                style={{ background: medal.color }}
+                style={{ background: medal.iconColor }}
                 initial={{ width: 0 }}
                 animate={{ width: `${score}%` }}
                 transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -194,15 +177,32 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
             </div>
 
             {/* Results breakdown */}
-            <div className="parchment-card p-4 text-left space-y-2">
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--ink-muted)', fontWeight: 700, letterSpacing: '0.08em' }}>
-                ИТОГ ПО ВОПРОСАМ
+            <div className="glass-card p-4 text-left flex flex-col gap-2">
+              <p className="text-[11px] font-bold tracking-wider" style={{ color: 'var(--ink-muted)' }}>
+                {'ИТОГ ПО ВОПРОСАМ'}
               </p>
               {questions.map((item, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <span style={{ fontSize: 12 }}>{i < correctCount ? '✅' : '❌'}</span>
-                  <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--ink-muted)' }}>
-                    §{item.paragraphId} — {item.question.slice(0, 50)}{item.question.length > 50 ? '...' : ''}
+                  <div
+                    className="w-5 h-5 rounded-md flex items-center justify-center shrink-0"
+                    style={{
+                      background: i < correctCount ? 'rgba(45,212,168,0.1)' : 'rgba(255,107,107,0.08)',
+                      color: i < correctCount ? 'var(--teal)' : 'var(--coral)',
+                    }}
+                  >
+                    {i < correctCount ? (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <polyline points="20,6 9,17 4,12" />
+                      </svg>
+                    ) : (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    )}
+                  </div>
+                  <span className="text-[11px]" style={{ color: 'var(--ink-muted)' }}>
+                    {'\u00a7'}{item.paragraphId}{' \u2014 '}{item.question.slice(0, 50)}{item.question.length > 50 ? '...' : ''}
                   </span>
                 </div>
               ))}
@@ -210,25 +210,21 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
 
             <div className="flex flex-col gap-3 w-full pt-1">
               <Link href={`/section/${id}`}>
-                <button className="btn-terracotta w-full py-3.5 text-sm font-bold"
-                  style={{ fontFamily: 'var(--font-body)' }}>
-                  ← Вернуться к разделу
+                <button className="btn-primary w-full py-3.5 text-sm">
+                  {'Вернуться к разделу'}
                 </button>
               </Link>
               <Link href="/">
-                <button style={{
-                  width: '100%',
-                  padding: '12px',
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  background: 'var(--parchment-dark)',
-                  border: '1.5px solid var(--parchment-deep)',
-                  borderRadius: '10px',
-                  color: 'var(--ink)',
-                  cursor: 'pointer',
-                }}>
-                  На главную
+                <button
+                  className="w-full py-3 text-sm font-bold rounded-xl"
+                  style={{
+                    background: 'var(--cream-dark)',
+                    border: '1.5px solid var(--cream-deep)',
+                    color: 'var(--ink)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {'На главную'}
                 </button>
               </Link>
             </div>
@@ -238,33 +234,33 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
     )
   }
 
-  // ─── Quiz screen ─────────────────────────────────────────────
+  // Quiz screen
   return (
-    <div className="min-h-dvh flex flex-col">
+    <div className="min-h-dvh flex flex-col" style={{ background: 'var(--cream)' }}>
       <Header />
 
       {/* Progress bar */}
-      <div
-        style={{
-          background: `linear-gradient(to right, ${meta.color}22, ${meta.color}11)`,
-          borderBottom: `1px solid ${meta.color}44`,
-        }}
-      >
-        <div className="max-w-2xl mx-auto px-4 py-2 flex items-center gap-3">
-          <Link href={`/section/${id}`}
-            style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)', fontSize: '12px' }}>
-            ←
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid var(--cream-deep)' }}>
+        <div className="max-w-2xl mx-auto px-4 py-2.5 flex items-center gap-3">
+          <Link
+            href={`/section/${id}`}
+            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{ background: 'var(--cream)', color: 'var(--ink-muted)' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
           </Link>
           <div className="flex-1">
             <div className="flex justify-between items-center mb-1">
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)' }}>
-                {meta.emoji} Обобщающий тест · {current + 1} / {questions.length}
+              <span className="text-xs font-semibold" style={{ color: 'var(--ink-muted)' }}>
+                {'Обобщающий тест \u00b7 '}{current + 1}{' / '}{questions.length}
               </span>
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)' }}>
-                ✓ {correctCount}
+              <span className="text-xs font-bold" style={{ color: 'var(--teal)' }}>
+                {correctCount}{' верно'}
               </span>
             </div>
-            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--parchment-deep)' }}>
+            <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--cream)' }}>
               <motion.div
                 className="h-full rounded-full"
                 style={{ background: meta.color }}
@@ -276,7 +272,7 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
         </div>
       </div>
 
-      <main className="flex-1 px-4 py-5 max-w-2xl mx-auto w-full space-y-4">
+      <main className="flex-1 px-4 py-5 max-w-2xl mx-auto w-full flex flex-col gap-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={current}
@@ -284,50 +280,38 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
             transition={{ duration: 0.3 }}
-            className="space-y-4"
+            className="flex flex-col gap-4"
           >
-            {/* Source paragraph badge */}
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              background: `${meta.color}18`,
-              border: `1px solid ${meta.color}40`,
-              borderRadius: 20,
-              padding: '4px 12px',
-            }}>
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: meta.color, fontWeight: 700 }}>
-                §{q.paragraphId} · {q.paragraphTitle}
+            {/* Source badge */}
+            <div
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full self-start"
+              style={{
+                background: `${meta.color}10`,
+                border: `1px solid ${meta.color}30`,
+              }}
+            >
+              <span className="text-[11px] font-bold" style={{ color: meta.color }}>
+                {'\u00a7'}{q.paragraphId}{' \u00b7 '}{q.paragraphTitle}
               </span>
             </div>
 
             {/* Question card */}
-            <div style={{
-              background: `linear-gradient(135deg, ${meta.color} 0%, ${meta.color}cc 100%)`,
-              borderRadius: '14px',
-              padding: '16px',
-            }}>
-              <div style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '10px',
-                color: 'rgba(253,246,236,0.7)',
-                letterSpacing: '0.1em',
-                marginBottom: 8,
-              }}>
-                ВОПРОС {current + 1}
+            <div
+              className="rounded-2xl p-5"
+              style={{
+                background: `linear-gradient(135deg, ${meta.color} 0%, ${meta.color}dd 100%)`,
+              }}
+            >
+              <div className="text-[10px] font-bold tracking-widest mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                {'ВОПРОС '}{current + 1}
               </div>
-              <p style={{
-                fontFamily: 'var(--font-heading)',
-                color: '#FDF6EC',
-                fontSize: '15px',
-                lineHeight: 1.6,
-              }}>
+              <p className="text-[15px] leading-relaxed font-semibold" style={{ color: '#FFFFFF' }}>
                 {q.question}
               </p>
             </div>
 
             {!result && (
-              <div className="space-y-3">
+              <div className="flex flex-col gap-3">
                 <VoiceInput onSubmit={handleAnswerSubmit} disabled={isEvaluating} />
 
                 {isEvaluating && (
@@ -336,9 +320,15 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
                     animate={{ opacity: 1 }}
                     className="text-center py-4"
                   >
-                    <div style={{ fontSize: 28 }}>🤔</div>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink-muted)', marginTop: 8 }}>
-                      Проверяю твой ответ...
+                    <div className="w-12 h-12 rounded-2xl mx-auto mb-2 flex items-center justify-center animate-pulse"
+                      style={{ background: 'rgba(245,166,35,0.1)' }}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 6v6l4 2" />
+                      </svg>
+                    </div>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--ink-muted)' }}>
+                      {'Проверяю твой ответ...'}
                     </p>
                   </motion.div>
                 )}

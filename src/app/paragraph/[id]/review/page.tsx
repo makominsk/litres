@@ -39,29 +39,32 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [isEvaluating, setIsEvaluating] = useState(false)
   const [done, setDone] = useState(false)
 
-  // No wrong answers — nothing to review
+  // No wrong answers
   if (reviewQuestions.length === 0) {
     return (
-      <div className="min-h-dvh flex flex-col">
+      <div className="min-h-dvh flex flex-col" style={{ background: 'var(--cream)' }}>
         <Header />
         <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 max-w-lg mx-auto w-full text-center">
-          <div style={{ fontSize: 56 }} className="mb-4">🌿</div>
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+            style={{ background: 'rgba(45,212,168,0.1)' }}
+          >
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polyline points="20,6 9,17 4,12" />
+            </svg>
+          </div>
           <h1
-            style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}
-            className="text-xl font-bold mb-2"
+            className="text-xl font-extrabold mb-2"
+            style={{ color: 'var(--navy)' }}
           >
-            Ошибок нет!
+            {'Ошибок нет!'}
           </h1>
-          <p
-            style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)' }}
-            className="text-sm mb-6"
-          >
-            Ты ответил правильно на все вопросы этого параграфа.
+          <p className="text-sm mb-6" style={{ color: 'var(--ink-muted)' }}>
+            {'Ты ответил правильно на все вопросы этого параграфа.'}
           </p>
           <Link href={`/paragraph/${paragraphId}`}>
-            <button className="btn-terracotta px-8 py-3 text-sm font-bold"
-              style={{ fontFamily: 'var(--font-body)' }}>
-              ← Назад к параграфу
+            <button className="btn-primary px-8 py-3 text-sm">
+              {'Назад к параграфу'}
             </button>
           </Link>
         </main>
@@ -130,45 +133,50 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   // Done screen
   if (done) {
     return (
-      <div className="min-h-dvh flex flex-col">
+      <div className="min-h-dvh flex flex-col" style={{ background: 'var(--cream)' }}>
         <Header />
         <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 max-w-lg mx-auto w-full text-center">
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', duration: 0.6 }}
-            className="space-y-5"
+            className="flex flex-col gap-5 w-full"
           >
-            <div style={{ fontSize: 64 }}>🔄</div>
-            <h1 style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)', fontSize: 22, fontWeight: 800 }}>
-              Повторение завершено!
+            <div
+              className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto"
+              style={{
+                background: 'rgba(37,99,235,0.08)',
+                border: '2px solid rgba(37,99,235,0.15)',
+              }}
+            >
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="23,4 23,10 17,10" />
+                <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" />
+              </svg>
+            </div>
+            <h1 className="text-xl font-extrabold" style={{ color: 'var(--navy)' }}>
+              {'Повторение завершено!'}
             </h1>
-            <p style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)', fontSize: 14 }}>
-              Повторил {reviewQuestions.length} {reviewQuestions.length === 1 ? 'вопрос' : 'вопроса'}
+            <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>
+              {'Повторил '}{reviewQuestions.length}{reviewQuestions.length === 1 ? ' вопрос' : ' вопроса'}
             </p>
             <div className="flex flex-col gap-3 w-full pt-2">
               <Link href={`/paragraph/${paragraphId}/quiz`}>
-                <button className="btn-terracotta w-full py-3.5 text-sm font-bold"
-                  style={{ fontFamily: 'var(--font-body)' }}>
-                  📝 Тест по датам
+                <button className="btn-primary w-full py-3.5 text-sm">
+                  {'Тест по датам'}
                 </button>
               </Link>
               <Link href={`/paragraph/${paragraphId}`}>
                 <button
+                  className="w-full py-3 text-sm font-bold rounded-xl"
                   style={{
-                    width: '100%',
-                    padding: '12px',
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    background: 'var(--parchment-dark)',
-                    border: '1.5px solid var(--parchment-deep)',
-                    borderRadius: '10px',
+                    background: 'var(--cream-dark)',
+                    border: '1.5px solid var(--cream-deep)',
                     color: 'var(--ink)',
                     cursor: 'pointer',
                   }}
                 >
-                  ← Назад к параграфу
+                  {'Назад к параграфу'}
                 </button>
               </Link>
             </div>
@@ -179,26 +187,31 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   }
 
   return (
-    <div className="min-h-dvh flex flex-col">
+    <div className="min-h-dvh flex flex-col" style={{ background: 'var(--cream)' }}>
       <Header />
 
       {/* Progress */}
-      <div style={{ background: 'var(--parchment-dark)', borderBottom: '1px solid var(--parchment-deep)' }}>
-        <div className="max-w-lg mx-auto px-4 py-2 flex items-center gap-3">
-          <Link href={`/paragraph/${paragraphId}`}
-            style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)', fontSize: '12px' }}>
-            ←
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid var(--cream-deep)' }}>
+        <div className="max-w-lg mx-auto px-4 py-2.5 flex items-center gap-3">
+          <Link
+            href={`/paragraph/${paragraphId}`}
+            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{ background: 'var(--cream)', color: 'var(--ink-muted)' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
           </Link>
           <div className="flex-1">
             <div className="flex justify-between items-center mb-1">
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)' }}>
-                🔄 Повторение ошибок · {current + 1} / {reviewQuestions.length}
+              <span className="text-xs font-semibold" style={{ color: 'var(--ink-muted)' }}>
+                {'Повторение \u00b7 '}{current + 1}{' / '}{reviewQuestions.length}
               </span>
             </div>
-            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--parchment-deep)' }}>
+            <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--cream)' }}>
               <motion.div
                 className="h-full rounded-full"
-                style={{ background: 'var(--sky)' }}
+                style={{ background: '#2563EB' }}
                 animate={{ width: `${((current + (result ? 1 : 0)) / reviewQuestions.length) * 100}%` }}
                 transition={{ duration: 0.4 }}
               />
@@ -207,32 +220,26 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         </div>
       </div>
 
-      <main className="flex-1 px-4 py-5 max-w-lg mx-auto w-full space-y-4">
+      <main className="flex-1 px-4 py-5 max-w-lg mx-auto w-full flex flex-col gap-4">
         {/* Paragraph context */}
         <div
-          className="parchment-card p-3"
-          style={{ display: 'flex', alignItems: 'center', gap: 10 }}
+          className="glass-card p-3 flex items-center gap-3"
         >
-          <div style={{
-            background: 'var(--sky)',
-            color: '#FDF6EC',
-            borderRadius: '50%',
-            width: 32,
-            height: 32,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 14,
-            flexShrink: 0,
-          }}>
-            🔄
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+            style={{ background: 'rgba(37,99,235,0.08)', color: '#2563EB' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polyline points="23,4 23,10 17,10" />
+              <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" />
+            </svg>
           </div>
           <div>
-            <p style={{ fontFamily: 'var(--font-body)', color: 'var(--ink)', fontSize: 12, fontWeight: 600 }}>
-              §{paragraphId} · {para.title}
+            <p className="text-xs font-bold" style={{ color: 'var(--ink)' }}>
+              {'\u00a7'}{paragraphId}{' \u00b7 '}{para.title}
             </p>
-            <p style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-muted)', fontSize: 11 }}>
-              Работаем над ошибками
+            <p className="text-[11px]" style={{ color: 'var(--ink-muted)' }}>
+              {'Работаем над ошибками'}
             </p>
           </div>
         </div>
@@ -244,35 +251,25 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
             transition={{ duration: 0.3 }}
-            className="space-y-4"
+            className="flex flex-col gap-4"
           >
             {/* Question */}
-            <div style={{
-              background: 'linear-gradient(135deg, var(--sky) 0%, #3a7a8f 100%)',
-              borderRadius: '14px',
-              padding: '16px',
-            }}>
-              <div style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '10px',
-                color: 'rgba(253,246,236,0.7)',
-                letterSpacing: '0.1em',
-                marginBottom: 8,
-              }}>
-                ВОПРОС {currentQ.idx + 1} (ПОВТОРЕНИЕ)
+            <div
+              className="rounded-2xl p-5"
+              style={{
+                background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
+              }}
+            >
+              <div className="text-[10px] font-bold tracking-widest mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                {'ВОПРОС '}{currentQ.idx + 1}{' (ПОВТОРЕНИЕ)'}
               </div>
-              <p style={{
-                fontFamily: 'var(--font-heading)',
-                color: '#FDF6EC',
-                fontSize: '15px',
-                lineHeight: 1.6,
-              }}>
+              <p className="text-[15px] leading-relaxed font-semibold" style={{ color: '#FFFFFF' }}>
                 {currentQ.question}
               </p>
             </div>
 
             {!result && (
-              <div className="space-y-3">
+              <div className="flex flex-col gap-3">
                 <VoiceInput onSubmit={handleAnswerSubmit} disabled={isEvaluating} />
 
                 {isEvaluating && (
@@ -281,9 +278,15 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     animate={{ opacity: 1 }}
                     className="text-center py-4"
                   >
-                    <div style={{ fontSize: 28 }}>🤔</div>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink-muted)', marginTop: 8 }}>
-                      Проверяю твой ответ...
+                    <div className="w-12 h-12 rounded-2xl mx-auto mb-2 flex items-center justify-center animate-pulse"
+                      style={{ background: 'rgba(245,166,35,0.1)' }}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 6v6l4 2" />
+                      </svg>
+                    </div>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--ink-muted)' }}>
+                      {'Проверяю твой ответ...'}
                     </p>
                   </motion.div>
                 )}

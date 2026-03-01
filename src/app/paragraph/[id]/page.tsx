@@ -51,7 +51,6 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
 
   const answers = useAppStore((s) => s.answers)
 
-  // Начинаем с первого неотвеченного вопроса
   const answeredIndices = new Set(
     answers.filter((a) => a.paragraphId === paragraphId).map((a) => a.questionIndex)
   )
@@ -96,7 +95,6 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
       const data: EvaluateResult = await res.json()
       setResult(data)
 
-      // Сохраняем прогресс
       saveAnswer({
         paragraphId,
         questionIndex,
@@ -104,7 +102,6 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
         hintLevel,
       })
 
-      // Сохраняем в Supabase если есть ученик
       if (student) {
         fetch('/api/progress', {
           method: 'POST',
@@ -141,73 +138,76 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
     }
   }
 
-  // Экран завершения
+  // Completion screen
   if (done) {
     return (
-      <div className="min-h-dvh flex flex-col">
+      <div className="min-h-dvh flex flex-col" style={{ background: 'var(--cream)' }}>
         <Header />
         <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 max-w-lg mx-auto w-full text-center">
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', duration: 0.6 }}
-            className="space-y-6"
+            className="flex flex-col gap-5"
           >
-            <div style={{ fontSize: 72 }}>🎉</div>
-            <h1
-              style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}
-              className="text-2xl font-bold"
+            <div
+              className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto"
+              style={{
+                background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%)',
+                boxShadow: '0 8px 32px rgba(45,212,168,0.3)',
+              }}
             >
-              Параграф пройден!
-            </h1>
-            <p
-              style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)' }}
-              className="text-sm"
-            >
-              §{paragraphId} · {para.title}
-            </p>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="20,6 9,17 4,12" />
+              </svg>
+            </div>
+            <div>
+              <h1
+                className="text-2xl font-extrabold"
+                style={{ color: 'var(--navy)' }}
+              >
+                {'Параграф пройден!'}
+              </h1>
+              <p
+                className="text-sm mt-1"
+                style={{ color: 'var(--ink-muted)' }}
+              >
+                {'\u00a7'}{paragraphId} {'\u00b7'} {para.title}
+              </p>
+            </div>
 
             <div className="grid grid-cols-2 gap-3 w-full">
               <Link href={`/paragraph/${paragraphId}/quiz`} className="col-span-2">
-                <button className="btn-terracotta w-full py-3.5 text-sm font-bold"
-                  style={{ fontFamily: 'var(--font-body)' }}>
-                  📝 Тест по датам
+                <button className="btn-primary w-full py-3.5 text-sm flex items-center justify-center gap-2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                    <polyline points="14,2 14,8 20,8" />
+                  </svg>
+                  {'Тест по датам'}
                 </button>
               </Link>
               <Link href={`/paragraph/${paragraphId}/review`}>
                 <button
+                  className="w-full py-3 text-xs font-bold rounded-xl transition-all"
                   style={{
-                    width: '100%',
-                    padding: '12px',
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    background: 'rgba(74,124,142,0.1)',
-                    border: '1.5px solid rgba(74,124,142,0.35)',
-                    borderRadius: '10px',
-                    color: 'var(--sky)',
-                    cursor: 'pointer',
+                    background: 'rgba(37,99,235,0.08)',
+                    border: '1.5px solid rgba(37,99,235,0.2)',
+                    color: '#2563EB',
                   }}
                 >
-                  🔄 Ошибки
+                  {'Ошибки'}
                 </button>
               </Link>
               <Link href={`/section/${sectionId}`}>
                 <button
+                  className="w-full py-3 text-xs font-bold rounded-xl transition-all"
                   style={{
-                    width: '100%',
-                    padding: '12px',
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    background: 'var(--parchment-dark)',
-                    border: '1.5px solid var(--parchment-deep)',
-                    borderRadius: '10px',
+                    background: 'var(--cream-dark)',
+                    border: '1.5px solid var(--cream-deep)',
                     color: 'var(--ink)',
-                    cursor: 'pointer',
                   }}
                 >
-                  ← Раздел
+                  {'К разделу'}
                 </button>
               </Link>
             </div>
@@ -218,33 +218,34 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
   }
 
   return (
-    <div className="min-h-dvh flex flex-col">
+    <div className="min-h-dvh flex flex-col" style={{ background: 'var(--cream)' }}>
       <Header />
 
-      {/* Прогресс параграфа */}
-      <div style={{ background: 'var(--parchment-dark)', borderBottom: '1px solid var(--parchment-deep)' }}>
-        <div className="max-w-2xl mx-auto px-4 py-2 flex items-center gap-3">
+      {/* Progress bar */}
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid var(--cream-deep)' }}>
+        <div className="max-w-2xl mx-auto px-4 py-2.5 flex items-center gap-3">
           <Link
             href={`/section/${sectionId}`}
-            style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)', fontSize: '12px' }}
+            className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
+            style={{ background: 'var(--cream)', color: 'var(--ink-muted)' }}
           >
-            ←
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
           </Link>
           <div className="flex-1">
             <div className="flex justify-between items-center mb-1">
-              <span
-                style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)' }}
-              >
-                §{paragraphId} · Вопрос {questionIndex + 1} из {questions.length}
+              <span className="text-xs font-semibold" style={{ color: 'var(--ink-muted)' }}>
+                {'\u00a7'}{paragraphId} {'\u00b7'} {'Вопрос '}{questionIndex + 1}{' из '}{questions.length}
               </span>
             </div>
             <div
-              className="h-1.5 rounded-full overflow-hidden"
-              style={{ background: 'var(--parchment-deep)' }}
+              className="h-2 rounded-full overflow-hidden"
+              style={{ background: 'var(--cream)' }}
             >
               <motion.div
                 className="h-full rounded-full"
-                style={{ background: 'var(--terracotta)' }}
+                style={{ background: 'var(--amber)' }}
                 animate={{ width: `${((questionIndex + (result ? 1 : 0)) / questions.length) * 100}%` }}
                 transition={{ duration: 0.4 }}
               />
@@ -253,27 +254,28 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
         </div>
       </div>
 
-      <main className="flex-1 px-4 py-5 max-w-2xl mx-auto w-full space-y-5">
+      <main className="flex-1 px-4 py-5 max-w-2xl mx-auto w-full flex flex-col gap-4">
 
-        {/* Заголовок параграфа */}
+        {/* Paragraph title */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="parchment-card p-4 text-center"
+          className="glass-card p-4 text-center"
         >
           <h1
-            style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)', fontSize: '17px', fontWeight: 700 }}
+            className="text-base font-extrabold"
+            style={{ color: 'var(--navy)' }}
           >
             {para.title}
           </h1>
         </motion.div>
 
-        {/* Карта событий */}
+        {/* Event map */}
         {para.mapMarkers && (para.mapMarkers as { lat: number; lng: number; name: string; description: string }[]).length > 0 && (
           <EventMap markers={para.mapMarkers as { lat: number; lng: number; name: string; description: string }[]} />
         )}
 
-        {/* Блок вопроса */}
+        {/* Question block */}
         <AnimatePresence mode="wait">
           <motion.div
             key={questionIndex}
@@ -281,46 +283,44 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
             transition={{ duration: 0.3 }}
-            className="space-y-4"
+            className="flex flex-col gap-4"
           >
-            {/* "Ты знал?" */}
+            {/* Fun fact */}
             <AnimatePresence>
               {showFunFact && funFact && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, height: 0 }}
+                  className="rounded-xl p-3"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(74,124,142,0.1), rgba(74,124,142,0.05))',
-                    border: '1.5px solid rgba(74,124,142,0.3)',
-                    borderRadius: '12px',
-                    padding: '10px 14px',
+                    background: 'rgba(245,166,35,0.08)',
+                    border: '1.5px solid rgba(245,166,35,0.15)',
                   }}
                 >
-                  <span style={{ fontFamily: 'var(--font-body)', fontSize: '10px', color: 'var(--sky)', fontWeight: 700, letterSpacing: '0.08em' }}>
-                    ✨ ТЫ ЗНАЛ?
+                  <span className="text-[10px] font-extrabold tracking-wider" style={{ color: 'var(--amber-dark)' }}>
+                    {'ТЫ ЗНАЛ?'}
                   </span>
-                  <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--ink)', marginTop: 4, lineHeight: 1.5 }}>
+                  <p className="text-xs mt-1 leading-relaxed" style={{ color: 'var(--ink)' }}>
                     {funFact}
                   </p>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* Вопрос */}
+            {/* Question card */}
             <div
+              className="rounded-2xl p-5 relative"
               style={{
-                background: 'linear-gradient(135deg, var(--ink) 0%, #5C4033 100%)',
-                borderRadius: '14px',
-                padding: '16px',
-                position: 'relative',
+                background: 'linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%)',
               }}
             >
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-3">
                 <div
-                  style={{ fontFamily: 'var(--font-body)', fontSize: '10px', color: 'var(--parchment-deep)', letterSpacing: '0.1em' }}
+                  className="text-[10px] font-bold tracking-widest"
+                  style={{ color: 'var(--amber-light)' }}
                 >
-                  ВОПРОС {questionIndex + 1}
+                  {'ВОПРОС '}{questionIndex + 1}
                 </div>
                 {!result && !isEvaluating && (
                   <HintButton
@@ -336,18 +336,17 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                 )}
               </div>
               <p
-                style={{ fontFamily: 'var(--font-heading)', color: '#FDF6EC', fontSize: '15px', lineHeight: 1.6 }}
+                className="text-[15px] leading-relaxed font-semibold"
+                style={{ color: '#FFFFFF' }}
               >
                 {currentQuestion}
               </p>
             </div>
 
-            {/* Если нет результата — показываем ввод */}
+            {/* Input area */}
             {!result && (
-              <div className="space-y-3">
-                {/* Текст подсказки */}
+              <div className="flex flex-col gap-3">
                 <HintDisplay hint={hintText} level={hintLevel} />
-
                 <VoiceInput onSubmit={handleAnswerSubmit} disabled={isEvaluating} />
 
                 {isEvaluating && (
@@ -356,9 +355,15 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                     animate={{ opacity: 1 }}
                     className="text-center py-4"
                   >
-                    <div style={{ fontSize: 28 }}>🤔</div>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink-muted)', marginTop: 8 }}>
-                      Проверяю твой ответ...
+                    <div className="w-12 h-12 rounded-2xl mx-auto mb-2 flex items-center justify-center animate-pulse"
+                      style={{ background: 'rgba(245,166,35,0.1)' }}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 6v6l4 2" />
+                      </svg>
+                    </div>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--ink-muted)' }}>
+                      {'Проверяю твой ответ...'}
                     </p>
                   </motion.div>
                 )}
@@ -367,38 +372,28 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
+                    className="rounded-xl p-4 text-center"
                     style={{
-                      background: 'rgba(199,91,57,0.1)',
-                      border: '1.5px solid var(--terracotta)',
-                      borderRadius: '12px',
-                      padding: '12px 16px',
-                      textAlign: 'center',
+                      background: 'rgba(255,107,107,0.08)',
+                      border: '1.5px solid rgba(255,107,107,0.2)',
                     }}
                   >
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--terracotta)' }}>
-                      Не удалось проверить ответ. Попробуй ещё раз.
+                    <p className="text-sm font-semibold" style={{ color: 'var(--coral)' }}>
+                      {'Не удалось проверить ответ. Попробуй ещё раз.'}
                     </p>
                     <button
                       onClick={() => setEvalError(false)}
-                      style={{
-                        marginTop: 8,
-                        fontFamily: 'var(--font-body)',
-                        fontSize: '12px',
-                        color: 'var(--terracotta)',
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        textDecoration: 'underline',
-                      }}
+                      className="mt-2 text-xs font-bold underline"
+                      style={{ color: 'var(--coral)', background: 'none', border: 'none', cursor: 'pointer' }}
                     >
-                      Попробовать снова
+                      {'Попробовать снова'}
                     </button>
                   </motion.div>
                 )}
               </div>
             )}
 
-            {/* Результат */}
+            {/* Result */}
             {result && (
               <ExplanationCard
                 result={result}

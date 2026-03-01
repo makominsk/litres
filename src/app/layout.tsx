@@ -1,26 +1,25 @@
-import type { Metadata } from 'next'
-import { Merriweather, Nunito } from 'next/font/google'
+import type { Metadata, Viewport } from 'next'
+import { Nunito } from 'next/font/google'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import './globals.css'
 
-const merriweather = Merriweather({
-  weight: ['400', '700', '900'],
-  subsets: ['latin', 'cyrillic'],
-  variable: '--font-merriweather',
-  display: 'swap',
-})
-
 const nunito = Nunito({
-  weight: ['400', '600', '700', '800'],
+  weight: ['400', '600', '700', '800', '900'],
   subsets: ['latin', 'cyrillic'],
   variable: '--font-nunito',
   display: 'swap',
 })
 
 export const metadata: Metadata = {
-  title: 'История Древнего мира — 5 класс',
-  description: 'Голосовой помощник по истории Древнего мира для учеников 5 класса',
+  title: 'ИстроКвест — Тесты по истории для 5 класса',
+  description: 'Интерактивные тесты по истории Древнего мира для учеников 5 класса. Отвечай голосом или текстом, получай медали!',
   manifest: '/manifest.json',
+}
+
+export const viewport: Viewport = {
+  themeColor: '#1B2A4A',
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({
@@ -29,8 +28,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ru" className={`${merriweather.variable} ${nunito.variable}`}>
-      <body className="antialiased">
+    <html lang="ru" className={nunito.variable}>
+      <body className="antialiased font-sans">
         <TooltipProvider delayDuration={300}>
           {children}
         </TooltipProvider>

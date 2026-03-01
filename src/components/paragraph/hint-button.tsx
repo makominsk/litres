@@ -6,7 +6,6 @@ interface HintButtonProps {
   questionIndex: number
   currentLevel: number
   onHintUsed: (level: number) => void
-  // compact mode: renders only the small trigger button; fires onReceiveHint with result
   compact?: boolean
   onReceiveHint?: (text: string) => void
   loading?: boolean
@@ -52,35 +51,38 @@ export function HintButton({
         onClick={requestHint}
         disabled={isMaxed || loading}
         title={isMaxed ? 'Все подсказки использованы' : levelLabels[nextLevel]}
+        className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold transition-all"
         style={{
-          fontFamily: 'var(--font-body)',
-          background: isMaxed ? 'rgba(253,246,236,0.08)' : 'rgba(201,151,58,0.25)',
-          border: '1px solid rgba(201,151,58,0.45)',
-          borderRadius: '20px',
-          padding: '4px 10px',
-          fontSize: '11px',
-          fontWeight: 600,
-          color: isMaxed ? 'rgba(253,246,236,0.35)' : 'rgba(253,246,236,0.9)',
+          background: isMaxed ? 'rgba(255,255,255,0.08)' : 'rgba(245,166,35,0.2)',
+          border: '1px solid rgba(245,166,35,0.35)',
+          color: isMaxed ? 'rgba(255,255,255,0.3)' : 'var(--amber-light)',
           cursor: isMaxed || loading ? 'not-allowed' : 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
           whiteSpace: 'nowrap',
-          transition: 'all 0.15s',
         }}
       >
-        <span>{loading ? '⏳' : '💡'}</span>
+        {loading ? (
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="animate-spin" aria-hidden="true">
+            <path d="M21 12a9 9 0 11-6.219-8.56" />
+          </svg>
+        ) : (
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M9 21c0 .5.4 1 1 1h4c.6 0 1-.5 1-1v-1H9v1zm3-19C8.1 2 5 5.1 5 9c0 2.4 1.2 4.5 3 5.7V17c0 .5.4 1 1 1h6c.6 0 1-.5 1-1v-2.3c1.8-1.3 3-3.4 3-5.7 0-3.9-3.1-7-7-7z" />
+          </svg>
+        )}
         {!isMaxed && <span>{levelLabels[nextLevel]}</span>}
-        {isMaxed && <span>✓</span>}
+        {isMaxed && (
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="20,6 9,17 4,12" />
+          </svg>
+        )}
       </button>
     )
   }
 
-  // Full mode (legacy, not used in main flow)
   return null
 }
 
-// Отдельный компонент для отображения текста подсказки
+// Hint display component
 export function HintDisplay({ hint, level }: { hint: string; level: number }) {
   return (
     <AnimatePresence>
@@ -89,30 +91,23 @@ export function HintDisplay({ hint, level }: { hint: string; level: number }) {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
+          className="rounded-xl p-4 overflow-hidden"
           style={{
-            background: 'rgba(201,151,58,0.1)',
-            border: '1.5px solid rgba(201,151,58,0.35)',
-            borderRadius: '10px',
-            padding: '12px 14px',
-            overflow: 'hidden',
+            background: 'rgba(245,166,35,0.06)',
+            border: '1.5px solid rgba(245,166,35,0.15)',
           }}
         >
-          <div style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: '11px',
-            color: 'var(--gold)',
-            fontWeight: 700,
-            marginBottom: 6,
-          }}>
-            💡 Подсказка {level} из 3
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-5 h-5 rounded-md flex items-center justify-center" style={{ background: 'rgba(245,166,35,0.15)' }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--amber)" aria-hidden="true">
+                <path d="M9 21c0 .5.4 1 1 1h4c.6 0 1-.5 1-1v-1H9v1zm3-19C8.1 2 5 5.1 5 9c0 2.4 1.2 4.5 3 5.7V17c0 .5.4 1 1 1h6c.6 0 1-.5 1-1v-2.3c1.8-1.3 3-3.4 3-5.7 0-3.9-3.1-7-7-7z" />
+              </svg>
+            </div>
+            <span className="text-[11px] font-extrabold tracking-wider" style={{ color: 'var(--amber-dark)' }}>
+              {'ПОДСКАЗКА '}{level}{' ИЗ 3'}
+            </span>
           </div>
-          <p style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: '13px',
-            color: 'var(--ink)',
-            lineHeight: 1.6,
-            margin: 0,
-          }}>
+          <p className="text-sm leading-relaxed" style={{ color: 'var(--ink)' }}>
             {hint}
           </p>
         </motion.div>

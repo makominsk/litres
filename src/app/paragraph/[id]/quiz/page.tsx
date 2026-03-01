@@ -8,10 +8,10 @@ import { buildQuiz, QuizQuestion } from '@/lib/quiz-data'
 import textbook from '@/data/textbook.json'
 import { useAppStore } from '@/stores/app-store'
 
-function getMedalInfo(score: number): { emoji: string; label: string; color: string } {
-  if (score >= 90) return { emoji: '🥇', label: 'Золото!', color: 'var(--gold)' }
-  if (score >= 60) return { emoji: '🥈', label: 'Серебро!', color: '#9CA3AF' }
-  return { emoji: '🥉', label: 'Бронза!', color: '#CD7F32' }
+function getMedalInfo(score: number): { label: string; color: string; bg: string; iconColor: string } {
+  if (score >= 90) return { label: 'Отлично!', color: '#D97706', bg: 'rgba(245,166,35,0.1)', iconColor: '#F5A623' }
+  if (score >= 60) return { label: 'Хорошо!', color: '#6B7280', bg: 'rgba(107,114,128,0.08)', iconColor: '#9CA3AF' }
+  return { label: 'Продолжай!', color: '#B45309', bg: 'rgba(180,83,9,0.08)', iconColor: '#D97706' }
 }
 
 export default function QuizPage({ params }: { params: Promise<{ id: string }> }) {
@@ -36,7 +36,6 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
   const [restartKey, setRestartKey] = useState(0)
 
   useEffect(() => {
-    // On initial load, restore saved result from store
     if (restartKey === 0) {
       const saved = useAppStore.getState().getQuizResult(paragraphId)
       if (saved) {
@@ -50,26 +49,32 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
 
   if (questions.length === 0 && !done) {
     return (
-      <div className="min-h-dvh flex flex-col">
+      <div className="min-h-dvh flex flex-col" style={{ background: 'var(--cream)' }}>
         <Header />
         <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 max-w-lg mx-auto w-full text-center">
-          <div style={{ fontSize: 56 }} className="mb-4">📅</div>
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+            style={{ background: 'var(--cream-dark)' }}
+          >
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ink-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+          </div>
           <h1
-            style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}
-            className="text-xl font-bold mb-2"
+            className="text-xl font-extrabold mb-2"
+            style={{ color: 'var(--navy)' }}
           >
-            Тест по датам недоступен
+            {'Тест по датам недоступен'}
           </h1>
-          <p
-            style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)' }}
-            className="text-sm mb-6"
-          >
-            Для этого параграфа недостаточно данных о датах.
+          <p className="text-sm mb-6" style={{ color: 'var(--ink-muted)' }}>
+            {'Для этого параграфа недостаточно данных о датах.'}
           </p>
           <Link href={`/paragraph/${paragraphId}`}>
-            <button className="btn-terracotta px-8 py-3 text-sm font-bold"
-              style={{ fontFamily: 'var(--font-body)' }}>
-              ← Назад к параграфу
+            <button className="btn-primary px-8 py-3 text-sm">
+              {'Назад к параграфу'}
             </button>
           </Link>
         </main>
@@ -107,7 +112,6 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
 
   function handleNext() {
     if (current === questions.length - 1) {
-      // correctCount is already updated by handleSelect — don't add again
       const finalTotal = questions.length
       setTotalCount(finalTotal)
       saveQuizResult({ paragraphId, correctCount, totalCount: finalTotal })
@@ -130,48 +134,50 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
     setRestartKey((k) => k + 1)
   }
 
-  // ─── Done screen ────────────────────────────────────────────
+  // Done screen
   if (done) {
     return (
-      <div className="min-h-dvh flex flex-col">
+      <div className="min-h-dvh flex flex-col" style={{ background: 'var(--cream)' }}>
         <Header />
         <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 max-w-lg mx-auto w-full text-center">
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', duration: 0.6 }}
-            className="space-y-5"
+            className="flex flex-col gap-5 w-full"
           >
-            <motion.div
-              animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-              style={{ fontSize: 72 }}
+            <div
+              className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto"
+              style={{
+                background: medal.bg,
+                border: `2px solid ${medal.color}33`,
+              }}
             >
-              {medal.emoji}
-            </motion.div>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill={medal.iconColor} aria-hidden="true">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+            </div>
 
             <div>
               <h1
-                style={{ fontFamily: 'var(--font-heading)', color: medal.color, fontSize: 28, fontWeight: 800 }}
+                className="text-2xl font-extrabold"
+                style={{ color: medal.color }}
               >
                 {medal.label}
               </h1>
-              <p
-                style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)', marginTop: 6 }}
-                className="text-sm"
-              >
-                {correctCount} из {displayTotal} верных ответов ({score}%)
+              <p className="text-sm mt-1" style={{ color: 'var(--ink-muted)' }}>
+                {correctCount}{' из '}{displayTotal}{' верных ответов ('}{score}{'%)'}
               </p>
             </div>
 
             {/* Score bar */}
             <div
               className="h-3 rounded-full overflow-hidden w-full"
-              style={{ background: 'var(--parchment-deep)' }}
+              style={{ background: 'var(--cream-dark)' }}
             >
               <motion.div
                 className="h-full rounded-full"
-                style={{ background: medal.color }}
+                style={{ background: medal.iconColor }}
                 initial={{ width: 0 }}
                 animate={{ width: `${score}%` }}
                 transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -180,44 +186,33 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
 
             <div className="flex flex-col gap-3 w-full pt-2">
               <Link href={`/paragraph/${paragraphId}`}>
-                <button className="btn-terracotta w-full py-3.5 text-sm font-bold"
-                  style={{ fontFamily: 'var(--font-body)' }}>
-                  ← Вернуться к параграфу
+                <button className="btn-primary w-full py-3.5 text-sm">
+                  {'Вернуться к параграфу'}
                 </button>
               </Link>
               <button
                 onClick={handleRestart}
+                className="w-full py-3 text-sm font-bold rounded-xl"
                 style={{
-                  width: '100%',
-                  padding: '12px',
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  background: 'rgba(201,151,58,0.12)',
-                  border: '1.5px solid rgba(201,151,58,0.4)',
-                  borderRadius: '10px',
-                  color: 'var(--gold)',
+                  background: 'rgba(37,99,235,0.08)',
+                  border: '1.5px solid rgba(37,99,235,0.2)',
+                  color: '#2563EB',
                   cursor: 'pointer',
                 }}
               >
-                🔁 Пройти тест заново
+                {'Пройти тест заново'}
               </button>
               <Link href={`/section/${para.sectionId}`}>
                 <button
+                  className="w-full py-3 text-sm font-bold rounded-xl"
                   style={{
-                    width: '100%',
-                    padding: '12px',
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    background: 'var(--parchment-dark)',
-                    border: '1.5px solid var(--parchment-deep)',
-                    borderRadius: '10px',
+                    background: 'var(--cream-dark)',
+                    border: '1.5px solid var(--cream-deep)',
                     color: 'var(--ink)',
                     cursor: 'pointer',
                   }}
                 >
-                  К разделу →
+                  {'К разделу'}
                 </button>
               </Link>
             </div>
@@ -227,31 +222,36 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
     )
   }
 
-  // ─── Quiz screen ─────────────────────────────────────────────
+  // Quiz screen
   return (
-    <div className="min-h-dvh flex flex-col">
+    <div className="min-h-dvh flex flex-col" style={{ background: 'var(--cream)' }}>
       <Header />
 
       {/* Progress bar */}
-      <div style={{ background: 'var(--parchment-dark)', borderBottom: '1px solid var(--parchment-deep)' }}>
-        <div className="max-w-lg mx-auto px-4 py-2 flex items-center gap-3">
-          <Link href={`/paragraph/${paragraphId}`}
-            style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)', fontSize: '12px' }}>
-            ←
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid var(--cream-deep)' }}>
+        <div className="max-w-lg mx-auto px-4 py-2.5 flex items-center gap-3">
+          <Link
+            href={`/paragraph/${paragraphId}`}
+            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{ background: 'var(--cream)', color: 'var(--ink-muted)' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
           </Link>
           <div className="flex-1">
             <div className="flex justify-between items-center mb-1">
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)' }}>
-                Тест по датам · {current + 1} / {questions.length}
+              <span className="text-xs font-semibold" style={{ color: 'var(--ink-muted)' }}>
+                {'Тест по датам \u00b7 '}{current + 1}{' / '}{questions.length}
               </span>
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)' }}>
-                ✓ {correctCount}
+              <span className="text-xs font-bold" style={{ color: 'var(--teal)' }}>
+                {correctCount}{' верно'}
               </span>
             </div>
-            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--parchment-deep)' }}>
+            <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--cream)' }}>
               <motion.div
                 className="h-full rounded-full"
-                style={{ background: 'var(--terracotta)' }}
+                style={{ background: 'var(--amber)' }}
                 animate={{ width: `${((current + (answered ? 1 : 0)) / questions.length) * 100}%` }}
                 transition={{ duration: 0.4 }}
               />
@@ -268,72 +268,58 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
             transition={{ duration: 0.3 }}
-            className="space-y-5"
+            className="flex flex-col gap-5"
           >
-            {/* Date card (the "question") */}
+            {/* Date card */}
             <div
+              className="rounded-2xl p-6 text-center"
               style={{
-                background: 'linear-gradient(135deg, var(--ink) 0%, #5C4033 100%)',
-                borderRadius: '16px',
-                padding: '24px 20px',
-                textAlign: 'center',
+                background: 'linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%)',
               }}
             >
-              <div style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '10px',
-                color: 'var(--parchment-deep)',
-                letterSpacing: '0.12em',
-                marginBottom: 16,
-              }}>
-                📅 ЧТО ПРОИЗОШЛО В ЭТУ ДАТУ?
+              <div className="text-[10px] font-bold tracking-widest mb-4" style={{ color: 'var(--amber-light)' }}>
+                {'ЧТО ПРОИЗОШЛО В ЭТУ ДАТУ?'}
               </div>
-              <div style={{
-                display: 'inline-block',
-                background: 'rgba(199,91,57,0.25)',
-                border: '1.5px solid rgba(199,91,57,0.5)',
-                borderRadius: '24px',
-                padding: '10px 24px',
-                fontFamily: 'var(--font-heading)',
-                color: 'var(--terracotta)',
-                fontSize: '20px',
-                fontWeight: 700,
-              }}>
+              <div
+                className="inline-block px-6 py-2.5 rounded-full text-xl font-extrabold"
+                style={{
+                  background: 'rgba(245,166,35,0.15)',
+                  border: '2px solid rgba(245,166,35,0.3)',
+                  color: 'var(--amber)',
+                }}
+              >
                 {q.date}
               </div>
             </div>
 
-            {/* The real question for user */}
-            <p style={{
-              fontFamily: 'var(--font-body)',
-              color: 'var(--ink-muted)',
-              fontSize: '12px',
-              textAlign: 'center',
-            }}>
-              Выбери, что произошло в эту дату:
+            <p className="text-xs font-semibold text-center" style={{ color: 'var(--ink-muted)' }}>
+              {'Выбери правильный ответ:'}
             </p>
 
             {/* Options */}
-            <div className="space-y-3">
+            <div className="flex flex-col gap-3">
               {q.options.map((option, idx) => {
                 const isSelected = selected === idx
                 const isCorrect = idx === q.correctIndex
-                let bg = 'var(--parchment)'
-                let border = '1.5px solid var(--parchment-deep)'
-                let color = 'var(--ink)'
-                let icon = ''
+
+                let bg = '#FFFFFF'
+                let border = '1.5px solid var(--cream-deep)'
+                let textColor = 'var(--ink)'
+                let badgeBg = 'var(--cream)'
+                let badgeColor = 'var(--ink-muted)'
 
                 if (answered) {
                   if (isCorrect) {
-                    bg = 'rgba(107,142,35,0.12)'
-                    border = '2px solid var(--olive)'
-                    color = 'var(--ink)'
-                    icon = '✓'
+                    bg = 'rgba(45,212,168,0.08)'
+                    border = '2px solid var(--teal)'
+                    badgeBg = 'var(--teal)'
+                    badgeColor = '#FFFFFF'
                   } else if (isSelected && !isCorrect) {
-                    bg = 'rgba(199,91,57,0.12)'
-                    border = '2px solid var(--terracotta)'
-                    color = 'var(--ink-muted)'
-                    icon = '✗'
+                    bg = 'rgba(255,107,107,0.06)'
+                    border = '2px solid var(--coral)'
+                    textColor = 'var(--ink-muted)'
+                    badgeBg = 'var(--coral)'
+                    badgeColor = '#FFFFFF'
                   }
                 }
 
@@ -344,45 +330,34 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                     whileTap={answered ? undefined : { scale: 0.98 }}
                     animate={answered && isCorrect ? { scale: [1, 1.02, 1] } : {}}
                     transition={{ duration: 0.3 }}
+                    className="w-full rounded-xl p-4 text-left flex items-start gap-3 cursor-pointer"
                     style={{
-                      width: '100%',
                       background: bg,
                       border,
-                      borderRadius: '12px',
-                      padding: '14px 16px',
-                      textAlign: 'left',
                       cursor: answered ? 'default' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: 10,
                     }}
                   >
-                    <span style={{
-                      flexShrink: 0,
-                      width: 22,
-                      height: 22,
-                      borderRadius: '50%',
-                      background: answered && isCorrect
-                        ? 'var(--olive)'
-                        : answered && isSelected && !isCorrect
-                          ? 'var(--terracotta)'
-                          : 'var(--parchment-deep)',
-                      color: answered && (isCorrect || (isSelected && !isCorrect)) ? '#FDF6EC' : 'var(--ink-muted)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      fontFamily: 'var(--font-body)',
-                    }}>
-                      {icon || String.fromCharCode(65 + idx)}
+                    <span
+                      className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold"
+                      style={{
+                        background: badgeBg,
+                        color: badgeColor,
+                      }}
+                    >
+                      {answered && isCorrect ? (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <polyline points="20,6 9,17 4,12" />
+                        </svg>
+                      ) : answered && isSelected && !isCorrect ? (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <line x1="18" y1="6" x2="6" y2="18" />
+                          <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                      ) : (
+                        String.fromCharCode(65 + idx)
+                      )}
                     </span>
-                    <span style={{
-                      fontFamily: 'var(--font-body)',
-                      fontSize: '13px',
-                      color,
-                      lineHeight: 1.5,
-                    }}>
+                    <span className="text-sm leading-relaxed" style={{ color: textColor }}>
                       {option}
                     </span>
                   </motion.button>
@@ -390,56 +365,52 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
               })}
             </div>
 
-            {/* Next button */}
+            {/* Feedback & Next */}
             <AnimatePresence>
               {answered && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
+                  className="flex flex-col gap-3"
                 >
                   {selected === q.correctIndex ? (
                     <div
+                      className="rounded-xl p-4"
                       style={{
-                        background: 'rgba(107,142,35,0.1)',
-                        border: '1.5px solid var(--olive)',
-                        borderRadius: '12px',
-                        padding: '12px 16px',
-                        marginBottom: 12,
+                        background: 'rgba(45,212,168,0.08)',
+                        border: '1.5px solid rgba(45,212,168,0.2)',
                       }}
                     >
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink)', fontWeight: 600 }}>
-                        🌿 Верно!
+                      <p className="text-sm font-bold" style={{ color: 'var(--teal-dark)' }}>
+                        {'Верно!'}
                       </p>
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--ink-muted)', marginTop: 2 }}>
-                        {q.date} — {q.correctEvent}
+                      <p className="text-xs mt-1" style={{ color: 'var(--ink-muted)' }}>
+                        {q.date}{' \u2014 '}{q.correctEvent}
                       </p>
                     </div>
                   ) : (
                     <div
+                      className="rounded-xl p-4"
                       style={{
-                        background: 'rgba(199,91,57,0.08)',
-                        border: '1.5px solid var(--terracotta)',
-                        borderRadius: '12px',
-                        padding: '12px 16px',
-                        marginBottom: 12,
+                        background: 'rgba(255,107,107,0.06)',
+                        border: '1.5px solid rgba(255,107,107,0.2)',
                       }}
                     >
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--terracotta)', fontWeight: 600 }}>
-                        Не совсем...
+                      <p className="text-sm font-bold" style={{ color: 'var(--coral)' }}>
+                        {'Не совсем...'}
                       </p>
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--ink-muted)', marginTop: 2 }}>
-                        Правильный ответ: {q.date} — {q.correctEvent}
+                      <p className="text-xs mt-1" style={{ color: 'var(--ink-muted)' }}>
+                        {'Правильный ответ: '}{q.date}{' \u2014 '}{q.correctEvent}
                       </p>
                     </div>
                   )}
 
                   <button
                     onClick={handleNext}
-                    className="btn-terracotta w-full py-3.5 text-sm font-bold"
-                    style={{ fontFamily: 'var(--font-body)' }}
+                    className="btn-primary w-full py-3.5 text-sm"
                   >
-                    {current === questions.length - 1 ? 'Завершить тест →' : 'Следующий вопрос →'}
+                    {current === questions.length - 1 ? 'Завершить тест' : 'Следующий вопрос'}
                   </button>
                 </motion.div>
               )}

@@ -89,152 +89,147 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
   const busyNotRecording = (isTranscribing || !!disabled)
 
   return (
-    <div className="space-y-3">
-      {/* Переключатель режимов — по центру */}
+    <div className="flex flex-col gap-3">
+      {/* Mode toggle */}
       <div className="flex justify-center gap-2">
         <button
           onClick={() => switchMode('voice')}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all"
           style={{
-            fontFamily: 'var(--font-body)',
-            background: mode === 'voice' ? 'var(--terracotta)' : 'var(--parchment-dark)',
-            color: mode === 'voice' ? '#FDF6EC' : 'var(--ink-muted)',
-            border: '1.5px solid var(--parchment-deep)',
-            borderRadius: '8px',
-            padding: '6px 18px',
-            fontSize: '12px',
-            fontWeight: 600,
+            background: mode === 'voice' ? 'var(--navy)' : '#FFFFFF',
+            color: mode === 'voice' ? '#FFFFFF' : 'var(--ink-muted)',
+            border: mode === 'voice' ? '1.5px solid var(--navy)' : '1.5px solid var(--cream-deep)',
             cursor: 'pointer',
-            transition: 'all 0.15s',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
           }}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
+            <path d="M19 10v2a7 7 0 01-14 0v-2" />
+            <line x1="12" y1="19" x2="12" y2="23" />
+            <line x1="8" y1="23" x2="16" y2="23" />
           </svg>
-          Голос
+          {'Голос'}
         </button>
         <button
           onClick={() => switchMode('text')}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all"
           style={{
-            fontFamily: 'var(--font-body)',
-            background: mode === 'text' ? 'var(--terracotta)' : 'var(--parchment-dark)',
-            color: mode === 'text' ? '#FDF6EC' : 'var(--ink-muted)',
-            border: '1.5px solid var(--parchment-deep)',
-            borderRadius: '8px',
-            padding: '6px 18px',
-            fontSize: '12px',
-            fontWeight: 600,
+            background: mode === 'text' ? 'var(--navy)' : '#FFFFFF',
+            color: mode === 'text' ? '#FFFFFF' : 'var(--ink-muted)',
+            border: mode === 'text' ? '1.5px solid var(--navy)' : '1.5px solid var(--cream-deep)',
             cursor: 'pointer',
-            transition: 'all 0.15s',
           }}
         >
-          ✏️ Текст
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M17 3a2.85 2.85 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+          </svg>
+          {'Текст'}
         </button>
       </div>
 
-      {/* Кнопка микрофона — по центру */}
+      {/* Mic button */}
       {mode === 'voice' && (
-        <div className="flex flex-col items-center gap-2 py-1">
+        <div className="flex flex-col items-center gap-2 py-2">
           <motion.button
             onClick={handleVoiceToggle}
             disabled={busyNotRecording}
             whileTap={{ scale: 0.93 }}
-            animate={isRecording ? { scale: [1, 1.07, 1], transition: { repeat: Infinity, duration: 1.1 } } : {}}
+            animate={isRecording ? { scale: [1, 1.05, 1], transition: { repeat: Infinity, duration: 1.1 } } : {}}
+            className="w-16 h-16 rounded-2xl flex items-center justify-center transition-all"
             style={{
-              width: 72,
-              height: 72,
-              borderRadius: '50%',
               background: isRecording
-                ? 'var(--terracotta)'
+                ? 'var(--coral)'
                 : isTranscribing
-                ? 'rgba(201,151,58,0.25)'
-                : 'var(--parchment-dark)',
-              border: `2px solid ${isRecording ? '#a03a20' : 'var(--parchment-deep)'}`,
+                ? 'var(--cream-dark)'
+                : 'var(--navy)',
+              boxShadow: isRecording
+                ? '0 4px 24px rgba(255,107,107,0.4)'
+                : '0 4px 16px rgba(27,42,74,0.2)',
+              border: 'none',
               cursor: busyNotRecording ? 'not-allowed' : 'pointer',
               opacity: disabled ? 0.5 : 1,
-              transition: 'background 0.2s, border-color 0.2s',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              color: '#FFFFFF',
             }}
           >
-            {isTranscribing
-              ? <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ opacity: 0.7 }}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-              : isRecording
-              ? <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
-              : <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-            }
+            {isTranscribing ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ink-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-spin" aria-hidden="true">
+                <path d="M21 12a9 9 0 11-6.219-8.56" />
+              </svg>
+            ) : isRecording ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <rect x="6" y="6" width="12" height="12" rx="2" />
+              </svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
+                <path d="M19 10v2a7 7 0 01-14 0v-2" />
+                <line x1="12" y1="19" x2="12" y2="23" />
+              </svg>
+            )}
           </motion.button>
-          <p style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-muted)', fontSize: 11, textAlign: 'center', lineHeight: 1.4 }}>
+          <p className="text-[11px] text-center leading-relaxed" style={{ color: 'var(--ink-muted)' }}>
             {isRecording
-              ? '🔴 Говори… когда закончишь, нажми Стоп'
+              ? 'Говори... Нажми для остановки'
               : isTranscribing
               ? 'Распознаю речь...'
-              : 'Нажми Старт для записи ответа. Когда всё скажешь, нажми Стоп'}
+              : 'Нажми для записи ответа'}
           </p>
         </div>
       )}
 
-      {/* Ошибка */}
+      {/* Error */}
       <AnimatePresence>
         {error && (
           <motion.p
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--terracotta)', margin: 0 }}
+            className="text-xs font-semibold"
+            style={{ color: 'var(--coral)' }}
           >
             {error}
           </motion.p>
         )}
       </AnimatePresence>
 
-      {/* Текстовое поле */}
+      {/* Text area */}
       <textarea
         value={editableText}
         onChange={(e) => setEditableText(e.target.value)}
         placeholder={
           mode === 'voice'
-            ? 'Нажми на микрофон и говори — ответ появится здесь...'
+            ? 'Нажми на микрофон — ответ появится здесь...'
             : 'Напиши свой ответ здесь...'
         }
         rows={4}
         disabled={disabled || isTranscribing}
+        className="w-full px-4 py-3 text-sm leading-relaxed rounded-xl outline-none resize-y transition-all"
         style={{
-          width: '100%',
-          background: 'var(--parchment-dark)',
-          border: `1.5px solid ${editableText ? 'var(--terracotta)' : 'var(--parchment-deep)'}`,
-          borderRadius: '10px',
-          fontFamily: 'var(--font-body)',
+          background: '#FFFFFF',
+          border: `2px solid ${editableText ? 'var(--amber)' : 'var(--cream-deep)'}`,
           color: 'var(--ink)',
-          padding: '10px 14px',
-          fontSize: '14px',
-          lineHeight: 1.6,
-          resize: 'vertical',
-          outline: 'none',
-          transition: 'border-color 0.15s',
           opacity: disabled || isTranscribing ? 0.6 : 1,
         }}
-        onFocus={(e) => (e.target.style.borderColor = 'var(--terracotta)')}
+        onFocus={(e) => (e.target.style.borderColor = 'var(--amber)')}
         onBlur={(e) => {
-          e.target.style.borderColor = editableText ? 'var(--terracotta)' : 'var(--parchment-deep)'
+          e.target.style.borderColor = editableText ? 'var(--amber)' : 'var(--cream-deep)'
         }}
       />
 
-      {/* Кнопка отправки */}
+      {/* Submit button */}
       <button
         onClick={handleSubmit}
         disabled={disabled || !editableText.trim() || isTranscribing}
-        className="btn-terracotta w-full py-3 text-sm font-bold"
+        className="btn-primary w-full py-3.5 text-sm flex items-center justify-center gap-2"
         style={{
-          fontFamily: 'var(--font-body)',
-          opacity: disabled || !editableText.trim() || isTranscribing ? 0.5 : 1,
+          opacity: disabled || !editableText.trim() || isTranscribing ? 0.4 : 1,
           cursor: disabled || !editableText.trim() || isTranscribing ? 'not-allowed' : 'pointer',
         }}
       >
-        Проверить ответ →
+        {'Проверить ответ'}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
       </button>
     </div>
   )

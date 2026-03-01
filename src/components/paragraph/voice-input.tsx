@@ -143,8 +143,8 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
             whileTap={{ scale: 0.93 }}
             animate={isRecording ? { scale: [1, 1.07, 1], transition: { repeat: Infinity, duration: 1.1 } } : {}}
             style={{
-              width: 64,
-              height: 64,
+              width: 72,
+              height: 72,
               borderRadius: '50%',
               background: isRecording
                 ? 'var(--terracotta)'
@@ -152,17 +152,19 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
                 ? 'rgba(201,151,58,0.25)'
                 : 'var(--parchment-dark)',
               border: `2px solid ${isRecording ? '#a03a20' : 'var(--parchment-deep)'}`,
-              fontSize: 28,
               cursor: busyNotRecording ? 'not-allowed' : 'pointer',
               opacity: disabled ? 0.5 : 1,
               transition: 'background 0.2s, border-color 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             {isTranscribing
-              ? <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ opacity: 0.7 }}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+              ? <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ opacity: 0.7 }}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
               : isRecording
-              ? <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
-              : <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+              ? <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+              : <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
             }
           </motion.button>
           <p style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-muted)', fontSize: 11, textAlign: 'center', lineHeight: 1.4 }}>

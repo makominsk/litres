@@ -11,13 +11,12 @@ const nunito = Nunito({
 })
 
 export const metadata: Metadata = {
-  title: 'ИстроКвест — Тесты по истории для 5 класса',
-  description: 'Интерактивные тесты по истории Древнего мира для учеников 5 класса. Отвечай голосом или текстом, получай медали!',
-  manifest: '/manifest.json',
+  title: 'ИстoriКвест -- Тесты по истории для 5 класса',
+  description: 'Интерактивные тесты по истории Древнего мира для учеников 5 класса. Отвечай голосом или текстом!',
 }
 
 export const viewport: Viewport = {
-  themeColor: '#1B2A4A',
+  themeColor: '#4F46E5',
   width: 'device-width',
   initialScale: 1,
 }

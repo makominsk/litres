@@ -5,49 +5,60 @@
 @custom-variant dark (&:is(.dark *));
 
 /* =============================================
-   Тема «Путешествие во времени» — переменные
+   Fresh Modern Theme
    ============================================= */
 :root {
-  /* Основная палитра — глубокий синий + тёплый янтарь */
-  --navy:          #1B2A4A;
-  --navy-light:    #2A3D66;
-  --navy-muted:    #3D5280;
-  --amber:         #F5A623;
-  --amber-dark:    #D4891A;
-  --amber-light:   #FFC857;
-  --cream:         #FDF8F0;
-  --cream-dark:    #F0E6D6;
-  --cream-deep:    #DDD0BD;
-  --ink:           #1E1E2E;
-  --ink-light:     #3A3A52;
-  --ink-muted:     #6B7280;
-  --teal:          #2DD4A8;
-  --teal-dark:     #1FA882;
-  --coral:         #FF6B6B;
-  --coral-dark:    #E04E4E;
+  /* Primary — deep indigo */
+  --primary-600: #4F46E5;
+  --primary-500: #6366F1;
+  --primary-400: #818CF8;
+  --primary-100: #E0E7FF;
+  --primary-50:  #EEF2FF;
+
+  /* Accent — warm coral-orange */
+  --accent-500: #F97316;
+  --accent-400: #FB923C;
+  --accent-100: #FFEDD5;
+
+  /* Success */
+  --success-500: #10B981;
+  --success-100: #D1FAE5;
+
+  /* Error */
+  --error-500: #EF4444;
+  --error-100: #FEE2E2;
+
+  /* Neutrals */
+  --gray-900: #111827;
+  --gray-700: #374151;
+  --gray-500: #6B7280;
+  --gray-300: #D1D5DB;
+  --gray-200: #E5E7EB;
+  --gray-100: #F3F4F6;
+  --gray-50:  #F9FAFB;
+  --white:    #FFFFFF;
 
   /* shadcn overrides */
-  --radius: 1rem;
-  --background: var(--cream);
-  --foreground: var(--ink);
-  --card: #FFFFFF;
-  --card-foreground: var(--ink);
-  --popover: #FFFFFF;
-  --popover-foreground: var(--ink);
-  --primary: var(--navy);
-  --primary-foreground: #FFFFFF;
-  --secondary: var(--cream-dark);
-  --secondary-foreground: var(--ink);
-  --muted: var(--cream-dark);
-  --muted-foreground: var(--ink-muted);
-  --accent: var(--amber);
-  --accent-foreground: var(--ink);
-  --destructive: var(--coral);
-  --border: var(--cream-deep);
-  --input: var(--cream-dark);
-  --ring: var(--amber);
+  --radius: 0.75rem;
+  --background: var(--white);
+  --foreground: var(--gray-900);
+  --card: var(--white);
+  --card-foreground: var(--gray-900);
+  --popover: var(--white);
+  --popover-foreground: var(--gray-900);
+  --primary: var(--primary-600);
+  --primary-foreground: var(--white);
+  --secondary: var(--gray-100);
+  --secondary-foreground: var(--gray-900);
+  --muted: var(--gray-100);
+  --muted-foreground: var(--gray-500);
+  --accent: var(--primary-50);
+  --accent-foreground: var(--primary-600);
+  --destructive: var(--error-500);
+  --border: var(--gray-200);
+  --input: var(--gray-200);
+  --ring: var(--primary-500);
 
-  /* Шрифты */
   --font-heading: var(--font-nunito), 'Trebuchet MS', sans-serif;
   --font-body: var(--font-nunito), 'Trebuchet MS', sans-serif;
 }
@@ -69,14 +80,6 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-destructive: var(--destructive);
-  --color-navy: var(--navy);
-  --color-navy-light: var(--navy-light);
-  --color-amber: var(--amber);
-  --color-amber-light: var(--amber-light);
-  --color-teal: var(--teal);
-  --color-coral: var(--coral);
-  --color-cream: var(--cream);
-  --color-cream-dark: var(--cream-dark);
   --font-sans: var(--font-body);
   --font-heading: var(--font-heading);
   --radius-sm: calc(var(--radius) - 4px);
@@ -99,15 +102,15 @@
   }
 
   body {
-    background-color: var(--cream);
-    color: var(--ink);
+    background-color: var(--gray-50);
+    color: var(--gray-900);
     font-family: var(--font-body);
     min-height: 100dvh;
   }
 
   h1, h2, h3, h4 {
     font-family: var(--font-heading);
-    color: var(--ink);
+    color: var(--gray-900);
   }
 }
 
@@ -115,129 +118,92 @@
    Utility classes
    ============================================= */
 
-/* Glass card */
 .glass-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  background: var(--white);
+  border: 1px solid var(--gray-200);
   border-radius: var(--radius);
-  box-shadow:
-    0 4px 24px rgba(27, 42, 74, 0.06),
-    0 1px 3px rgba(27, 42, 74, 0.04);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
 }
 
-/* Parchment card — legacy support */
-.parchment-card {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-  border: 1.5px solid var(--cream-deep);
-  border-radius: var(--radius);
-  box-shadow:
-    0 2px 12px rgba(27, 42, 74, 0.06),
-    0 1px 2px rgba(27, 42, 74, 0.03);
+.glass-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
 }
 
-/* Primary button — amber accent */
 .btn-primary {
-  background: var(--amber);
-  color: var(--navy);
-  border-radius: calc(var(--radius) - 2px);
+  background: var(--primary-600);
+  color: var(--white);
+  border-radius: var(--radius);
   font-family: var(--font-body);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.01em;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 0 var(--amber-dark), 0 4px 16px rgba(245, 166, 35, 0.25);
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(79,70,229,0.2);
   border: none;
   cursor: pointer;
 }
 .btn-primary:hover {
-  background: var(--amber-light);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 var(--amber-dark), 0 6px 24px rgba(245, 166, 35, 0.3);
+  background: var(--primary-500);
+  box-shadow: 0 4px 12px rgba(79,70,229,0.25);
+  transform: translateY(-1px);
 }
 .btn-primary:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 var(--amber-dark);
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(79,70,229,0.15);
 }
 
-/* Terracotta button — legacy support redirected to primary */
 .btn-terracotta {
-  background: var(--amber);
-  color: var(--navy);
-  border-radius: calc(var(--radius) - 2px);
+  background: var(--primary-600);
+  color: var(--white);
+  border-radius: var(--radius);
   font-family: var(--font-body);
-  font-weight: 800;
-  letter-spacing: 0.01em;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 0 var(--amber-dark), 0 4px 16px rgba(245, 166, 35, 0.25);
+  font-weight: 700;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(79,70,229,0.2);
   border: none;
   cursor: pointer;
 }
 .btn-terracotta:hover {
-  background: var(--amber-light);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 var(--amber-dark), 0 6px 24px rgba(245, 166, 35, 0.3);
-}
-.btn-terracotta:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 var(--amber-dark);
+  background: var(--primary-500);
+  box-shadow: 0 4px 12px rgba(79,70,229,0.25);
+  transform: translateY(-1px);
 }
 
-/* Navy button */
 .btn-navy {
-  background: var(--navy);
-  color: #FFFFFF;
-  border-radius: calc(var(--radius) - 2px);
+  background: var(--gray-900);
+  color: var(--white);
+  border-radius: var(--radius);
   font-family: var(--font-body);
   font-weight: 700;
-  letter-spacing: 0.01em;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 0 #131E36;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
   border: none;
   cursor: pointer;
 }
 .btn-navy:hover {
-  background: var(--navy-light);
+  background: var(--gray-700);
   transform: translateY(-1px);
-  box-shadow: 0 5px 0 #131E36;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 .btn-navy:active {
-  transform: translateY(1px);
-  box-shadow: 0 2px 0 #131E36;
+  transform: translateY(0);
 }
 
-/* Декоративный разделитель */
-.divider-ornament {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--amber);
-  opacity: 0.5;
-}
-.divider-ornament::before,
-.divider-ornament::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(to right, transparent, var(--cream-deep), transparent);
-}
-
-/* Микрофон — пульсация */
+/* Mic pulse */
 @keyframes mic-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(245,166,35,0.4); }
-  50% { box-shadow: 0 0 0 16px rgba(245,166,35,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+  50% { box-shadow: 0 0 0 16px rgba(239,68,68,0); }
 }
 .mic-pulsing {
   animation: mic-pulse 1.4s ease-in-out infinite;
 }
 
-/* Медаль блеск */
+/* Medal shine */
 @keyframes medal-shine {
   0% { background-position: -200% center; }
   100% { background-position: 200% center; }
 }
 .medal-gold {
-  background: linear-gradient(105deg, #F5A623 0%, #FFC857 40%, #F5A623 60%, #D4891A 100%);
+  background: linear-gradient(105deg, #F59E0B 0%, #FCD34D 40%, #F59E0B 60%, #D97706 100%);
   background-size: 200% auto;
   animation: medal-shine 2.5s linear infinite;
   -webkit-background-clip: text;
@@ -245,37 +211,26 @@
   background-clip: text;
 }
 
-/* Floating animation */
+/* Float */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  50% { transform: translateY(-6px); }
 }
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
 
-/* Sparkle animation */
-@keyframes sparkle {
-  0%, 100% { opacity: 0.3; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.2); }
-}
-
-/* Progress ring */
-@keyframes progress-fill {
-  from { stroke-dashoffset: 283; }
-}
-
-/* Прокрутка */
+/* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--cream-deep); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--ink-muted); }
+::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gray-500); }
 
-/* Fade-in анимация */
+/* Fade */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .fade-up {
-  animation: fadeUp 0.5s ease forwards;
+  animation: fadeUp 0.4s ease forwards;
 }

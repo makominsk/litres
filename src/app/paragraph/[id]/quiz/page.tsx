@@ -107,11 +107,10 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
 
   function handleNext() {
     if (current === questions.length - 1) {
-      const finalCorrect = selected === q.correctIndex ? correctCount + 1 : correctCount
+      // correctCount is already updated by handleSelect — don't add again
       const finalTotal = questions.length
-      setCorrectCount(finalCorrect)
       setTotalCount(finalTotal)
-      saveQuizResult({ paragraphId, correctCount: finalCorrect, totalCount: finalTotal })
+      saveQuizResult({ paragraphId, correctCount, totalCount: finalTotal })
       setDone(true)
     } else {
       setCurrent((c) => c + 1)

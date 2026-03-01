@@ -9,39 +9,10 @@ export interface QuizQuestion {
 
 // Clean up PDF-extracted event text
 function cleanEvent(raw: string): string {
-  // Remove leading dashes/spaces
   const s = raw.replace(/^[\s\-–—]+/, '').trim()
-  // Take up to first period or 90 chars
   const dot = s.search(/[.!?]/)
   const clean = dot > 20 && dot < 120 ? s.slice(0, dot + 1) : s.slice(0, 100)
   return clean.trim()
-}
-
-// Gather ALL dates from all paragraphs for distractor pool
-function getAllDates(): string[] {
-  const dates = new Set<string>()
-  for (let i = 1; i <= 31; i++) {
-    const p = textbook.paragraphs[String(i) as keyof typeof textbook.paragraphs]
-    if (p?.dates) {
-      p.dates.forEach((d: { date: string }) => dates.add(d.date))
-    }
-  }
-  return Array.from(dates)
-}
-
-// Gather ALL events for distractor pool
-function getAllEvents(): string[] {
-  const events: string[] = []
-  for (let i = 1; i <= 31; i++) {
-    const p = textbook.paragraphs[String(i) as keyof typeof textbook.paragraphs]
-    if (p?.dates) {
-      p.dates.forEach((d: { date: string; event: string }) => {
-        const clean = cleanEvent(d.event)
-        if (clean.length > 20) events.push(clean)
-      })
-    }
-  }
-  return events
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -53,20 +24,76 @@ function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
+// Get events from specific paragraph ids
+function getEventsFromParagraphs(paraIds: number[], excludeParagraphId?: number): string[] {
+  const events: string[] = []
+  for (const id of paraIds) {
+    if (id === excludeParagraphId) continue
+    const p = textbook.paragraphs[String(id) as keyof typeof textbook.paragraphs]
+    if (p?.dates) {
+      p.dates.forEach((d: { date: string; event: string }) => {
+        const clean = cleanEvent(d.event)
+        if (clean.length > 20) events.push(clean)
+      })
+    }
+  }
+  return events
+}
+
+// Find which section a paragraph belongs to
+function getSectionParaIds(paragraphId: number): number[] {
+  for (const section of textbook.sections) {
+    if ((section.paragraphs as number[]).includes(paragraphId)) {
+      return section.paragraphs as number[]
+    }
+  }
+  return []
+}
+
+// Get all events from all paragraphs
+function getAllEvents(excludeParagraphId?: number): string[] {
+  const events: string[] = []
+  for (let i = 1; i <= 31; i++) {
+    if (i === excludeParagraphId) continue
+    const p = textbook.paragraphs[String(i) as keyof typeof textbook.paragraphs]
+    if (p?.dates) {
+      p.dates.forEach((d: { date: string; event: string }) => {
+        const clean = cleanEvent(d.event)
+        if (clean.length > 20) events.push(clean)
+      })
+    }
+  }
+  return events
+}
+
 export function buildQuiz(paragraphId: number): QuizQuestion[] {
   const p = textbook.paragraphs[String(paragraphId) as keyof typeof textbook.paragraphs]
   if (!p?.dates || p.dates.length < 2) return []
 
-  const allEvents = getAllEvents()
+  // Prefer distractors from same section (harder, more plausible)
+  const sectionParaIds = getSectionParaIds(paragraphId)
+  const sectionEvents = getEventsFromParagraphs(sectionParaIds, paragraphId)
+  // Fallback: all events from other paragraphs
+  const allEvents = getAllEvents(paragraphId)
+
   const questions: QuizQuestion[] = []
 
   p.dates.forEach((d: { date: string; event: string }) => {
     const correct = cleanEvent(d.event)
     if (correct.length < 20) return
 
-    // Pick 3 distractors from all events pool, excluding correct
-    const pool = allEvents.filter((e) => e !== correct)
-    const distractors = shuffle(pool).slice(0, 3)
+    // Build distractor pool: section-first, then global, dedup
+    const sectionPool = sectionEvents.filter((e) => e !== correct)
+    const globalPool = allEvents.filter((e) => e !== correct && !sectionPool.includes(e))
+    const pool = [...shuffle(sectionPool), ...shuffle(globalPool)]
+
+    // Take 3 unique distractors
+    const distractors: string[] = []
+    for (const e of pool) {
+      if (!distractors.includes(e)) distractors.push(e)
+      if (distractors.length === 3) break
+    }
+
     if (distractors.length < 3) return
 
     const options = shuffle([correct, ...distractors])

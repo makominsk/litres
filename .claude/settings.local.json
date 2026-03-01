@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm_config_cache=/tmp/npm-cache npx vercel --version)",
+      "Bash(npm_config_cache=/tmp/npm-cache npm run build)"
+    ]
+  }
+}

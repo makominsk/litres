@@ -17,6 +17,8 @@ function getMedalInfo(score: number): { emoji: string; label: string; color: str
 export default function QuizPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const student = useAppStore((s) => s.student)
+  const saveQuizResult = useAppStore((s) => s.saveQuizResult)
+  const clearQuizResult = useAppStore((s) => s.clearQuizResult)
 
   const paragraphId = parseInt(id)
   if (isNaN(paragraphId) || paragraphId < 1 || paragraphId > 31) notFound()
@@ -29,13 +31,24 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
   const [selected, setSelected] = useState<number | null>(null)
   const [answered, setAnswered] = useState(false)
   const [correctCount, setCorrectCount] = useState(0)
+  const [totalCount, setTotalCount] = useState(0)
   const [done, setDone] = useState(false)
+  const [restartKey, setRestartKey] = useState(0)
 
   useEffect(() => {
+    // On initial load, restore saved result from store
+    if (restartKey === 0) {
+      const saved = useAppStore.getState().getQuizResult(paragraphId)
+      if (saved) {
+        setCorrectCount(saved.correctCount)
+        setTotalCount(saved.totalCount)
+        setDone(true)
+      }
+    }
     setQuestions(buildQuiz(paragraphId))
-  }, [paragraphId])
+  }, [paragraphId, restartKey])
 
-  if (questions.length === 0) {
+  if (questions.length === 0 && !done) {
     return (
       <div className="min-h-dvh flex flex-col">
         <Header />
@@ -65,7 +78,8 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
   }
 
   const q = questions[current]
-  const score = questions.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0
+  const displayTotal = done ? totalCount : questions.length
+  const score = displayTotal > 0 ? Math.round((correctCount / displayTotal) * 100) : 0
   const medal = getMedalInfo(score)
 
   function handleSelect(idx: number) {
@@ -76,7 +90,6 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
       setCorrectCount((c) => c + 1)
     }
 
-    // Save quiz result to Supabase
     if (student) {
       fetch('/api/progress', {
         method: 'POST',
@@ -94,12 +107,28 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
 
   function handleNext() {
     if (current === questions.length - 1) {
+      const finalCorrect = selected === q.correctIndex ? correctCount + 1 : correctCount
+      const finalTotal = questions.length
+      setCorrectCount(finalCorrect)
+      setTotalCount(finalTotal)
+      saveQuizResult({ paragraphId, correctCount: finalCorrect, totalCount: finalTotal })
       setDone(true)
     } else {
       setCurrent((c) => c + 1)
       setSelected(null)
       setAnswered(false)
     }
+  }
+
+  function handleRestart() {
+    clearQuizResult(paragraphId)
+    setCurrent(0)
+    setSelected(null)
+    setAnswered(false)
+    setCorrectCount(0)
+    setTotalCount(0)
+    setDone(false)
+    setRestartKey((k) => k + 1)
   }
 
   // ─── Done screen ────────────────────────────────────────────
@@ -132,7 +161,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                 style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)', marginTop: 6 }}
                 className="text-sm"
               >
-                {correctCount} из {questions.length} верных ответов ({score}%)
+                {correctCount} из {displayTotal} верных ответов ({score}%)
               </p>
             </div>
 
@@ -157,6 +186,23 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                   ← Вернуться к параграфу
                 </button>
               </Link>
+              <button
+                onClick={handleRestart}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  background: 'rgba(201,151,58,0.12)',
+                  border: '1.5px solid rgba(201,151,58,0.4)',
+                  borderRadius: '10px',
+                  color: 'var(--gold)',
+                  cursor: 'pointer',
+                }}
+              >
+                🔁 Пройти тест заново
+              </button>
               <Link href={`/section/${para.sectionId}`}>
                 <button
                   style={{

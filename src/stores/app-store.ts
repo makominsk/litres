@@ -14,12 +14,22 @@ interface Answer {
   hintLevel: number
 }
 
+interface QuizResult {
+  paragraphId: number
+  correctCount: number
+  totalCount: number
+}
+
 interface AppState {
   student: Student | null
   answers: Answer[]
+  quizResults: QuizResult[]
   setStudent: (student: Student) => void
   clearStudent: () => void
   saveAnswer: (answer: Answer) => void
+  saveQuizResult: (result: QuizResult) => void
+  getQuizResult: (paragraphId: number) => QuizResult | null
+  clearQuizResult: (paragraphId: number) => void
   getParaProgress: (paragraphId: number) => {
     answered: number
     correct: number
@@ -37,6 +47,7 @@ export const useAppStore = create<AppState>()(
     (set, get) => ({
       student: null,
       answers: [],
+      quizResults: [],
 
       setStudent: (student) => set({ student }),
       clearStudent: () => set({ student: null }),
@@ -53,6 +64,25 @@ export const useAppStore = create<AppState>()(
           }
           return { answers: [...state.answers, answer] }
         }),
+
+      saveQuizResult: (result) =>
+        set((state) => {
+          const existing = state.quizResults.findIndex((r) => r.paragraphId === result.paragraphId)
+          if (existing >= 0) {
+            const updated = [...state.quizResults]
+            updated[existing] = result
+            return { quizResults: updated }
+          }
+          return { quizResults: [...state.quizResults, result] }
+        }),
+
+      getQuizResult: (paragraphId) =>
+        get().quizResults.find((r) => r.paragraphId === paragraphId) ?? null,
+
+      clearQuizResult: (paragraphId) =>
+        set((state) => ({
+          quizResults: state.quizResults.filter((r) => r.paragraphId !== paragraphId),
+        })),
 
       getParaProgress: (paragraphId) => {
         const { answers } = get()
@@ -85,6 +115,7 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         student: state.student,
         answers: state.answers,
+        quizResults: state.quizResults,
       }),
     }
   )

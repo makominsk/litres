@@ -147,9 +147,27 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               Повторил {reviewQuestions.length} {reviewQuestions.length === 1 ? 'вопрос' : 'вопроса'}
             </p>
             <div className="flex flex-col gap-3 w-full pt-2">
-              <Link href={`/paragraph/${paragraphId}`}>
+              <Link href={`/paragraph/${paragraphId}/quiz`}>
                 <button className="btn-terracotta w-full py-3.5 text-sm font-bold"
                   style={{ fontFamily: 'var(--font-body)' }}>
+                  📝 Тест по датам
+                </button>
+              </Link>
+              <Link href={`/paragraph/${paragraphId}`}>
+                <button
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    background: 'var(--parchment-dark)',
+                    border: '1.5px solid var(--parchment-deep)',
+                    borderRadius: '10px',
+                    color: 'var(--ink)',
+                    cursor: 'pointer',
+                  }}
+                >
                   ← Назад к параграфу
                 </button>
               </Link>

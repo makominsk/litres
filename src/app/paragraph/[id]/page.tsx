@@ -52,10 +52,11 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
   const answers = useAppStore((s) => s.answers)
 
   // Начинаем с первого неотвеченного вопроса
+  const answeredIndices = new Set(
+    answers.filter((a) => a.paragraphId === paragraphId).map((a) => a.questionIndex)
+  )
+  const allAnswered = para.questions.every((_, i) => answeredIndices.has(i))
   const firstUnanswered = (() => {
-    const answeredIndices = new Set(
-      answers.filter((a) => a.paragraphId === paragraphId).map((a) => a.questionIndex)
-    )
     const idx = para.questions.findIndex((_, i) => !answeredIndices.has(i))
     return idx === -1 ? 0 : idx
   })()
@@ -67,7 +68,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
   const [hintLevel, setHintLevel] = useState(0)
   const [hintText, setHintText] = useState('')
   const [hintLoading, setHintLoading] = useState(false)
-  const [done, setDone] = useState(false)
+  const [done, setDone] = useState(allAnswered)
   const [showFunFact, setShowFunFact] = useState(true)
 
   const questions = para.questions

@@ -46,7 +46,7 @@
   --ring: var(--terracotta);
 
   /* Шрифты */
-  --font-heading: var(--font-merriweather), Georgia, serif;
+  --font-heading: var(--font-comfortaa), var(--font-nunito), sans-serif;
   --font-body: var(--font-nunito), 'Trebuchet MS', sans-serif;
 }
 

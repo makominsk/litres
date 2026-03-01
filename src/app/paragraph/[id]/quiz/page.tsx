@@ -330,8 +330,8 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                     color = 'var(--ink)'
                     icon = '✓'
                   } else if (isSelected && !isCorrect) {
-                    bg = 'rgba(239,68,68,0.08)'
-                    border = '2px solid #EF4444'
+                    bg = 'rgba(245,158,11,0.1)'
+                    border = '2px solid #F59E0B'
                     color = 'var(--ink-muted)'
                     icon = '✗'
                   }
@@ -368,7 +368,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                       background: answered && isCorrect
                         ? 'var(--olive)'
                         : answered && isSelected && !isCorrect
-                          ? '#EF4444'
+                          ? '#F59E0B'
                           : 'var(--parchment-deep)',
                       color: answered && (isCorrect || (isSelected && !isCorrect)) ? '#FFFFFF' : 'var(--ink-muted)',
                       display: 'flex',
@@ -421,14 +421,14 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                   ) : (
                     <div
                       style={{
-                        background: 'rgba(199,91,57,0.08)',
-                        border: '1.5px solid var(--terracotta)',
+                        background: 'rgba(245,158,11,0.1)',
+                        border: '1.5px solid #F59E0B',
                         borderRadius: '12px',
                         padding: '12px 16px',
                         marginBottom: 12,
                       }}
                     >
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--terracotta)', fontWeight: 600 }}>
+                      <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: '#D97706', fontWeight: 600 }}>
                         Не совсем...
                       </p>
                       <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--ink-muted)', marginTop: 2 }}>

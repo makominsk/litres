@@ -1,12 +1,12 @@
 import type { Metadata } from 'next'
-import { Merriweather, Nunito } from 'next/font/google'
+import { Comfortaa, Nunito } from 'next/font/google'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import './globals.css'
 
-const merriweather = Merriweather({
-  weight: ['400', '700', '900'],
+const comfortaa = Comfortaa({
+  weight: ['400', '600', '700'],
   subsets: ['latin', 'cyrillic'],
-  variable: '--font-merriweather',
+  variable: '--font-comfortaa',
   display: 'swap',
 })
 
@@ -29,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ru" className={`${merriweather.variable} ${nunito.variable}`}>
+    <html lang="ru" className={`${comfortaa.variable} ${nunito.variable}`}>
       <body className="antialiased">
         <TooltipProvider delayDuration={300}>
           {children}

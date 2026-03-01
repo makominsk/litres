@@ -23,7 +23,7 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
   const scoreColor =
     result.score >= 80 ? 'var(--olive)' :
     result.score >= 50 ? 'var(--gold)' :
-    'var(--terracotta)'
+    '#F59E0B'
 
   const scoreBg =
     result.score >= 80 ? 'rgba(39,174,96,0.1)' :

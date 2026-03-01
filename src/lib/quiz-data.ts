@@ -70,11 +70,15 @@ export function buildQuiz(paragraphId: number): QuizQuestion[] {
   const p = textbook.paragraphs[String(paragraphId) as keyof typeof textbook.paragraphs]
   if (!p?.dates || p.dates.length < 2) return []
 
-  // Prefer distractors from same section (harder, more plausible)
+  // Primary: same section (excluding current paragraph)
   const sectionParaIds = getSectionParaIds(paragraphId)
   const sectionEvents = getEventsFromParagraphs(sectionParaIds, paragraphId)
-  // Fallback: all events from other paragraphs
-  const allEvents = getAllEvents(paragraphId)
+
+  // Fallback: only two adjacent paragraphs (prev and next)
+  const adjacentIds = [paragraphId - 1, paragraphId + 1].filter(
+    (id) => id >= 1 && id <= 31 && !sectionParaIds.includes(id)
+  )
+  const adjacentEvents = getEventsFromParagraphs(adjacentIds)
 
   const questions: QuizQuestion[] = []
 
@@ -82,10 +86,10 @@ export function buildQuiz(paragraphId: number): QuizQuestion[] {
     const correct = cleanEvent(d.event)
     if (correct.length < 20) return
 
-    // Build distractor pool: section-first, then global, dedup
+    // Pool: section-first, then adjacent only (no global)
     const sectionPool = sectionEvents.filter((e) => e !== correct)
-    const globalPool = allEvents.filter((e) => e !== correct && !sectionPool.includes(e))
-    const pool = [...shuffle(sectionPool), ...shuffle(globalPool)]
+    const adjacentPool = adjacentEvents.filter((e) => e !== correct && !sectionPool.includes(e))
+    const pool = [...shuffle(sectionPool), ...shuffle(adjacentPool)]
 
     // Take 3 unique distractors
     const distractors: string[] = []

@@ -12,27 +12,27 @@ const SECTIONS = [
     title: 'Древняя Греция',
     subtitle: 'Демократия, философия, Олимп',
     icon: 'greece',
-    colorFrom: '#4A6FA5',
-    colorTo: '#3B5D8C',
-    accentColor: '#A8C4E0',
+    colorFrom: '#E8913A',
+    colorTo: '#D07E2F',
+    accentColor: '#FCDDB8',
   },
   {
     id: 'ancient-rome',
     title: 'Древний Рим',
     subtitle: 'Республика, легионы, Колизей',
     icon: 'rome',
-    colorFrom: '#C47D5A',
-    colorTo: '#A8664A',
-    accentColor: '#E8C4B0',
+    colorFrom: '#D4782E',
+    colorTo: '#BE6824',
+    accentColor: '#F5CDA3',
   },
   {
     id: 'germanic-slavic',
     title: 'Германцы и Славяне',
     subtitle: 'Племена, обычаи, переселение',
     icon: 'slavic',
-    colorFrom: '#5A8A72',
-    colorTo: '#4A7560',
-    accentColor: '#A8D4BA',
+    colorFrom: '#C8892F',
+    colorTo: '#B57A28',
+    accentColor: '#F0D9A8',
   },
 ]
 
@@ -195,7 +195,7 @@ export default function HomePage() {
                   className="btn-primary w-full py-3.5 text-sm"
                   style={{ opacity: loading ? 0.7 : 1 }}
                 >
-                  {loading ? 'Входим...' : 'Начать путешествие'}
+                  {loading ? 'Входим...' : 'Начать п��тешествие'}
                 </button>
               </form>
             </motion.div>

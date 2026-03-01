@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Header } from '@/components/ui/header'
 import { VoiceInput } from '@/components/paragraph/voice-input'
 import { ExplanationCard } from '@/components/paragraph/explanation-card'
-import { HintButton } from '@/components/paragraph/hint-button'
+import { HintButton, HintDisplay } from '@/components/paragraph/hint-button'
 import { EventMap } from '@/components/paragraph/event-map'
 import { useAppStore } from '@/stores/app-store'
 import textbook from '@/data/textbook.json'
@@ -65,6 +65,8 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
   const [isEvaluating, setIsEvaluating] = useState(false)
   const [evalError, setEvalError] = useState(false)
   const [hintLevel, setHintLevel] = useState(0)
+  const [hintText, setHintText] = useState('')
+  const [hintLoading, setHintLoading] = useState(false)
   const [done, setDone] = useState(false)
   const [showFunFact, setShowFunFact] = useState(true)
 
@@ -131,6 +133,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
     } else {
       setResult(null)
       setHintLevel(0)
+      setHintText('')
       setEvalError(false)
       setShowFunFact(true)
       setQuestionIndex((i) => i + 1)
@@ -309,12 +312,27 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                 background: 'linear-gradient(135deg, var(--ink) 0%, #5C4033 100%)',
                 borderRadius: '14px',
                 padding: '16px',
+                position: 'relative',
               }}
             >
-              <div
-                style={{ fontFamily: 'var(--font-body)', fontSize: '10px', color: 'var(--parchment-deep)', letterSpacing: '0.1em', marginBottom: 8 }}
-              >
-                ВОПРОС {questionIndex + 1}
+              <div className="flex items-center justify-between mb-2">
+                <div
+                  style={{ fontFamily: 'var(--font-body)', fontSize: '10px', color: 'var(--parchment-deep)', letterSpacing: '0.1em' }}
+                >
+                  ВОПРОС {questionIndex + 1}
+                </div>
+                {!result && !isEvaluating && (
+                  <HintButton
+                    paragraphId={paragraphId}
+                    questionIndex={questionIndex}
+                    currentLevel={hintLevel}
+                    onHintUsed={setHintLevel}
+                    compact
+                    onReceiveHint={setHintText}
+                    loading={hintLoading}
+                    onSetLoading={setHintLoading}
+                  />
+                )}
               </div>
               <p
                 style={{ fontFamily: 'var(--font-heading)', color: '#FDF6EC', fontSize: '15px', lineHeight: 1.6 }}
@@ -323,18 +341,11 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
               </p>
             </div>
 
-            {/* Если нет результата — показываем подсказки и ввод */}
+            {/* Если нет результата — показываем ввод */}
             {!result && (
               <div className="space-y-3">
-                {/* Подсказка — вверху, перед полем ввода */}
-                {!isEvaluating && (
-                  <HintButton
-                    paragraphId={paragraphId}
-                    questionIndex={questionIndex}
-                    currentLevel={hintLevel}
-                    onHintUsed={setHintLevel}
-                  />
-                )}
+                {/* Текст подсказки */}
+                <HintDisplay hint={hintText} level={hintLevel} />
 
                 <VoiceInput onSubmit={handleAnswerSubmit} disabled={isEvaluating} />
 

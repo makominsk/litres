@@ -1,5 +1,4 @@
 'use client'
-import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface HintButtonProps {
@@ -7,26 +6,29 @@ interface HintButtonProps {
   questionIndex: number
   currentLevel: number
   onHintUsed: (level: number) => void
+  // compact mode: renders only the small trigger button; fires onReceiveHint with result
+  compact?: boolean
+  onReceiveHint?: (text: string) => void
+  loading?: boolean
+  onSetLoading?: (v: boolean) => void
 }
 
-export function HintButton({ paragraphId, questionIndex, currentLevel, onHintUsed }: HintButtonProps) {
-  const [hint, setHint] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
+const levelLabels: Record<1 | 2 | 3, string> = {
+  1: 'Подсказка',
+  2: 'Сильнее',
+  3: 'Ответ',
+}
 
+export function HintButton({
+  paragraphId, questionIndex, currentLevel, onHintUsed,
+  compact, onReceiveHint, loading, onSetLoading,
+}: HintButtonProps) {
   const nextLevel = Math.min(currentLevel + 1, 3) as 1 | 2 | 3
   const isMaxed = currentLevel >= 3
 
-  const levelLabels: Record<1 | 2 | 3, string> = {
-    1: 'Лёгкая подсказка',
-    2: 'Подсказка посильнее',
-    3: 'Полный ответ',
-  }
-
   async function requestHint() {
     if (isMaxed || loading) return
-    setLoading(true)
-    setError(false)
+    onSetLoading?.(true)
     try {
       const res = await fetch('/api/hint', {
         method: 'POST',
@@ -34,96 +36,87 @@ export function HintButton({ paragraphId, questionIndex, currentLevel, onHintUse
         body: JSON.stringify({ paragraphId, questionIndex, hintLevel: nextLevel }),
       })
       const data = await res.json()
-      const hintText: string = data.hint
-      if (!hintText) {
-        setError(true)
-        return
-      }
-      setHint(hintText)
+      if (!data.hint) return
       onHintUsed(nextLevel)
+      onReceiveHint?.(data.hint)
     } catch (err) {
       console.error(err)
-      setError(true)
     } finally {
-      setLoading(false)
+      onSetLoading?.(false)
     }
   }
 
-  return (
-    <div className="space-y-2">
+  if (compact) {
+    return (
       <button
         onClick={requestHint}
         disabled={isMaxed || loading}
+        title={isMaxed ? 'Все подсказки использованы' : levelLabels[nextLevel]}
         style={{
           fontFamily: 'var(--font-body)',
-          background: isMaxed ? 'var(--parchment-dark)' : 'rgba(201,151,58,0.15)',
-          border: '1.5px solid rgba(201,151,58,0.4)',
-          borderRadius: '10px',
-          padding: '8px 16px',
-          fontSize: '12px',
+          background: isMaxed ? 'rgba(253,246,236,0.08)' : 'rgba(201,151,58,0.25)',
+          border: '1px solid rgba(201,151,58,0.45)',
+          borderRadius: '20px',
+          padding: '4px 10px',
+          fontSize: '11px',
           fontWeight: 600,
-          color: isMaxed ? 'var(--ink-muted)' : 'var(--gold)',
+          color: isMaxed ? 'rgba(253,246,236,0.35)' : 'rgba(253,246,236,0.9)',
           cursor: isMaxed || loading ? 'not-allowed' : 'pointer',
-          opacity: isMaxed ? 0.5 : 1,
-          transition: 'all 0.15s',
           display: 'flex',
           alignItems: 'center',
-          gap: 6,
-          width: '100%',
+          gap: 4,
+          whiteSpace: 'nowrap',
+          transition: 'all 0.15s',
         }}
       >
         <span>{loading ? '⏳' : '💡'}</span>
-        <span>
-          {loading ? 'Думаю...' : isMaxed ? 'Все подсказки использованы' : levelLabels[nextLevel]}
-        </span>
-        {!isMaxed && !loading && (
-          <span style={{ opacity: 0.6, fontSize: '10px', marginLeft: 'auto' }}>
-            {nextLevel}/3
-          </span>
-        )}
+        {!isMaxed && <span>{levelLabels[nextLevel]}</span>}
+        {isMaxed && <span>✓</span>}
       </button>
+    )
+  }
 
-      {error && (
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--terracotta)', paddingLeft: 4 }}>
-          Не удалось загрузить подсказку. Попробуй ещё раз.
-        </p>
+  // Full mode (legacy, not used in main flow)
+  return null
+}
+
+// Отдельный компонент для отображения текста подсказки
+export function HintDisplay({ hint, level }: { hint: string; level: number }) {
+  return (
+    <AnimatePresence>
+      {hint && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          style={{
+            background: 'rgba(201,151,58,0.1)',
+            border: '1.5px solid rgba(201,151,58,0.35)',
+            borderRadius: '10px',
+            padding: '12px 14px',
+            overflow: 'hidden',
+          }}
+        >
+          <div style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: '11px',
+            color: 'var(--gold)',
+            fontWeight: 700,
+            marginBottom: 6,
+          }}>
+            💡 Подсказка {level} из 3
+          </div>
+          <p style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: '13px',
+            color: 'var(--ink)',
+            lineHeight: 1.6,
+            margin: 0,
+          }}>
+            {hint}
+          </p>
+        </motion.div>
       )}
-
-      <AnimatePresence>
-        {hint && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            style={{
-              background: 'rgba(201,151,58,0.1)',
-              border: '1.5px solid rgba(201,151,58,0.35)',
-              borderRadius: '10px',
-              padding: '12px 14px',
-              overflow: 'hidden',
-            }}
-          >
-            <div style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: '11px',
-              color: 'var(--gold)',
-              fontWeight: 700,
-              marginBottom: 6,
-            }}>
-              💡 Подсказка {currentLevel} из 3
-            </div>
-            <p style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: '13px',
-              color: 'var(--ink)',
-              lineHeight: 1.6,
-              margin: 0,
-            }}>
-              {hint}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    </AnimatePresence>
   )
 }

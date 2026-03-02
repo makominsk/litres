@@ -368,14 +368,14 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     style={{
-                      background: 'rgba(239,68,68,0.08)',
-                      border: '1.5px solid #EF4444',
+                      background: 'rgba(245,158,11,0.08)',
+                      border: '1.5px solid #F59E0B',
                       borderRadius: '12px',
                       padding: '12px 16px',
                       textAlign: 'center',
                     }}
                   >
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: '#EF4444' }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: '#D97706' }}>
                       Не удалось проверить ответ. Попробуй ещё раз.
                     </p>
                     <button
@@ -384,7 +384,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                         marginTop: 8,
                         fontFamily: 'var(--font-body)',
                         fontSize: '12px',
-                        color: '#EF4444',
+                        color: '#D97706',
                         background: 'none',
                         border: 'none',
                         cursor: 'pointer',

@@ -76,11 +76,11 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
           width: '100%',
           padding: '14px 16px',
           background: isError
-            ? 'rgba(239,68,68,0.08)'
+            ? 'rgba(245,158,11,0.08)'
             : isPlaying
             ? 'rgba(67,97,238,0.12)'
             : 'linear-gradient(135deg, rgba(67,97,238,0.08), rgba(67,97,238,0.04))',
-          border: `1.5px solid ${isError ? '#EF4444' : 'rgba(67,97,238,0.35)'}`,
+          border: `1.5px solid ${isError ? '#F59E0B' : 'rgba(67,97,238,0.35)'}`,
           borderRadius: '12px',
           cursor: isLoading ? 'wait' : 'pointer',
           display: 'flex',
@@ -90,7 +90,7 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
           fontFamily: 'var(--font-body)',
           fontSize: '14px',
           fontWeight: 600,
-          color: isError ? '#EF4444' : 'var(--sky)',
+          color: isError ? '#D97706' : 'var(--sky)',
         }}
       >
         <span style={{ fontSize: 20 }}>

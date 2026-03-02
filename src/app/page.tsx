@@ -20,8 +20,8 @@ const SECTIONS = [
     title: 'Древний Рим',
     subtitle: 'Республика, легионы, Колизей',
     emoji: '🦅',
-    colorFrom: '#C62828',
-    colorTo: '#8B0000',
+    colorFrom: '#0E7490',
+    colorTo: '#155E75',
   },
   {
     id: 'germanic-slavic',

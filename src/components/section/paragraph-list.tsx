@@ -48,7 +48,7 @@ export function ParagraphList({ paragraphs }: ParagraphListProps) {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateX(4px)'
-                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(61,43,31,0.12)'
+                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(94,53,214,0.14)'
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = ''

@@ -16,7 +16,7 @@ const SECTION_META: Record<string, { emoji: string; color: string; description: 
   },
   'ancient-rome': {
     emoji: '🦅',
-    color: '#C62828',
+    color: '#0E7490',
     description: '§17 – §29 · Республика, Пунические войны, Цезарь, Империя',
   },
   'germanic-slavic': {

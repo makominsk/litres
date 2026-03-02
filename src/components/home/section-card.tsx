@@ -33,8 +33,8 @@ export function SectionCard({
           className="rounded-2xl overflow-hidden relative group cursor-pointer"
           style={{
             background: `linear-gradient(135deg, ${colorFrom} 0%, ${colorTo} 100%)`,
-            boxShadow: '0 4px 20px rgba(61,43,31,0.15), 0 1px 3px rgba(61,43,31,0.1)',
-            border: '1.5px solid rgba(255,255,255,0.2)',
+            boxShadow: `0 8px 32px ${colorFrom}55, 0 2px 8px ${colorFrom}30`,
+            border: '1.5px solid rgba(255,255,255,0.25)',
           }}
         >
           {/* Декоративный паттерн */}
@@ -96,7 +96,7 @@ export function SectionCard({
               </div>
               <div
                 className="h-1.5 rounded-full overflow-hidden"
-                style={{ background: 'rgba(61,43,31,0.25)' }}
+                style={{ background: 'rgba(0,0,0,0.2)' }}
               >
                 <motion.div
                   className="h-full rounded-full"

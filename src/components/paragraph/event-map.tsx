@@ -158,7 +158,7 @@ export function EventMap({ markers }: EventMapProps) {
         borderRadius: '12px',
         overflow: 'hidden',
         border: '1.5px solid var(--parchment-deep)',
-        boxShadow: '0 2px 8px rgba(61,43,31,0.1)',
+        boxShadow: '0 2px 12px rgba(94,53,214,0.08)',
       }}
     >
       <div

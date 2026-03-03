@@ -332,3 +332,18 @@
   background: var(--ink);
   border-radius: 2px;
 }
+
+.textbook-modal-content {
+  border-radius: 12px;
+}
+
+.textbook-safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+@media (max-width: 640px) {
+  .textbook-modal-content {
+    border-radius: 0;
+    box-shadow: none !important;
+  }
+}

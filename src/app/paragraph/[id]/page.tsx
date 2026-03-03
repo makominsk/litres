@@ -8,8 +8,11 @@ import { VoiceInput } from '@/components/paragraph/voice-input'
 import { ExplanationCard } from '@/components/paragraph/explanation-card'
 import { HintButton, HintDisplay } from '@/components/paragraph/hint-button'
 import { EventMap } from '@/components/paragraph/event-map'
+import { TextbookModal } from '@/components/textbook/textbook-modal'
 import { useAppStore } from '@/stores/app-store'
+import { useTextbookStore } from '@/stores/textbook-store'
 import textbook from '@/data/textbook.json'
+import textbookPages from '@/data/textbook-pages.json'
 
 interface EvaluateResult {
   isCorrect: boolean
@@ -61,6 +64,8 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
   })()
 
   const clearParagraphAnswers = useAppStore((s) => s.clearParagraphAnswers)
+  const openTextbook = useTextbookStore((s) => s.openTextbook)
+  const setSelectedParagraphId = useTextbookStore((s) => s.setSelectedParagraphId)
 
   const [questionIndex, setQuestionIndex] = useState(firstUnanswered)
   const [result, setResult] = useState<EvaluateResult | null>(null)
@@ -149,6 +154,12 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
     setEvalError(false)
     setShowFunFact(true)
     setDone(false)
+  }
+
+  function handleOpenParagraphInTextbook() {
+    setSelectedParagraphId(paragraphId)
+    const range = textbookPages[String(paragraphId) as keyof typeof textbookPages]
+    openTextbook(range?.startPage ?? 1)
   }
 
   // Экран завершения
@@ -268,6 +279,13 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
           >
             {para.title}
           </h1>
+          <button
+            type="button"
+            onClick={handleOpenParagraphInTextbook}
+            className="btn-brutal-secondary mt-3 px-3 py-2 text-xs sm:text-sm"
+          >
+            📖 Читать этот § в учебнике
+          </button>
         </motion.div>
 
         {/* Карта событий */}
@@ -423,6 +441,8 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
           </motion.div>
         </AnimatePresence>
       </main>
+
+      <TextbookModal />
     </div>
   )
 }

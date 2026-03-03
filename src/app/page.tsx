@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Header } from '@/components/ui/header'
 import { SectionCard } from '@/components/home/section-card'
+import { TextbookLauncher } from '@/components/textbook/textbook-launcher'
+import { TextbookModal } from '@/components/textbook/textbook-modal'
 import { useAppStore } from '@/stores/app-store'
 import textbook from '@/data/textbook.json'
 
@@ -193,6 +195,15 @@ export default function HomePage() {
           <span className="text-xs font-bold">✦ ✦ ✦</span>
         </div>
 
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="mb-5"
+        >
+          <TextbookLauncher />
+        </motion.div>
+
         {/* Карточки разделов */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {SECTIONS.map((section, i) => {
@@ -235,6 +246,8 @@ export default function HomePage() {
           </div>
         </motion.div>
       </main>
+
+      <TextbookModal />
     </div>
   )
 }

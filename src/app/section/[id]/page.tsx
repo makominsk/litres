@@ -11,7 +11,7 @@ import textbook from '@/data/textbook.json'
 const SECTION_META: Record<string, { emoji: string; color: string; description: string }> = {
   'ancient-greece': {
     emoji: '🏛️',
-    color: '#5E35D6',
+    color: '#4338CA',
     description: '§1 – §16 · Полисы, войны, олимпийские игры, Александр Македонский',
   },
   'ancient-rome': {
@@ -33,7 +33,7 @@ export default function SectionPage({ params }: { params: Promise<{ id: string }
   const section = textbook.sections.find((s) => s.id === id)
   if (!section) notFound()
 
-  const meta = SECTION_META[id] ?? { emoji: '📖', color: '#5E35D6', description: '' }
+  const meta = SECTION_META[id] ?? { emoji: '📖', color: '#4338CA', description: '' }
   const paragraphs = section.paragraphs
     .map((num) => textbook.paragraphs[String(num) as keyof typeof textbook.paragraphs])
     .filter(Boolean)
@@ -48,16 +48,25 @@ export default function SectionPage({ params }: { params: Promise<{ id: string }
       {/* Шапка раздела */}
       <div
         style={{
-          background: `linear-gradient(135deg, ${meta.color}dd 0%, ${meta.color}aa 100%)`,
-          borderBottom: '2px solid rgba(255,255,255,0.15)',
+          background: meta.color,
+          borderBottom: '3px solid var(--border-color)',
         }}
         className="px-4 pt-6 pb-8"
       >
         <div className="max-w-4xl mx-auto">
           <Link
             href="/"
-            style={{ color: 'rgba(253,246,236,0.7)', fontFamily: 'var(--font-body)' }}
-            className="text-xs mb-3 inline-block hover:opacity-100 transition-opacity"
+            style={{
+              color: '#FFFFFF',
+              fontFamily: 'var(--font-body)',
+              fontWeight: 800,
+              background: 'rgba(0,0,0,0.2)',
+              border: '2px solid rgba(255,255,255,0.3)',
+              borderRadius: '8px',
+              padding: '3px 10px',
+              fontSize: '12px',
+            }}
+            className="inline-block mb-3 hover:opacity-90 transition-opacity"
           >
             ← Все разделы
           </Link>
@@ -67,16 +76,30 @@ export default function SectionPage({ params }: { params: Promise<{ id: string }
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45 }}
           >
-            <div className="text-4xl mb-2">{meta.emoji}</div>
+            <div
+              style={{
+                fontSize: 36,
+                display: 'inline-block',
+                background: 'var(--yellow)',
+                border: '2.5px solid var(--border-color)',
+                borderRadius: '12px',
+                padding: '4px 10px',
+                boxShadow: '3px 3px 0px var(--shadow-color)',
+                marginBottom: 8,
+                lineHeight: 1.2,
+              }}
+            >
+              {meta.emoji}
+            </div>
             <h1
-              style={{ fontFamily: 'var(--font-heading)', color: '#FDF6EC' }}
-              className="text-2xl font-bold mb-1"
+              style={{ fontFamily: 'var(--font-heading)', color: '#FFFFFF' }}
+              className="text-2xl font-extrabold mb-1"
             >
               {section.title}
             </h1>
             <p
-              style={{ color: 'rgba(253,246,236,0.75)', fontFamily: 'var(--font-body)' }}
-              className="text-xs mb-4"
+              style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'var(--font-body)' }}
+              className="text-xs mb-4 font-semibold"
             >
               {meta.description}
             </p>
@@ -84,20 +107,30 @@ export default function SectionPage({ params }: { params: Promise<{ id: string }
             {/* Прогресс */}
             <div className="flex items-center gap-3">
               <div
-                className="flex-1 h-2.5 rounded-full overflow-hidden"
-                style={{ background: 'rgba(255,255,255,0.2)' }}
+                className="flex-1 h-3 rounded-full overflow-hidden"
+                style={{
+                  background: 'rgba(0,0,0,0.3)',
+                  border: '1.5px solid rgba(0,0,0,0.2)',
+                }}
               >
                 <motion.div
                   className="h-full rounded-full"
-                  style={{ background: 'rgba(253,246,236,0.75)' }}
+                  style={{ background: 'var(--yellow)' }}
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPct}%` }}
                   transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
                 />
               </div>
               <span
-                style={{ color: '#FDF6EC', fontFamily: 'var(--font-body)' }}
-                className="text-xs font-bold whitespace-nowrap"
+                style={{
+                  color: 'var(--ink)',
+                  fontFamily: 'var(--font-body)',
+                  background: 'rgba(255,255,255,0.9)',
+                  borderRadius: '8px',
+                  padding: '2px 8px',
+                  fontSize: '12px',
+                  fontWeight: 800,
+                }}
               >
                 {completed} / {total} §
               </span>
@@ -116,13 +149,10 @@ export default function SectionPage({ params }: { params: Promise<{ id: string }
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
           className="mt-6 pt-5"
-          style={{ borderTop: '1px solid var(--parchment-deep)' }}
+          style={{ borderTop: '2.5px solid var(--border-color)' }}
         >
           <Link href={`/section/${id}/quiz`}>
-            <button
-              className="btn-terracotta w-full py-3.5 text-sm font-bold"
-              style={{ fontFamily: 'var(--font-body)' }}
-            >
+            <button className="btn-terracotta w-full py-3.5 text-sm">
               📝 Обобщающий тест по разделу
             </button>
           </Link>

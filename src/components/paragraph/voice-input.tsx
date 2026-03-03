@@ -90,51 +90,42 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
 
   return (
     <div className="space-y-3">
-      {/* Переключатель режимов — по центру */}
+      {/* Переключатель режимов */}
       <div className="flex justify-center gap-2">
-        <button
-          onClick={() => switchMode('voice')}
-          style={{
-            fontFamily: 'var(--font-body)',
-            background: mode === 'voice' ? 'var(--terracotta)' : 'var(--parchment-dark)',
-            color: mode === 'voice' ? '#FDF6EC' : 'var(--ink-muted)',
-            border: '1.5px solid var(--parchment-deep)',
-            borderRadius: '8px',
-            padding: '6px 18px',
-            fontSize: '12px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.15s',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
-          </svg>
-          Голос
-        </button>
-        <button
-          onClick={() => switchMode('text')}
-          style={{
-            fontFamily: 'var(--font-body)',
-            background: mode === 'text' ? 'var(--terracotta)' : 'var(--parchment-dark)',
-            color: mode === 'text' ? '#FDF6EC' : 'var(--ink-muted)',
-            border: '1.5px solid var(--parchment-deep)',
-            borderRadius: '8px',
-            padding: '6px 18px',
-            fontSize: '12px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.15s',
-          }}
-        >
-          ✏️ Текст
-        </button>
+        {(['voice', 'text'] as const).map((m) => (
+          <button
+            key={m}
+            onClick={() => switchMode(m)}
+            style={{
+              fontFamily: 'var(--font-body)',
+              background: mode === m ? 'var(--indigo)' : 'var(--card-bg)',
+              color: mode === m ? '#FFFFFF' : 'var(--ink)',
+              border: '2.5px solid var(--border-color)',
+              borderRadius: '10px',
+              padding: '6px 18px',
+              fontSize: '12px',
+              fontWeight: 800,
+              cursor: 'pointer',
+              boxShadow: mode === m ? '2px 2px 0px var(--shadow-color)' : 'var(--shadow-sm)',
+              transition: 'all 0.1s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            {m === 'voice' ? (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                </svg>
+                Голос
+              </>
+            ) : '✏️ Текст'}
+          </button>
+        ))}
       </div>
 
-      {/* Кнопка микрофона — по центру */}
+      {/* Кнопка микрофона */}
       {mode === 'voice' && (
         <div className="flex flex-col items-center gap-2 py-1">
           <motion.button
@@ -147,17 +138,19 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
               height: 72,
               borderRadius: '50%',
               background: isRecording
-                ? 'var(--terracotta)'
+                ? 'var(--pink)'
                 : isTranscribing
-                ? 'rgba(201,151,58,0.25)'
-                : 'var(--parchment-dark)',
-              border: `2px solid ${isRecording ? '#a03a20' : 'var(--parchment-deep)'}`,
+                ? 'var(--yellow-light)'
+                : 'var(--card-bg)',
+              border: '3px solid var(--border-color)',
               cursor: busyNotRecording ? 'not-allowed' : 'pointer',
               opacity: disabled ? 0.5 : 1,
               transition: 'background 0.2s, border-color 0.2s',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              boxShadow: isRecording ? '4px 4px 0px #9F1239' : 'var(--shadow-sm)',
+              color: isRecording ? '#FFFFFF' : 'var(--ink)',
             }}
           >
             {isTranscribing
@@ -167,7 +160,7 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
               : <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
             }
           </motion.button>
-          <p style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-muted)', fontSize: 11, textAlign: 'center', lineHeight: 1.4 }}>
+          <p style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-muted)', fontSize: 11, textAlign: 'center', lineHeight: 1.4, fontWeight: 600 }}>
             {isRecording
               ? '🔴 Говори… когда закончишь, нажми Стоп'
               : isTranscribing
@@ -184,7 +177,7 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--terracotta)', margin: 0 }}
+            style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--pink-dark)', margin: 0, fontWeight: 700 }}
           >
             {error}
           </motion.p>
@@ -204,9 +197,9 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
         disabled={disabled || isTranscribing}
         style={{
           width: '100%',
-          background: 'var(--parchment-dark)',
-          border: `1.5px solid ${editableText ? 'var(--terracotta)' : 'var(--parchment-deep)'}`,
-          borderRadius: '10px',
+          background: 'var(--card-bg)',
+          border: `2.5px solid var(--border-color)`,
+          borderRadius: '12px',
           fontFamily: 'var(--font-body)',
           color: 'var(--ink)',
           padding: '10px 14px',
@@ -214,12 +207,10 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
           lineHeight: 1.6,
           resize: 'vertical',
           outline: 'none',
-          transition: 'border-color 0.15s',
+          transition: 'box-shadow 0.15s',
           opacity: disabled || isTranscribing ? 0.6 : 1,
-        }}
-        onFocus={(e) => (e.target.style.borderColor = 'var(--terracotta)')}
-        onBlur={(e) => {
-          e.target.style.borderColor = editableText ? 'var(--terracotta)' : 'var(--parchment-deep)'
+          boxShadow: editableText ? 'var(--shadow-sm)' : 'inset 2px 2px 0px rgba(0,0,0,0.05)',
+          fontWeight: 500,
         }}
       />
 
@@ -227,9 +218,8 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
       <button
         onClick={handleSubmit}
         disabled={disabled || !editableText.trim() || isTranscribing}
-        className="btn-terracotta w-full py-3 text-sm font-bold"
+        className="btn-terracotta w-full py-3 text-sm"
         style={{
-          fontFamily: 'var(--font-body)',
           opacity: disabled || !editableText.trim() || isTranscribing ? 0.5 : 1,
           cursor: disabled || !editableText.trim() || isTranscribing ? 'not-allowed' : 'pointer',
         }}

@@ -12,8 +12,8 @@ const SECTIONS = [
     title: 'Древняя Греция',
     subtitle: 'Демократия, философия, Олимп',
     emoji: '🏛️',
-    colorFrom: '#5E35D6',
-    colorTo: '#4527A0',
+    colorFrom: '#4338CA',
+    colorTo: '#3730A3',
   },
   {
     id: 'ancient-rome',
@@ -86,24 +86,30 @@ export default function HomePage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{ background: 'rgba(26,26,46,0.75)', backdropFilter: 'blur(4px)' }}
+            style={{ background: 'rgba(26,26,46,0.8)', backdropFilter: 'blur(6px)' }}
           >
             <motion.div
               initial={{ scale: 0.85, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: 'spring', duration: 0.4 }}
-              className="parchment-card w-full max-w-sm p-6 text-center"
+              className="w-full max-w-sm p-6 text-center"
+              style={{
+                background: 'var(--yellow)',
+                border: '2.5px solid var(--border-color)',
+                borderRadius: '1rem',
+                boxShadow: '8px 8px 0px var(--shadow-color)',
+              }}
             >
               <div className="text-5xl mb-3">📜</div>
               <h2
-                style={{ fontFamily: 'var(--font-heading)' }}
+                style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}
                 className="text-xl font-bold mb-1"
               >
                 Привет, путешественник!
               </h2>
               <p
-                style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)' }}
+                style={{ color: 'var(--ink-light)', fontFamily: 'var(--font-body)' }}
                 className="text-sm mb-5"
               >
                 Как тебя зовут? Я запомню твой прогресс.
@@ -118,28 +124,28 @@ export default function HomePage() {
                   maxLength={30}
                   autoFocus
                   style={{
-                    background: 'var(--parchment-dark)',
-                    border: '1.5px solid var(--parchment-deep)',
-                    borderRadius: '10px',
+                    background: '#FFFFFF',
+                    border: '2.5px solid var(--border-color)',
+                    borderRadius: '12px',
                     fontFamily: 'var(--font-body)',
                     color: 'var(--ink)',
                     width: '100%',
-                    padding: '10px 14px',
+                    padding: '12px 14px',
                     fontSize: '16px',
+                    fontWeight: 600,
                     outline: 'none',
+                    boxShadow: '3px 3px 0px var(--shadow-color)',
                   }}
-                  onFocus={(e) => (e.target.style.borderColor = 'var(--terracotta)')}
-                  onBlur={(e) => (e.target.style.borderColor = 'var(--parchment-deep)')}
                 />
                 {error && (
-                  <p style={{ color: 'var(--terracotta)', fontFamily: 'var(--font-body)' }} className="text-xs">
+                  <p style={{ color: 'var(--pink-dark)', fontFamily: 'var(--font-body)' }} className="text-xs font-bold">
                     {error}
                   </p>
                 )}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="btn-terracotta w-full py-3 text-sm"
+                  className="btn-brutal-indigo w-full py-3 text-sm"
                   style={{ opacity: loading ? 0.7 : 1 }}
                 >
                   {loading ? 'Входим...' : 'Начать путешествие →'}
@@ -164,27 +170,27 @@ export default function HomePage() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
               style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)' }}
-              className="text-sm mb-1"
+              className="text-sm mb-1 font-bold"
             >
               Привет, {student.nickname}! 👋
             </motion.p>
           )}
           <h1
             style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}
-            className="text-2xl font-bold leading-tight"
+            className="text-2xl font-extrabold leading-tight"
           >
             История Древнего мира
           </h1>
           <p
             style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)' }}
-            className="text-sm mt-1"
+            className="text-sm mt-1 font-semibold"
           >
             Выбери раздел для изучения
           </p>
         </motion.div>
 
         <div className="divider-ornament mb-6">
-          <span className="text-xs">✦ ✦ ✦</span>
+          <span className="text-xs font-bold">✦ ✦ ✦</span>
         </div>
 
         {/* Карточки разделов */}
@@ -210,12 +216,23 @@ export default function HomePage() {
           transition={{ delay: 0.8 }}
           className="text-center mt-8"
         >
-          <p
-            style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)' }}
-            className="text-xs"
+          <div
+            style={{
+              display: 'inline-block',
+              background: 'var(--yellow-light)',
+              border: '2px solid var(--border-color)',
+              borderRadius: '12px',
+              padding: '8px 16px',
+              boxShadow: '3px 3px 0px var(--shadow-color)',
+            }}
           >
-            🎙️ Отвечай голосом или текстом · 🗺️ Смотри карты событий · 🏅 Получай медали
-          </p>
+            <p
+              style={{ color: 'var(--ink)', fontFamily: 'var(--font-body)' }}
+              className="text-xs font-bold"
+            >
+              🎙️ Отвечай голосом или текстом · 🗺️ Смотри карты · 🏅 Получай медали
+            </p>
+          </div>
         </motion.div>
       </main>
     </div>

@@ -51,7 +51,6 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
 
   const answers = useAppStore((s) => s.answers)
 
-  // Начинаем с первого неотвеченного вопроса
   const answeredIndices = new Set(
     answers.filter((a) => a.paragraphId === paragraphId).map((a) => a.questionIndex)
   )
@@ -96,7 +95,6 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
       const data: EvaluateResult = await res.json()
       setResult(data)
 
-      // Сохраняем прогресс
       saveAnswer({
         paragraphId,
         questionIndex,
@@ -104,7 +102,6 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
         hintLevel,
       })
 
-      // Сохраняем в Supabase если есть ученик
       if (student) {
         fetch('/api/progress', {
           method: 'POST',
@@ -156,57 +153,30 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
             <div style={{ fontSize: 72 }}>🎉</div>
             <h1
               style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}
-              className="text-2xl font-bold"
+              className="text-2xl font-extrabold"
             >
               Параграф пройден!
             </h1>
             <p
               style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)' }}
-              className="text-sm"
+              className="text-sm font-semibold"
             >
               §{paragraphId} · {para.title}
             </p>
 
             <div className="grid grid-cols-2 gap-3 w-full">
               <Link href={`/paragraph/${paragraphId}/quiz`} className="col-span-2">
-                <button className="btn-terracotta w-full py-3.5 text-sm font-bold"
-                  style={{ fontFamily: 'var(--font-body)' }}>
+                <button className="btn-terracotta w-full py-3.5 text-sm">
                   📝 Тест по датам
                 </button>
               </Link>
               <Link href={`/paragraph/${paragraphId}/review`}>
-                <button
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    background: 'rgba(67,97,238,0.08)',
-                    border: '1.5px solid rgba(67,97,238,0.3)',
-                    borderRadius: '10px',
-                    color: 'var(--sky)',
-                    cursor: 'pointer',
-                  }}
-                >
+                <button className="btn-brutal-secondary w-full py-3 text-[13px]">
                   🔄 Ошибки
                 </button>
               </Link>
               <Link href={`/section/${sectionId}`}>
-                <button
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    background: '#FFFFFF',
-                    border: '1.5px solid var(--parchment-deep)',
-                    borderRadius: '10px',
-                    color: 'var(--ink)',
-                    cursor: 'pointer',
-                  }}
-                >
+                <button className="btn-brutal-secondary w-full py-3 text-[13px]">
                   ← Раздел
                 </button>
               </Link>
@@ -222,29 +192,42 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
       <Header />
 
       {/* Прогресс параграфа */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid var(--parchment-deep)', boxShadow: '0 1px 4px rgba(94,53,214,0.06)' }}>
+      <div style={{
+        background: 'var(--card-bg)',
+        borderBottom: '2.5px solid var(--border-color)',
+      }}>
         <div className="max-w-2xl mx-auto px-4 py-2 flex items-center gap-3">
           <Link
             href={`/section/${sectionId}`}
-            style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)', fontSize: '12px' }}
+            style={{
+              color: 'var(--ink)',
+              fontFamily: 'var(--font-body)',
+              fontSize: '14px',
+              fontWeight: 800,
+              background: 'var(--yellow-light)',
+              border: '2px solid var(--border-color)',
+              borderRadius: '8px',
+              padding: '2px 8px',
+              boxShadow: '2px 2px 0px var(--shadow-color)',
+            }}
           >
             ←
           </Link>
           <div className="flex-1">
             <div className="flex justify-between items-center mb-1">
               <span
-                style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)' }}
+                style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)', fontWeight: 700 }}
               >
                 §{paragraphId} · Вопрос {questionIndex + 1} из {questions.length}
               </span>
             </div>
             <div
-              className="h-1.5 rounded-full overflow-hidden"
-              style={{ background: 'var(--parchment-deep)' }}
+              className="h-2.5 rounded-full overflow-hidden"
+              style={{ background: 'var(--bg-dark)', border: '1.5px solid var(--border-color)' }}
             >
               <motion.div
                 className="h-full rounded-full"
-                style={{ background: 'var(--terracotta)' }}
+                style={{ background: 'var(--indigo)' }}
                 animate={{ width: `${((questionIndex + (result ? 1 : 0)) / questions.length) * 100}%` }}
                 transition={{ duration: 0.4 }}
               />
@@ -262,7 +245,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
           className="parchment-card p-4 text-center"
         >
           <h1
-            style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)', fontSize: '17px', fontWeight: 700 }}
+            style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)', fontSize: '17px', fontWeight: 800 }}
           >
             {para.title}
           </h1>
@@ -291,13 +274,14 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, height: 0 }}
                   style={{
-                    background: 'linear-gradient(135deg, rgba(67,97,238,0.08), rgba(67,97,238,0.04))',
-                    border: '1.5px solid rgba(67,97,238,0.25)',
-                    borderRadius: '12px',
+                    background: 'var(--yellow-light)',
+                    border: '2.5px solid var(--border-color)',
+                    borderRadius: '14px',
                     padding: '10px 14px',
+                    boxShadow: 'var(--shadow-sm)',
                   }}
                 >
-                  <span style={{ fontFamily: 'var(--font-body)', fontSize: '10px', color: 'var(--sky)', fontWeight: 700, letterSpacing: '0.08em' }}>
+                  <span style={{ fontFamily: 'var(--font-body)', fontSize: '10px', color: 'var(--ink)', fontWeight: 800, letterSpacing: '0.08em' }}>
                     ✨ ТЫ ЗНАЛ?
                   </span>
                   <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--ink)', marginTop: 4, lineHeight: 1.5 }}>
@@ -310,15 +294,26 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
             {/* Вопрос */}
             <div
               style={{
-                background: 'linear-gradient(135deg, #5E35D6 0%, #4527A0 100%)',
+                background: 'var(--indigo)',
+                border: '2.5px solid var(--border-color)',
                 borderRadius: '14px',
                 padding: '16px',
                 position: 'relative',
+                boxShadow: 'var(--shadow-md)',
               }}
             >
               <div className="flex items-center justify-between mb-2">
                 <div
-                  style={{ fontFamily: 'var(--font-body)', fontSize: '10px', color: 'rgba(255,255,255,0.6)', letterSpacing: '0.1em' }}
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: '10px',
+                    color: 'rgba(255,255,255,0.7)',
+                    letterSpacing: '0.1em',
+                    fontWeight: 800,
+                    background: 'rgba(0,0,0,0.2)',
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                  }}
                 >
                   ВОПРОС {questionIndex + 1}
                 </div>
@@ -336,7 +331,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                 )}
               </div>
               <p
-                style={{ fontFamily: 'var(--font-heading)', color: '#FDF6EC', fontSize: '15px', lineHeight: 1.6 }}
+                style={{ fontFamily: 'var(--font-heading)', color: '#FFFFFF', fontSize: '15px', lineHeight: 1.6, fontWeight: 600 }}
               >
                 {currentQuestion}
               </p>
@@ -345,9 +340,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
             {/* Если нет результата — показываем ввод */}
             {!result && (
               <div className="space-y-3">
-                {/* Текст подсказки */}
                 <HintDisplay hint={hintText} level={hintLevel} />
-
                 <VoiceInput onSubmit={handleAnswerSubmit} disabled={isEvaluating} />
 
                 {isEvaluating && (
@@ -357,7 +350,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                     className="text-center py-4"
                   >
                     <div style={{ fontSize: 28 }}>🤔</div>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink-muted)', marginTop: 8 }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink-muted)', marginTop: 8, fontWeight: 600 }}>
                       Проверяю твой ответ...
                     </p>
                   </motion.div>
@@ -368,14 +361,15 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     style={{
-                      background: 'rgba(245,158,11,0.08)',
-                      border: '1.5px solid #F59E0B',
+                      background: 'var(--yellow-light)',
+                      border: '2.5px solid var(--border-color)',
                       borderRadius: '12px',
                       padding: '12px 16px',
                       textAlign: 'center',
+                      boxShadow: 'var(--shadow-sm)',
                     }}
                   >
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: '#D97706' }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink)', fontWeight: 700 }}>
                       Не удалось проверить ответ. Попробуй ещё раз.
                     </p>
                     <button
@@ -384,10 +378,11 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                         marginTop: 8,
                         fontFamily: 'var(--font-body)',
                         fontSize: '12px',
-                        color: '#D97706',
+                        color: 'var(--indigo)',
                         background: 'none',
                         border: 'none',
                         cursor: 'pointer',
+                        fontWeight: 800,
                         textDecoration: 'underline',
                       }}
                     >

@@ -6,7 +6,6 @@ interface HintButtonProps {
   questionIndex: number
   currentLevel: number
   onHintUsed: (level: number) => void
-  // compact mode: renders only the small trigger button; fires onReceiveHint with result
   compact?: boolean
   onReceiveHint?: (text: string) => void
   loading?: boolean
@@ -54,19 +53,20 @@ export function HintButton({
         title={isMaxed ? 'Все подсказки использованы' : levelLabels[nextLevel]}
         style={{
           fontFamily: 'var(--font-body)',
-          background: isMaxed ? 'rgba(253,246,236,0.08)' : 'rgba(201,151,58,0.25)',
-          border: '1px solid rgba(201,151,58,0.45)',
-          borderRadius: '20px',
+          background: isMaxed ? 'rgba(255,255,255,0.1)' : 'var(--yellow)',
+          border: '2px solid var(--border-color)',
+          borderRadius: '10px',
           padding: '4px 10px',
           fontSize: '11px',
-          fontWeight: 600,
-          color: isMaxed ? 'rgba(253,246,236,0.35)' : 'rgba(253,246,236,0.9)',
+          fontWeight: 800,
+          color: isMaxed ? 'rgba(255,255,255,0.4)' : 'var(--ink)',
           cursor: isMaxed || loading ? 'not-allowed' : 'pointer',
           display: 'flex',
           alignItems: 'center',
           gap: 4,
           whiteSpace: 'nowrap',
-          transition: 'all 0.15s',
+          transition: 'all 0.1s',
+          boxShadow: isMaxed ? 'none' : '2px 2px 0px var(--shadow-color)',
         }}
       >
         <span>{loading ? '⏳' : '💡'}</span>
@@ -76,11 +76,9 @@ export function HintButton({
     )
   }
 
-  // Full mode (legacy, not used in main flow)
   return null
 }
 
-// Отдельный компонент для отображения текста подсказки
 export function HintDisplay({ hint, level }: { hint: string; level: number }) {
   return (
     <AnimatePresence>
@@ -90,18 +88,19 @@ export function HintDisplay({ hint, level }: { hint: string; level: number }) {
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
           style={{
-            background: 'rgba(201,151,58,0.1)',
-            border: '1.5px solid rgba(201,151,58,0.35)',
-            borderRadius: '10px',
+            background: 'var(--yellow-light)',
+            border: '2.5px solid var(--border-color)',
+            borderRadius: '12px',
             padding: '12px 14px',
             overflow: 'hidden',
+            boxShadow: 'var(--shadow-sm)',
           }}
         >
           <div style={{
             fontFamily: 'var(--font-body)',
             fontSize: '11px',
-            color: 'var(--gold)',
-            fontWeight: 700,
+            color: 'var(--ink)',
+            fontWeight: 800,
             marginBottom: 6,
           }}>
             💡 Подсказка {level} из 3
@@ -112,6 +111,7 @@ export function HintDisplay({ hint, level }: { hint: string; level: number }) {
             color: 'var(--ink)',
             lineHeight: 1.6,
             margin: 0,
+            fontWeight: 500,
           }}>
             {hint}
           </p>

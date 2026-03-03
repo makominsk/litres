@@ -40,28 +40,32 @@ export function ParagraphList({ paragraphs }: ParagraphListProps) {
           >
             <Link href={`/paragraph/${para.id}`}>
               <div
-                className="parchment-card p-4 flex items-center gap-3 group cursor-pointer"
+                className="p-4 flex items-center gap-3 group cursor-pointer"
                 style={{
-                  borderColor: isDone ? 'var(--olive)' : undefined,
-                  borderWidth: isDone ? '1.5px' : undefined,
-                  transition: 'transform 0.15s, box-shadow 0.15s',
+                  background: 'var(--card-bg)',
+                  border: '2.5px solid var(--border-color)',
+                  borderRadius: '1rem',
+                  boxShadow: isDone ? '4px 4px 0px #065F46' : 'var(--shadow-sm)',
+                  transition: 'transform 0.1s, box-shadow 0.1s',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateX(4px)'
-                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(94,53,214,0.14)'
+                  e.currentTarget.style.transform = 'translate(-2px, -2px)'
+                  e.currentTarget.style.boxShadow = isDone ? '6px 6px 0px #065F46' : 'var(--shadow-md)'
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = ''
-                  e.currentTarget.style.boxShadow = ''
+                  e.currentTarget.style.boxShadow = isDone ? '4px 4px 0px #065F46' : 'var(--shadow-sm)'
                 }}
               >
                 {/* Номер параграфа */}
                 <div
-                  className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
+                  className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-sm font-extrabold"
                   style={{
-                    background: isDone ? 'var(--olive)' : 'var(--parchment-deep)',
-                    color: isDone ? '#FDF6EC' : 'var(--ink-muted)',
+                    background: isDone ? '#059669' : 'var(--indigo)',
+                    color: '#FFFFFF',
                     fontFamily: 'var(--font-heading)',
+                    border: '2px solid var(--border-color)',
+                    boxShadow: '2px 2px 0px var(--shadow-color)',
                   }}
                 >
                   {medal ?? `§${para.id}`}
@@ -71,13 +75,13 @@ export function ParagraphList({ paragraphs }: ParagraphListProps) {
                 <div className="flex-1 min-w-0">
                   <p
                     style={{ fontFamily: 'var(--font-body)', color: 'var(--ink)' }}
-                    className="text-sm font-semibold leading-snug truncate"
+                    className="text-sm font-bold leading-snug truncate"
                   >
                     {para.title}
                   </p>
                   <p
                     style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)' }}
-                    className="text-xs mt-0.5"
+                    className="text-xs mt-0.5 font-semibold"
                   >
                     {answered > 0
                       ? `${answered} вопросов · ${correct} верно`
@@ -87,8 +91,12 @@ export function ParagraphList({ paragraphs }: ParagraphListProps) {
 
                 {/* Стрелка */}
                 <span
-                  style={{ color: 'var(--terracotta)' }}
-                  className="text-lg opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
+                  style={{
+                    color: 'var(--ink)',
+                    fontWeight: 900,
+                    fontSize: '18px',
+                  }}
+                  className="opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
                 >
                   →
                 </span>

@@ -1,12 +1,12 @@
 import type { Metadata } from 'next'
-import { Comfortaa, Nunito } from 'next/font/google'
+import { Rubik, Nunito } from 'next/font/google'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import './globals.css'
 
-const comfortaa = Comfortaa({
-  weight: ['400', '600', '700'],
+const rubik = Rubik({
+  weight: ['400', '600', '700', '800', '900'],
   subsets: ['latin', 'cyrillic'],
-  variable: '--font-comfortaa',
+  variable: '--font-rubik',
   display: 'swap',
 })
 
@@ -29,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ru" className={`${comfortaa.variable} ${nunito.variable}`}>
+    <html lang="ru" className={`${rubik.variable} ${nunito.variable}`}>
       <body className="antialiased">
         <TooltipProvider delayDuration={300}>
           {children}

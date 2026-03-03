@@ -26,39 +26,43 @@ export function SectionCard({
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay, ease: 'easeOut' }}
-      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+      whileHover={{ y: -4, transition: { duration: 0.15 } }}
     >
       <Link href={`/section/${id}`} className="block">
         <div
           className="rounded-2xl overflow-hidden relative group cursor-pointer"
           style={{
             background: `linear-gradient(135deg, ${colorFrom} 0%, ${colorTo} 100%)`,
-            boxShadow: `0 8px 32px ${colorFrom}55, 0 2px 8px ${colorFrom}30`,
-            border: '1.5px solid rgba(255,255,255,0.25)',
+            border: '2.5px solid var(--border-color)',
+            boxShadow: 'var(--shadow-md)',
           }}
         >
-          {/* Декоративный паттерн */}
-          <div
-            className="absolute inset-0 opacity-10"
-            style={{
-              backgroundImage: `radial-gradient(circle at 20% 80%, white 1px, transparent 1px),
-                radial-gradient(circle at 80% 20%, white 1px, transparent 1px),
-                radial-gradient(circle at 50% 50%, white 0.5px, transparent 0.5px)`,
-              backgroundSize: '40px 40px, 40px 40px, 20px 20px',
-            }}
-          />
-
           <div className="relative p-4 pb-4">
             {/* Бейдж с количеством параграфов */}
             <div className="flex justify-between items-start mb-3">
-              <div className="text-3xl filter drop-shadow-sm">{emoji}</div>
               <div
                 style={{
-                  background: 'rgba(253,246,236,0.2)',
-                  color: '#FDF6EC',
-                  fontFamily: 'var(--font-body)',
+                  fontSize: 28,
+                  background: 'var(--yellow)',
+                  border: '2px solid var(--border-color)',
+                  borderRadius: '10px',
+                  padding: '2px 8px',
+                  boxShadow: '2px 2px 0px var(--shadow-color)',
+                  lineHeight: 1.3,
                 }}
-                className="text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap"
+              >
+                {emoji}
+              </div>
+              <div
+                style={{
+                  background: 'var(--yellow)',
+                  color: 'var(--ink)',
+                  fontFamily: 'var(--font-body)',
+                  border: '2px solid var(--border-color)',
+                  borderRadius: '20px',
+                  boxShadow: '2px 2px 0px var(--shadow-color)',
+                }}
+                className="text-xs font-extrabold px-3 py-0.5 whitespace-nowrap"
               >
                 {paragraphCount} §
               </div>
@@ -66,13 +70,13 @@ export function SectionCard({
 
             {/* Заголовок */}
             <h2
-              style={{ fontFamily: 'var(--font-heading)', color: '#FDF6EC' }}
+              style={{ fontFamily: 'var(--font-heading)', color: '#FFFFFF' }}
               className="text-base font-bold leading-tight mb-0.5"
             >
               {title}
             </h2>
             <p
-              style={{ color: 'rgba(253,246,236,0.7)', fontFamily: 'var(--font-body)' }}
+              style={{ color: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-body)' }}
               className="text-xs mb-4 leading-snug"
             >
               {subtitle}
@@ -82,25 +86,35 @@ export function SectionCard({
             <div>
               <div className="flex justify-between items-center mb-1">
                 <span
-                  style={{ color: 'rgba(253,246,236,0.8)', fontFamily: 'var(--font-body)' }}
-                  className="text-xs"
+                  style={{ color: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-body)' }}
+                  className="text-xs font-bold"
                 >
                   Пройдено
                 </span>
                 <span
-                  style={{ color: '#FDF6EC', fontFamily: 'var(--font-body)' }}
-                  className="text-xs font-bold"
+                  style={{
+                    color: 'var(--ink)',
+                    fontFamily: 'var(--font-body)',
+                    background: 'rgba(255,255,255,0.9)',
+                    borderRadius: '6px',
+                    padding: '1px 6px',
+                    fontSize: '11px',
+                    fontWeight: 800,
+                  }}
                 >
                   {completedCount}/{paragraphCount}
                 </span>
               </div>
               <div
-                className="h-1.5 rounded-full overflow-hidden"
-                style={{ background: 'rgba(0,0,0,0.2)' }}
+                className="h-2.5 rounded-full overflow-hidden"
+                style={{
+                  background: 'rgba(0,0,0,0.3)',
+                  border: '1.5px solid rgba(0,0,0,0.2)',
+                }}
               >
                 <motion.div
                   className="h-full rounded-full"
-                  style={{ background: 'rgba(253,246,236,0.7)' }}
+                  style={{ background: 'var(--yellow)' }}
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 0.8, delay: delay + 0.3, ease: 'easeOut' }}

@@ -5,48 +5,77 @@
 @custom-variant dark (&:is(.dark *));
 
 /* =============================================
-   Gamified purple theme — переменные
+   Neo-Brutalist Gamified Theme
    ============================================= */
 :root {
-  /* Основная палитра */
-  --parchment:      #F4F1FE;
-  --parchment-dark: #EAE5FD;
+  /* Neo-Brutalist palette */
+  --indigo:       #4338CA;
+  --indigo-dark:  #3730A3;
+  --indigo-light: #6366F1;
+  --yellow:       #FBBF24;
+  --yellow-light: #FDE68A;
+  --yellow-dark:  #D97706;
+  --pink:         #FF6B8A;
+  --pink-light:   #FFB3C6;
+  --pink-dark:    #E11D48;
+  --lime:         #84CC16;
+  --lime-dark:    #65A30D;
+  --sky:          #38BDF8;
+  --sky-dark:     #0EA5E9;
+
+  /* Surfaces */
+  --bg:           #F5F3FF;
+  --bg-dark:      #EDE9FE;
+  --card-bg:      #FFFFFF;
+
+  /* Ink */
+  --ink:          #1A1A2E;
+  --ink-light:    #2D2D4E;
+  --ink-muted:    #6B7280;
+
+  /* Brutalist accents */
+  --border-color: #1A1A2E;
+  --shadow-color: #1A1A2E;
+  --border-w:     2.5px;
+  --shadow-sm:    3px 3px 0px var(--shadow-color);
+  --shadow-md:    5px 5px 0px var(--shadow-color);
+  --shadow-lg:    8px 8px 0px var(--shadow-color);
+
+  /* Legacy aliases (for backward compat) */
+  --parchment:      var(--bg);
+  --parchment-dark: var(--bg-dark);
   --parchment-deep: #C9C0F0;
-  --terracotta:     #5E35D6;
-  --terracotta-dark: #4527A0;
-  --terracotta-light: #7E57C2;
-  --ink:            #1A1A2E;
-  --ink-light:      #2D2D4E;
-  --ink-muted:      #6B7280;
+  --terracotta:     var(--indigo);
+  --terracotta-dark: var(--indigo-dark);
+  --terracotta-light: var(--indigo-light);
   --olive:          #27AE60;
   --olive-dark:     #1E8449;
-  --gold:           #F5A623;
-  --gold-light:     #FFD93D;
-  --sky:            #4361EE;
+  --gold:           var(--yellow);
+  --gold-light:     var(--yellow-light);
 
   /* shadcn overrides */
-  --radius: 0.75rem;
-  --background: var(--parchment);
+  --radius: 1rem;
+  --background: var(--bg);
   --foreground: var(--ink);
-  --card: #FFFFFF;
+  --card: var(--card-bg);
   --card-foreground: var(--ink);
-  --popover: #FFFFFF;
+  --popover: var(--card-bg);
   --popover-foreground: var(--ink);
-  --primary: var(--terracotta);
+  --primary: var(--indigo);
   --primary-foreground: #FFFFFF;
-  --secondary: var(--parchment-dark);
+  --secondary: var(--bg-dark);
   --secondary-foreground: var(--ink);
-  --muted: var(--parchment-dark);
+  --muted: var(--bg-dark);
   --muted-foreground: var(--ink-muted);
-  --accent: var(--gold-light);
+  --accent: var(--yellow);
   --accent-foreground: var(--ink);
-  --destructive: #EF4444;
-  --border: var(--parchment-deep);
-  --input: var(--parchment-dark);
-  --ring: var(--terracotta);
+  --destructive: var(--pink);
+  --border: var(--border-color);
+  --input: var(--bg-dark);
+  --ring: var(--indigo);
 
   /* Шрифты */
-  --font-heading: var(--font-comfortaa), var(--font-nunito), sans-serif;
+  --font-heading: var(--font-rubik), var(--font-nunito), sans-serif;
   --font-body: var(--font-nunito), 'Trebuchet MS', sans-serif;
 }
 
@@ -89,7 +118,7 @@
   }
 
   body {
-    background-color: var(--parchment);
+    background-color: var(--bg);
     color: var(--ink);
     font-family: var(--font-body);
     min-height: 100dvh;
@@ -102,60 +131,159 @@
 }
 
 /* =============================================
-   Утилиты gamified темы
+   Neo-Brutalist utility classes
    ============================================= */
+
+/* Карточка — белая с толстой обводкой и чёрной тенью */
+.brutal-card {
+  background: var(--card-bg);
+  border: var(--border-w) solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.brutal-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Legacy alias */
+.parchment-card {
+  background: var(--card-bg);
+  border: var(--border-w) solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+}
+
+/* Кнопка primary — neo-brutalist */
+.btn-brutal {
+  background: var(--yellow);
+  color: var(--ink);
+  border: var(--border-w) solid var(--border-color);
+  border-radius: calc(var(--radius) - 2px);
+  font-family: var(--font-body);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.btn-brutal:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-md);
+}
+.btn-brutal:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px var(--shadow-color);
+}
+
+/* Legacy alias — теперь neo-brutalist */
+.btn-terracotta {
+  background: var(--yellow);
+  color: var(--ink);
+  border: var(--border-w) solid var(--border-color);
+  border-radius: calc(var(--radius) - 2px);
+  font-family: var(--font-body);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.btn-terracotta:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-md);
+}
+.btn-terracotta:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px var(--shadow-color);
+}
+
+/* Secondary button */
+.btn-brutal-secondary {
+  background: var(--card-bg);
+  color: var(--ink);
+  border: var(--border-w) solid var(--border-color);
+  border-radius: calc(var(--radius) - 2px);
+  font-family: var(--font-body);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.btn-brutal-secondary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-md);
+}
+.btn-brutal-secondary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px var(--shadow-color);
+}
+
+/* Indigo button (for primary actions) */
+.btn-brutal-indigo {
+  background: var(--indigo);
+  color: #FFFFFF;
+  border: var(--border-w) solid var(--border-color);
+  border-radius: calc(var(--radius) - 2px);
+  font-family: var(--font-body);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.btn-brutal-indigo:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-md);
+}
+.btn-brutal-indigo:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px var(--shadow-color);
+}
+
+/* Pink button */
+.btn-brutal-pink {
+  background: var(--pink);
+  color: #FFFFFF;
+  border: var(--border-w) solid var(--border-color);
+  border-radius: calc(var(--radius) - 2px);
+  font-family: var(--font-body);
+  font-weight: 800;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.btn-brutal-pink:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-md);
+}
+.btn-brutal-pink:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px var(--shadow-color);
+}
 
 /* Декоративный разделитель */
 .divider-ornament {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: var(--terracotta);
-  opacity: 0.4;
+  color: var(--indigo);
+  opacity: 0.5;
 }
 .divider-ornament::before,
 .divider-ornament::after {
   content: '';
   flex: 1;
-  height: 1px;
-  background: linear-gradient(to right, transparent, var(--terracotta), transparent);
-}
-
-/* Белая карточка */
-.parchment-card {
-  background: #FFFFFF;
-  border: 1.5px solid var(--parchment-deep);
-  border-radius: var(--radius);
-  box-shadow:
-    0 4px 20px rgba(94, 53, 214, 0.10),
-    0 1px 4px rgba(94, 53, 214, 0.06);
-}
-
-/* Кнопка primary (purple) */
-.btn-terracotta {
-  background: var(--terracotta);
-  color: #FFFFFF;
-  border-radius: calc(var(--radius) - 2px);
-  font-family: var(--font-body);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-  box-shadow: 0 3px 0 var(--terracotta-dark);
-}
-.btn-terracotta:hover {
-  background: var(--terracotta-light);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 0 var(--terracotta-dark);
-}
-.btn-terracotta:active {
-  transform: translateY(1px);
-  box-shadow: 0 2px 0 var(--terracotta-dark);
+  height: 2.5px;
+  background: var(--ink);
+  border-radius: 2px;
 }
 
 /* Микрофон — пульсация */
 @keyframes mic-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(94,53,214,0.4); }
-  50% { box-shadow: 0 0 0 16px rgba(94,53,214,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(67,56,202,0.4); }
+  50% { box-shadow: 0 0 0 16px rgba(67,56,202,0); }
 }
 .mic-pulsing {
   animation: mic-pulse 1.4s ease-in-out infinite;
@@ -167,7 +295,7 @@
   100% { background-position: 200% center; }
 }
 .medal-gold {
-  background: linear-gradient(105deg, #F5A623 0%, #FFD93D 40%, #F5A623 60%, #D4891A 100%);
+  background: linear-gradient(105deg, #FBBF24 0%, #FDE68A 40%, #FBBF24 60%, #D97706 100%);
   background-size: 200% auto;
   animation: medal-shine 2.5s linear infinite;
   -webkit-background-clip: text;
@@ -177,9 +305,9 @@
 
 /* Прокрутка */
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--parchment-dark); }
-::-webkit-scrollbar-thumb { background: var(--parchment-deep); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--terracotta-light); }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: var(--indigo-light); border-radius: 4px; border: 2px solid var(--ink); }
+::-webkit-scrollbar-thumb:hover { background: var(--indigo); }
 
 /* Fade-in анимация */
 @keyframes fadeUp {
@@ -188,4 +316,19 @@
 }
 .fade-up {
   animation: fadeUp 0.5s ease forwards;
+}
+
+/* Wiggle decorations */
+.wiggle-border {
+  position: relative;
+}
+.wiggle-border::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 10%;
+  right: 10%;
+  height: 3px;
+  background: var(--ink);
+  border-radius: 2px;
 }

@@ -39,7 +39,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [isEvaluating, setIsEvaluating] = useState(false)
   const [done, setDone] = useState(false)
 
-  // No wrong answers — nothing to review
   if (reviewQuestions.length === 0) {
     return (
       <div className="min-h-dvh flex flex-col">
@@ -48,19 +47,18 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           <div style={{ fontSize: 56 }} className="mb-4">🌿</div>
           <h1
             style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}
-            className="text-xl font-bold mb-2"
+            className="text-xl font-extrabold mb-2"
           >
             Ошибок нет!
           </h1>
           <p
             style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)' }}
-            className="text-sm mb-6"
+            className="text-sm mb-6 font-semibold"
           >
             Ты ответил правильно на все вопросы этого параграфа.
           </p>
           <Link href={`/paragraph/${paragraphId}`}>
-            <button className="btn-terracotta px-8 py-3 text-sm font-bold"
-              style={{ fontFamily: 'var(--font-body)' }}>
+            <button className="btn-terracotta px-8 py-3 text-sm">
               ← Назад к параграфу
             </button>
           </Link>
@@ -127,7 +125,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     }
   }
 
-  // Done screen
   if (done) {
     return (
       <div className="min-h-dvh flex flex-col">
@@ -140,34 +137,20 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             className="space-y-5"
           >
             <div style={{ fontSize: 64 }}>🔄</div>
-            <h1 style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)', fontSize: 22, fontWeight: 800 }}>
+            <h1 style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)', fontSize: 22, fontWeight: 900 }}>
               Повторение завершено!
             </h1>
-            <p style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)', fontSize: 14 }}>
+            <p style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600 }}>
               Повторил {reviewQuestions.length} {reviewQuestions.length === 1 ? 'вопрос' : 'вопроса'}
             </p>
             <div className="flex flex-col gap-3 w-full pt-2">
               <Link href={`/paragraph/${paragraphId}/quiz`}>
-                <button className="btn-terracotta w-full py-3.5 text-sm font-bold"
-                  style={{ fontFamily: 'var(--font-body)' }}>
+                <button className="btn-terracotta w-full py-3.5 text-sm">
                   📝 Тест по датам
                 </button>
               </Link>
               <Link href={`/paragraph/${paragraphId}`}>
-                <button
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    background: 'var(--parchment-dark)',
-                    border: '1.5px solid var(--parchment-deep)',
-                    borderRadius: '10px',
-                    color: 'var(--ink)',
-                    cursor: 'pointer',
-                  }}
-                >
+                <button className="btn-brutal-secondary w-full py-3 text-sm">
                   ← Назад к параграфу
                 </button>
               </Link>
@@ -183,19 +166,35 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       <Header />
 
       {/* Progress */}
-      <div style={{ background: 'var(--parchment-dark)', borderBottom: '1px solid var(--parchment-deep)' }}>
+      <div style={{
+        background: 'var(--card-bg)',
+        borderBottom: '2.5px solid var(--border-color)',
+      }}>
         <div className="max-w-lg mx-auto px-4 py-2 flex items-center gap-3">
           <Link href={`/paragraph/${paragraphId}`}
-            style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)', fontSize: '12px' }}>
+            style={{
+              color: 'var(--ink)',
+              fontFamily: 'var(--font-body)',
+              fontSize: '14px',
+              fontWeight: 800,
+              background: 'var(--yellow-light)',
+              border: '2px solid var(--border-color)',
+              borderRadius: '8px',
+              padding: '2px 8px',
+              boxShadow: '2px 2px 0px var(--shadow-color)',
+            }}>
             ←
           </Link>
           <div className="flex-1">
             <div className="flex justify-between items-center mb-1">
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)' }}>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)', fontWeight: 700 }}>
                 🔄 Повторение ошибок · {current + 1} / {reviewQuestions.length}
               </span>
             </div>
-            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--parchment-deep)' }}>
+            <div className="h-2.5 rounded-full overflow-hidden" style={{
+              background: 'var(--bg-dark)',
+              border: '1.5px solid var(--border-color)',
+            }}>
               <motion.div
                 className="h-full rounded-full"
                 style={{ background: 'var(--sky)' }}
@@ -215,8 +214,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         >
           <div style={{
             background: 'var(--sky)',
-            color: '#FDF6EC',
-            borderRadius: '50%',
+            color: '#FFFFFF',
+            borderRadius: '10px',
             width: 32,
             height: 32,
             display: 'flex',
@@ -224,14 +223,16 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             justifyContent: 'center',
             fontSize: 14,
             flexShrink: 0,
+            border: '2px solid var(--border-color)',
+            boxShadow: '2px 2px 0px var(--shadow-color)',
           }}>
             🔄
           </div>
           <div>
-            <p style={{ fontFamily: 'var(--font-body)', color: 'var(--ink)', fontSize: 12, fontWeight: 600 }}>
+            <p style={{ fontFamily: 'var(--font-body)', color: 'var(--ink)', fontSize: 12, fontWeight: 700 }}>
               §{paragraphId} · {para.title}
             </p>
-            <p style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-muted)', fontSize: 11 }}>
+            <p style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-muted)', fontSize: 11, fontWeight: 600 }}>
               Работаем над ошибками
             </p>
           </div>
@@ -248,24 +249,28 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           >
             {/* Question */}
             <div style={{
-              background: 'linear-gradient(135deg, var(--sky) 0%, #3a7a8f 100%)',
+              background: 'var(--sky)',
+              border: '2.5px solid var(--border-color)',
               borderRadius: '14px',
               padding: '16px',
+              boxShadow: 'var(--shadow-md)',
             }}>
               <div style={{
                 fontFamily: 'var(--font-body)',
                 fontSize: '10px',
-                color: 'rgba(253,246,236,0.7)',
+                color: 'rgba(255,255,255,0.7)',
                 letterSpacing: '0.1em',
                 marginBottom: 8,
+                fontWeight: 800,
               }}>
                 ВОПРОС {currentQ.idx + 1} (ПОВТОРЕНИЕ)
               </div>
               <p style={{
                 fontFamily: 'var(--font-heading)',
-                color: '#FDF6EC',
+                color: '#FFFFFF',
                 fontSize: '15px',
                 lineHeight: 1.6,
+                fontWeight: 600,
               }}>
                 {currentQ.question}
               </p>
@@ -282,7 +287,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     className="text-center py-4"
                   >
                     <div style={{ fontSize: 28 }}>🤔</div>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink-muted)', marginTop: 8 }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink-muted)', marginTop: 8, fontWeight: 600 }}>
                       Проверяю твой ответ...
                     </p>
                   </motion.div>

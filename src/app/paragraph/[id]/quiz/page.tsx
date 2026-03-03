@@ -9,7 +9,7 @@ import textbook from '@/data/textbook.json'
 import { useAppStore } from '@/stores/app-store'
 
 function getMedalInfo(score: number): { emoji: string; label: string; color: string } {
-  if (score >= 90) return { emoji: '🥇', label: 'Золото!', color: 'var(--gold)' }
+  if (score >= 90) return { emoji: '🥇', label: 'Золото!', color: 'var(--yellow)' }
   if (score >= 60) return { emoji: '🥈', label: 'Серебро!', color: '#9CA3AF' }
   return { emoji: '🥉', label: 'Бронза!', color: '#CD7F32' }
 }
@@ -36,7 +36,6 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
   const [restartKey, setRestartKey] = useState(0)
 
   useEffect(() => {
-    // On initial load, restore saved result from store
     if (restartKey === 0) {
       const saved = useAppStore.getState().getQuizResult(paragraphId)
       if (saved) {
@@ -56,19 +55,18 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
           <div style={{ fontSize: 56 }} className="mb-4">📅</div>
           <h1
             style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}
-            className="text-xl font-bold mb-2"
+            className="text-xl font-extrabold mb-2"
           >
             Тест по датам недоступен
           </h1>
           <p
             style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)' }}
-            className="text-sm mb-6"
+            className="text-sm mb-6 font-semibold"
           >
             Для этого параграфа недостаточно данных о датах.
           </p>
           <Link href={`/paragraph/${paragraphId}`}>
-            <button className="btn-terracotta px-8 py-3 text-sm font-bold"
-              style={{ fontFamily: 'var(--font-body)' }}>
+            <button className="btn-terracotta px-8 py-3 text-sm">
               ← Назад к параграфу
             </button>
           </Link>
@@ -107,7 +105,6 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
 
   function handleNext() {
     if (current === questions.length - 1) {
-      // correctCount is already updated by handleSelect — don't add again
       const finalTotal = questions.length
       setTotalCount(finalTotal)
       saveQuizResult({ paragraphId, correctCount, totalCount: finalTotal })
@@ -152,13 +149,13 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
 
             <div>
               <h1
-                style={{ fontFamily: 'var(--font-heading)', color: medal.color, fontSize: 28, fontWeight: 800 }}
+                style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)', fontSize: 28, fontWeight: 900 }}
               >
                 {medal.label}
               </h1>
               <p
                 style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)', marginTop: 6 }}
-                className="text-sm"
+                className="text-sm font-bold"
               >
                 {correctCount} из {displayTotal} верных ответов ({score}%)
               </p>
@@ -166,8 +163,11 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
 
             {/* Score bar */}
             <div
-              className="h-3 rounded-full overflow-hidden w-full"
-              style={{ background: 'var(--parchment-dark)' }}
+              className="h-4 rounded-full overflow-hidden w-full"
+              style={{
+                background: 'var(--bg-dark)',
+                border: '2px solid var(--border-color)',
+              }}
             >
               <motion.div
                 className="h-full rounded-full"
@@ -180,43 +180,18 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
 
             <div className="flex flex-col gap-3 w-full pt-2">
               <Link href={`/paragraph/${paragraphId}`}>
-                <button className="btn-terracotta w-full py-3.5 text-sm font-bold"
-                  style={{ fontFamily: 'var(--font-body)' }}>
+                <button className="btn-terracotta w-full py-3.5 text-sm">
                   ← Вернуться к параграфу
                 </button>
               </Link>
               <button
                 onClick={handleRestart}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  background: 'rgba(255,217,61,0.12)',
-                  border: '1.5px solid rgba(255,217,61,0.4)',
-                  borderRadius: '10px',
-                  color: '#D4890A',
-                  cursor: 'pointer',
-                }}
+                className="btn-brutal-secondary w-full py-3 text-sm"
               >
                 🔁 Пройти тест заново
               </button>
               <Link href={`/section/${para.sectionId}`}>
-                <button
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    background: '#FFFFFF',
-                    border: '1.5px solid var(--parchment-deep)',
-                    borderRadius: '10px',
-                    color: 'var(--ink)',
-                    cursor: 'pointer',
-                  }}
-                >
+                <button className="btn-brutal-secondary w-full py-3 text-sm">
                   К разделу →
                 </button>
               </Link>
@@ -233,25 +208,51 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
       <Header />
 
       {/* Progress bar */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid var(--parchment-deep)', boxShadow: '0 1px 4px rgba(94,53,214,0.06)' }}>
+      <div style={{
+        background: 'var(--card-bg)',
+        borderBottom: '2.5px solid var(--border-color)',
+      }}>
         <div className="max-w-lg mx-auto px-4 py-2 flex items-center gap-3">
           <Link href={`/paragraph/${paragraphId}`}
-            style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)', fontSize: '12px' }}>
+            style={{
+              color: 'var(--ink)',
+              fontFamily: 'var(--font-body)',
+              fontSize: '14px',
+              fontWeight: 800,
+              background: 'var(--yellow-light)',
+              border: '2px solid var(--border-color)',
+              borderRadius: '8px',
+              padding: '2px 8px',
+              boxShadow: '2px 2px 0px var(--shadow-color)',
+            }}>
             ←
           </Link>
           <div className="flex-1">
             <div className="flex justify-between items-center mb-1">
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)' }}>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)', fontWeight: 700 }}>
                 Тест по датам · {current + 1} / {questions.length}
               </span>
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)' }}>
+              <span
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '11px',
+                  color: 'var(--ink)',
+                  fontWeight: 800,
+                  background: 'var(--yellow-light)',
+                  borderRadius: '6px',
+                  padding: '1px 6px',
+                }}
+              >
                 ✓ {correctCount}
               </span>
             </div>
-            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--parchment-deep)' }}>
+            <div className="h-2.5 rounded-full overflow-hidden" style={{
+              background: 'var(--bg-dark)',
+              border: '1.5px solid var(--border-color)',
+            }}>
               <motion.div
                 className="h-full rounded-full"
-                style={{ background: 'var(--terracotta)' }}
+                style={{ background: 'var(--indigo)' }}
                 animate={{ width: `${((current + (answered ? 1 : 0)) / questions.length) * 100}%` }}
                 transition={{ duration: 0.4 }}
               />
@@ -270,45 +271,49 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
             transition={{ duration: 0.3 }}
             className="space-y-5"
           >
-            {/* Date card (the "question") */}
+            {/* Date card */}
             <div
               style={{
-                background: 'linear-gradient(135deg, #5E35D6 0%, #4527A0 100%)',
+                background: 'var(--indigo)',
+                border: '2.5px solid var(--border-color)',
                 borderRadius: '16px',
                 padding: '24px 20px',
                 textAlign: 'center',
+                boxShadow: 'var(--shadow-md)',
               }}
             >
               <div style={{
                 fontFamily: 'var(--font-body)',
                 fontSize: '10px',
-                color: 'rgba(255,255,255,0.6)',
+                color: 'rgba(255,255,255,0.7)',
                 letterSpacing: '0.12em',
                 marginBottom: 16,
+                fontWeight: 800,
               }}>
                 📅 ЧТО ПРОИЗОШЛО В ЭТУ ДАТУ?
               </div>
               <div style={{
                 display: 'inline-block',
-                background: 'rgba(255,217,61,0.2)',
-                border: '1.5px solid rgba(255,217,61,0.6)',
-                borderRadius: '24px',
+                background: 'var(--yellow)',
+                border: '2.5px solid var(--border-color)',
+                borderRadius: '14px',
                 padding: '10px 24px',
                 fontFamily: 'var(--font-heading)',
-                color: '#FFD93D',
+                color: 'var(--ink)',
                 fontSize: '20px',
-                fontWeight: 700,
+                fontWeight: 900,
+                boxShadow: '3px 3px 0px var(--shadow-color)',
               }}>
                 {q.date}
               </div>
             </div>
 
-            {/* The real question for user */}
             <p style={{
               fontFamily: 'var(--font-body)',
               color: 'var(--ink-muted)',
               fontSize: '12px',
               textAlign: 'center',
+              fontWeight: 700,
             }}>
               Выбери, что произошло в эту дату:
             </p>
@@ -318,26 +323,29 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
               {q.options.map((option, idx) => {
                 const isSelected = selected === idx
                 const isCorrect = idx === q.correctIndex
-                let bg = '#FFFFFF'
-                let border = '1.5px solid var(--parchment-deep)'
+                let bg = 'var(--card-bg)'
+                let border = '2.5px solid var(--border-color)'
                 let color = 'var(--ink)'
                 let icon = ''
+                let shadow = 'var(--shadow-sm)'
 
                 if (answered) {
                   if (isCorrect) {
-                    bg = 'rgba(39,174,96,0.1)'
-                    border = '2px solid var(--olive)'
+                    bg = '#D1FAE5'
+                    border = '2.5px solid var(--border-color)'
                     color = 'var(--ink)'
                     icon = '✓'
+                    shadow = '3px 3px 0px #065F46'
                   } else if (isSelected && !isCorrect) {
-                    bg = 'rgba(245,158,11,0.1)'
-                    border = '2px solid #F59E0B'
-                    color = 'var(--ink-muted)'
+                    bg = 'var(--pink-light)'
+                    border = '2.5px solid var(--border-color)'
+                    color = 'var(--ink)'
                     icon = '✗'
+                    shadow = '3px 3px 0px #9F1239'
                   }
                 } else if (isSelected) {
-                  bg = 'rgba(67,97,238,0.08)'
-                  border = '2px solid var(--sky)'
+                  bg = 'var(--yellow-light)'
+                  border = '2.5px solid var(--border-color)'
                 }
 
                 return (
@@ -351,32 +359,35 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                       width: '100%',
                       background: bg,
                       border,
-                      borderRadius: '12px',
+                      borderRadius: '14px',
                       padding: '14px 16px',
                       textAlign: 'left',
                       cursor: answered ? 'default' : 'pointer',
                       display: 'flex',
                       alignItems: 'flex-start',
                       gap: 10,
+                      boxShadow: shadow,
+                      transition: 'transform 0.1s, box-shadow 0.1s',
                     }}
                   >
                     <span style={{
                       flexShrink: 0,
-                      width: 22,
-                      height: 22,
-                      borderRadius: '50%',
+                      width: 26,
+                      height: 26,
+                      borderRadius: '8px',
                       background: answered && isCorrect
-                        ? 'var(--olive)'
+                        ? '#059669'
                         : answered && isSelected && !isCorrect
-                          ? '#F59E0B'
-                          : 'var(--parchment-deep)',
-                      color: answered && (isCorrect || (isSelected && !isCorrect)) ? '#FFFFFF' : 'var(--ink-muted)',
+                          ? 'var(--pink)'
+                          : 'var(--indigo)',
+                      color: '#FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '11px',
-                      fontWeight: 700,
+                      fontSize: '12px',
+                      fontWeight: 900,
                       fontFamily: 'var(--font-body)',
+                      border: '2px solid var(--border-color)',
                     }}>
                       {icon || String.fromCharCode(65 + idx)}
                     </span>
@@ -385,6 +396,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                       fontSize: '13px',
                       color,
                       lineHeight: 1.5,
+                      fontWeight: 600,
                     }}>
                       {option}
                     </span>
@@ -404,34 +416,36 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                   {selected === q.correctIndex ? (
                     <div
                       style={{
-                        background: 'rgba(107,142,35,0.1)',
-                        border: '1.5px solid var(--olive)',
+                        background: '#D1FAE5',
+                        border: '2.5px solid var(--border-color)',
                         borderRadius: '12px',
                         padding: '12px 16px',
                         marginBottom: 12,
+                        boxShadow: '3px 3px 0px #065F46',
                       }}
                     >
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink)', fontWeight: 600 }}>
+                      <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink)', fontWeight: 800 }}>
                         🌿 Верно!
                       </p>
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--ink-muted)', marginTop: 2 }}>
+                      <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--ink-muted)', marginTop: 2, fontWeight: 600 }}>
                         {q.date} — {q.correctEvent}
                       </p>
                     </div>
                   ) : (
                     <div
                       style={{
-                        background: 'rgba(245,158,11,0.1)',
-                        border: '1.5px solid #F59E0B',
+                        background: 'var(--yellow-light)',
+                        border: '2.5px solid var(--border-color)',
                         borderRadius: '12px',
                         padding: '12px 16px',
                         marginBottom: 12,
+                        boxShadow: 'var(--shadow-sm)',
                       }}
                     >
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: '#D97706', fontWeight: 600 }}>
+                      <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink)', fontWeight: 800 }}>
                         Не совсем...
                       </p>
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--ink-muted)', marginTop: 2 }}>
+                      <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--ink-muted)', marginTop: 2, fontWeight: 600 }}>
                         Правильный ответ: {q.date} — {q.correctEvent}
                       </p>
                     </div>
@@ -439,8 +453,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
 
                   <button
                     onClick={handleNext}
-                    className="btn-terracotta w-full py-3.5 text-sm font-bold"
-                    style={{ fontFamily: 'var(--font-body)' }}
+                    className="btn-terracotta w-full py-3.5 text-sm"
                   >
                     {current === questions.length - 1 ? 'Завершить тест →' : 'Следующий вопрос →'}
                   </button>

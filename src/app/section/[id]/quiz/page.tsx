@@ -27,9 +27,9 @@ interface QuizItem {
 }
 
 const SECTION_META: Record<string, { emoji: string; color: string; name: string }> = {
-  'ancient-greece': { emoji: '🏛️', color: '#4A7C8E', name: 'Древняя Греция' },
-  'ancient-rome': { emoji: '🦅', color: '#8B3A2A', name: 'Древний Рим' },
-  'germanic-slavic': { emoji: '🌲', color: '#4A6741', name: 'Германцы и славяне' },
+  'ancient-greece': { emoji: '🏛️', color: '#4338CA', name: 'Древняя Греция' },
+  'ancient-rome': { emoji: '🦅', color: '#0E7490', name: 'Древний Рим' },
+  'germanic-slavic': { emoji: '🌲', color: '#1B6CA8', name: 'Германцы и славяне' },
 }
 
 function shuffleArray<T>(arr: T[]): T[] {
@@ -46,7 +46,6 @@ function buildSectionQuiz(sectionId: string, paragraphIds: number[]): QuizItem[]
   paragraphIds.forEach((pid) => {
     const para = textbook.paragraphs[String(pid) as keyof typeof textbook.paragraphs]
     if (!para) return
-    // Take up to 2 questions per paragraph
     para.questions.slice(0, 2).forEach((q, qi) => {
       items.push({
         paragraphId: pid,
@@ -57,12 +56,11 @@ function buildSectionQuiz(sectionId: string, paragraphIds: number[]): QuizItem[]
       })
     })
   })
-  // Shuffle and limit to 10 questions for a manageable quiz
   return shuffleArray(items).slice(0, 10)
 }
 
 function getMedalInfo(score: number): { emoji: string; label: string; color: string } {
-  if (score >= 90) return { emoji: '🥇', label: 'Отлично!', color: 'var(--gold)' }
+  if (score >= 90) return { emoji: '🥇', label: 'Отлично!', color: 'var(--yellow)' }
   if (score >= 60) return { emoji: '🥈', label: 'Хорошо!', color: '#9CA3AF' }
   return { emoji: '🥉', label: 'Продолжай учиться!', color: '#CD7F32' }
 }
@@ -74,7 +72,7 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
   const section = textbook.sections.find((s) => s.id === id)
   if (!section) notFound()
 
-  const meta = SECTION_META[id] ?? { emoji: '📖', color: '#5C4033', name: section.title }
+  const meta = SECTION_META[id] ?? { emoji: '📖', color: '#4338CA', name: section.title }
 
   const [questions] = useState<QuizItem[]>(() => buildSectionQuiz(id, section.paragraphs))
   const [current, setCurrent] = useState(0)
@@ -158,9 +156,9 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
             <div>
               <h1 style={{
                 fontFamily: 'var(--font-heading)',
-                color: medal.color,
+                color: 'var(--ink)',
                 fontSize: 26,
-                fontWeight: 800,
+                fontWeight: 900,
               }}>
                 {medal.label}
               </h1>
@@ -169,6 +167,7 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
                 fontFamily: 'var(--font-body)',
                 fontSize: 14,
                 marginTop: 6,
+                fontWeight: 600,
               }}>
                 {meta.emoji} {meta.name}
               </p>
@@ -177,13 +176,17 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
                 fontFamily: 'var(--font-body)',
                 fontSize: 13,
                 marginTop: 4,
+                fontWeight: 700,
               }}>
                 {correctCount} из {questions.length} верных ответов ({score}%)
               </p>
             </div>
 
             {/* Score bar */}
-            <div className="h-3 rounded-full overflow-hidden w-full" style={{ background: 'var(--parchment-deep)' }}>
+            <div className="h-4 rounded-full overflow-hidden w-full" style={{
+              background: 'var(--bg-dark)',
+              border: '2px solid var(--border-color)',
+            }}>
               <motion.div
                 className="h-full rounded-full"
                 style={{ background: medal.color }}
@@ -195,13 +198,13 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
 
             {/* Results breakdown */}
             <div className="parchment-card p-4 text-left space-y-2">
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--ink-muted)', fontWeight: 700, letterSpacing: '0.08em' }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--ink-muted)', fontWeight: 800, letterSpacing: '0.08em' }}>
                 ИТОГ ПО ВОПРОСАМ
               </p>
               {questions.map((item, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <span style={{ fontSize: 12 }}>{i < correctCount ? '✅' : '❌'}</span>
-                  <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--ink-muted)' }}>
+                  <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--ink-muted)', fontWeight: 600 }}>
                     §{item.paragraphId} — {item.question.slice(0, 50)}{item.question.length > 50 ? '...' : ''}
                   </span>
                 </div>
@@ -210,24 +213,12 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
 
             <div className="flex flex-col gap-3 w-full pt-1">
               <Link href={`/section/${id}`}>
-                <button className="btn-terracotta w-full py-3.5 text-sm font-bold"
-                  style={{ fontFamily: 'var(--font-body)' }}>
+                <button className="btn-terracotta w-full py-3.5 text-sm">
                   ← Вернуться к разделу
                 </button>
               </Link>
               <Link href="/">
-                <button style={{
-                  width: '100%',
-                  padding: '12px',
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  background: 'var(--parchment-dark)',
-                  border: '1.5px solid var(--parchment-deep)',
-                  borderRadius: '10px',
-                  color: 'var(--ink)',
-                  cursor: 'pointer',
-                }}>
+                <button className="btn-brutal-secondary w-full py-3 text-sm">
                   На главную
                 </button>
               </Link>
@@ -244,27 +235,46 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
       <Header />
 
       {/* Progress bar */}
-      <div
-        style={{
-          background: `linear-gradient(to right, ${meta.color}22, ${meta.color}11)`,
-          borderBottom: `1px solid ${meta.color}44`,
-        }}
-      >
+      <div style={{
+        background: 'var(--card-bg)',
+        borderBottom: '2.5px solid var(--border-color)',
+      }}>
         <div className="max-w-2xl mx-auto px-4 py-2 flex items-center gap-3">
           <Link href={`/section/${id}`}
-            style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)', fontSize: '12px' }}>
+            style={{
+              color: 'var(--ink)',
+              fontFamily: 'var(--font-body)',
+              fontSize: '14px',
+              fontWeight: 800,
+              background: 'var(--yellow-light)',
+              border: '2px solid var(--border-color)',
+              borderRadius: '8px',
+              padding: '2px 8px',
+              boxShadow: '2px 2px 0px var(--shadow-color)',
+            }}>
             ←
           </Link>
           <div className="flex-1">
             <div className="flex justify-between items-center mb-1">
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)' }}>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)', fontWeight: 700 }}>
                 {meta.emoji} Обобщающий тест · {current + 1} / {questions.length}
               </span>
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)' }}>
+              <span style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: '11px',
+                color: 'var(--ink)',
+                fontWeight: 800,
+                background: 'var(--yellow-light)',
+                borderRadius: '6px',
+                padding: '1px 6px',
+              }}>
                 ✓ {correctCount}
               </span>
             </div>
-            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--parchment-deep)' }}>
+            <div className="h-2.5 rounded-full overflow-hidden" style={{
+              background: 'var(--bg-dark)',
+              border: '1.5px solid var(--border-color)',
+            }}>
               <motion.div
                 className="h-full rounded-full"
                 style={{ background: meta.color }}
@@ -291,36 +301,41 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
               display: 'inline-flex',
               alignItems: 'center',
               gap: 6,
-              background: `${meta.color}18`,
-              border: `1px solid ${meta.color}40`,
-              borderRadius: 20,
+              background: 'var(--yellow-light)',
+              border: '2px solid var(--border-color)',
+              borderRadius: 10,
               padding: '4px 12px',
+              boxShadow: '2px 2px 0px var(--shadow-color)',
             }}>
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: meta.color, fontWeight: 700 }}>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--ink)', fontWeight: 800 }}>
                 §{q.paragraphId} · {q.paragraphTitle}
               </span>
             </div>
 
             {/* Question card */}
             <div style={{
-              background: `linear-gradient(135deg, ${meta.color} 0%, ${meta.color}cc 100%)`,
+              background: meta.color,
+              border: '2.5px solid var(--border-color)',
               borderRadius: '14px',
               padding: '16px',
+              boxShadow: 'var(--shadow-md)',
             }}>
               <div style={{
                 fontFamily: 'var(--font-body)',
                 fontSize: '10px',
-                color: 'rgba(253,246,236,0.7)',
+                color: 'rgba(255,255,255,0.7)',
                 letterSpacing: '0.1em',
                 marginBottom: 8,
+                fontWeight: 800,
               }}>
                 ВОПРОС {current + 1}
               </div>
               <p style={{
                 fontFamily: 'var(--font-heading)',
-                color: '#FDF6EC',
+                color: '#FFFFFF',
                 fontSize: '15px',
                 lineHeight: 1.6,
+                fontWeight: 600,
               }}>
                 {q.question}
               </p>
@@ -337,7 +352,7 @@ export default function SectionQuizPage({ params }: { params: Promise<{ id: stri
                     className="text-center py-4"
                   >
                     <div style={{ fontSize: 28 }}>🤔</div>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink-muted)', marginTop: 8 }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink-muted)', marginTop: 8, fontWeight: 600 }}>
                       Проверяю твой ответ...
                     </p>
                   </motion.div>

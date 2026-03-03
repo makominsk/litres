@@ -5,6 +5,21 @@ import textbook from '@/data/textbook.json'
 import textbookPages from '@/data/textbook-pages.json'
 import { useTextbookStore } from '@/stores/textbook-store'
 
+const FIRST_NUMBERED_PDF_PAGE = 7
+const LAST_NUMBERED_PDF_PAGE = 137
+const FIRST_TEXTBOOK_PAGE = 4
+const LAST_TEXTBOOK_PAGE = 134
+
+function pdfToTextbookPage(pdfPage: number) {
+  if (pdfPage < FIRST_NUMBERED_PDF_PAGE || pdfPage > LAST_NUMBERED_PDF_PAGE) return null
+  return pdfPage - 3
+}
+
+function textbookToPdfPage(textbookPage: number) {
+  if (textbookPage < FIRST_TEXTBOOK_PAGE || textbookPage > LAST_TEXTBOOK_PAGE) return null
+  return textbookPage + 3
+}
+
 export function TextbookModal() {
   const isOpen = useTextbookStore((s) => s.isOpen)
   const closeTextbook = useTextbookStore((s) => s.closeTextbook)
@@ -16,11 +31,14 @@ export function TextbookModal() {
   const selectedParagraphId = useTextbookStore((s) => s.selectedParagraphId)
   const setSelectedParagraphId = useTextbookStore((s) => s.setSelectedParagraphId)
 
-  const [pageInput, setPageInput] = useState(String(currentPage))
+  const textbookPage = pdfToTextbookPage(currentPage)
+  const [pageInput, setPageInput] = useState(
+    textbookPage ? String(textbookPage) : String(FIRST_TEXTBOOK_PAGE)
+  )
 
   useEffect(() => {
-    setPageInput(String(currentPage))
-  }, [currentPage])
+    setPageInput(textbookPage ? String(textbookPage) : String(FIRST_TEXTBOOK_PAGE))
+  }, [textbookPage])
 
   useEffect(() => {
     if (!isOpen) return
@@ -46,9 +64,11 @@ export function TextbookModal() {
 
   function handlePageSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const page = Number(pageInput)
-    if (!Number.isFinite(page)) return
-    goToPage(page)
+    const textbookPageToGo = Number(pageInput)
+    if (!Number.isFinite(textbookPageToGo)) return
+    const pdfPage = textbookToPdfPage(textbookPageToGo)
+    if (!pdfPage) return
+    goToPage(pdfPage)
   }
 
   function handleParagraphGo() {
@@ -103,15 +123,15 @@ export function TextbookModal() {
                   След. →
                 </button>
                 <span style={{ color: 'var(--ink)', fontFamily: 'var(--font-body)' }} className="text-sm sm:text-base font-bold">
-                  Стр. {currentPage} / {totalPages}
+                  Стр. {textbookPage ?? '—'} / {LAST_TEXTBOOK_PAGE}
                 </span>
               </div>
 
               <form onSubmit={handlePageSubmit} className="flex items-center gap-2">
                 <input
                   type="number"
-                  min={1}
-                  max={totalPages}
+                  min={FIRST_TEXTBOOK_PAGE}
+                  max={LAST_TEXTBOOK_PAGE}
                   value={pageInput}
                   onChange={(e) => setPageInput(e.target.value)}
                   className="w-24 px-2 py-2 text-sm sm:text-base font-bold rounded-md"
@@ -173,7 +193,7 @@ export function TextbookModal() {
               src={`/textbook.pdf#page=${currentPage}&zoom=page-width`}
             />
             <p style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)' }} className="text-xs sm:text-sm mt-2 font-semibold">
-              Файл должен лежать в <code>/public/textbook.pdf</code>
+              Поле страницы работает по нумерации учебника (стр. 4-134).
             </p>
           </div>
         </div>

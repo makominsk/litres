@@ -61,7 +61,7 @@ export function TextbookModal() {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-[70] textbook-safe-top" style={{ background: 'rgba(15, 23, 42, 0.82)' }}>
+    <div className="fixed inset-0 z-[2000] textbook-safe-top" style={{ background: 'rgba(15, 23, 42, 0.82)' }}>
       <div className="w-full h-full p-2 sm:p-4">
         <div
           className="w-full h-full flex flex-col overflow-hidden textbook-modal-content"

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Header } from '@/components/ui/header'
 import { SectionCard } from '@/components/home/section-card'
+import { RandomHistoryFact } from '@/components/home/random-history-fact'
 import { TextbookLauncher } from '@/components/textbook/textbook-launcher'
 import { TextbookModal } from '@/components/textbook/textbook-modal'
 import { useAppStore } from '@/stores/app-store'
@@ -220,6 +221,15 @@ export default function HomePage() {
             )
           })}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+          className="mt-5"
+        >
+          <RandomHistoryFact />
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0 }}

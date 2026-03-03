@@ -40,6 +40,7 @@ interface AppState {
     total: number
   }
   getWrongQuestions: (paragraphId: number) => number[]
+  clearParagraphAnswers: (paragraphId: number) => void
 }
 
 export const useAppStore = create<AppState>()(
@@ -100,6 +101,11 @@ export const useAppStore = create<AppState>()(
           .filter((a) => a.paragraphId === paragraphId && !a.isCorrect)
           .map((a) => a.questionIndex)
       },
+
+      clearParagraphAnswers: (paragraphId) =>
+        set((state) => ({
+          answers: state.answers.filter((a) => a.paragraphId !== paragraphId),
+        })),
 
       getSectionProgress: (paragraphIds) => {
         const { answers } = get()

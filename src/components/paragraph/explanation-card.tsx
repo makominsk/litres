@@ -55,12 +55,12 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
         </div>
         <div>
           <div
-            style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)', fontSize: '15px', fontWeight: 800 }}
+            style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)', fontSize: '18px', fontWeight: 800 }}
           >
             {result.score >= 80 ? 'Отлично!' : result.score >= 50 ? 'Хорошо!' : 'Ты на верном пути!'}
           </div>
           <div
-            style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-muted)', fontSize: '11px', fontWeight: 700 }}
+            style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-muted)', fontSize: '13px', fontWeight: 700 }}
           >
             {result.score} / 100 баллов
           </div>
@@ -81,7 +81,7 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
           alignItems: 'center',
           justifyContent: 'center',
           gap: 10,
-          fontSize: '14px',
+          fontSize: '16px',
           cursor: isLoading ? 'wait' : 'pointer',
           opacity: isError ? 0.8 : 1,
         }}
@@ -104,7 +104,7 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
           style={{
             fontFamily: 'var(--font-body)',
             color: 'var(--ink)',
-            fontSize: '14px',
+            fontSize: '16px',
             lineHeight: 1.7,
             fontWeight: 500,
           }}
@@ -127,10 +127,10 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
             boxShadow: 'var(--shadow-sm)',
           }}
         >
-          <div style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink)', fontWeight: 800, marginBottom: 4 }}>
+          <div style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink)', fontWeight: 800, marginBottom: 4 }}>
             💡 Знаешь ли ты?
           </div>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink)', lineHeight: 1.6, fontWeight: 500 }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: '15px', color: 'var(--ink)', lineHeight: 1.6, fontWeight: 500 }}>
             {result.funFact}
           </p>
         </motion.div>
@@ -150,10 +150,10 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
             boxShadow: '3px 3px 0px #1E3A5F',
           }}
         >
-          <div style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink)', fontWeight: 800, marginBottom: 4 }}>
+          <div style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink)', fontWeight: 800, marginBottom: 4 }}>
             🔗 Сравни с сегодняшним днём
           </div>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink)', lineHeight: 1.6, fontWeight: 500 }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: '15px', color: 'var(--ink)', lineHeight: 1.6, fontWeight: 500 }}>
             {result.modernAnalogy}
           </p>
         </motion.div>
@@ -174,10 +174,10 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
             boxShadow: 'var(--shadow-md)',
           }}
         >
-          <div style={{ fontFamily: 'var(--font-body)', fontSize: '10px', color: 'rgba(255,255,255,0.7)', marginBottom: 6, letterSpacing: '0.1em', fontWeight: 800 }}>
+          <div style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'rgba(255,255,255,0.7)', marginBottom: 6, letterSpacing: '0.1em', fontWeight: 800 }}>
             🧠 КАК ЗАПОМНИТЬ
           </div>
-          <p style={{ fontFamily: 'var(--font-heading)', fontSize: '14px', color: 'var(--yellow)', fontStyle: 'italic', lineHeight: 1.5, fontWeight: 700 }}>
+          <p style={{ fontFamily: 'var(--font-heading)', fontSize: '16px', color: 'var(--yellow)', fontStyle: 'italic', lineHeight: 1.5, fontWeight: 700 }}>
             «{result.mnemonic}»
           </p>
         </motion.div>
@@ -189,7 +189,7 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
         onClick={onNext}
-        className="btn-terracotta w-full py-3.5 text-sm"
+        className="btn-terracotta w-full py-3.5 text-base"
       >
         {isLast ? '🏁 Завершить параграф' : 'Следующий вопрос →'}
       </motion.button>

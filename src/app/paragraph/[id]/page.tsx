@@ -60,6 +60,8 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
     return idx === -1 ? 0 : idx
   })()
 
+  const clearParagraphAnswers = useAppStore((s) => s.clearParagraphAnswers)
+
   const [questionIndex, setQuestionIndex] = useState(firstUnanswered)
   const [result, setResult] = useState<EvaluateResult | null>(null)
   const [isEvaluating, setIsEvaluating] = useState(false)
@@ -138,6 +140,17 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
     }
   }
 
+  function handleRestart() {
+    clearParagraphAnswers(paragraphId)
+    setQuestionIndex(0)
+    setResult(null)
+    setHintLevel(0)
+    setHintText('')
+    setEvalError(false)
+    setShowFunFact(true)
+    setDone(false)
+  }
+
   // Экран завершения
   if (done) {
     return (
@@ -153,30 +166,36 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
             <div style={{ fontSize: 72 }}>🎉</div>
             <h1
               style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}
-              className="text-2xl font-extrabold"
+              className="text-3xl font-extrabold"
             >
               Параграф пройден!
             </h1>
             <p
               style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)' }}
-              className="text-sm font-semibold"
+              className="text-base font-semibold"
             >
               §{paragraphId} · {para.title}
             </p>
 
             <div className="grid grid-cols-2 gap-3 w-full">
               <Link href={`/paragraph/${paragraphId}/quiz`} className="col-span-2">
-                <button className="btn-terracotta w-full py-3.5 text-sm">
+                <button className="btn-terracotta w-full py-3.5 text-base">
                   📝 Тест по датам
                 </button>
               </Link>
+              <button
+                onClick={handleRestart}
+                className="btn-brutal-secondary w-full py-3 text-sm col-span-2"
+              >
+                🔁 Пройти тест снова
+              </button>
               <Link href={`/paragraph/${paragraphId}/review`}>
-                <button className="btn-brutal-secondary w-full py-3 text-[13px]">
+                <button className="btn-brutal-secondary w-full py-3 text-sm">
                   🔄 Ошибки
                 </button>
               </Link>
               <Link href={`/section/${sectionId}`}>
-                <button className="btn-brutal-secondary w-full py-3 text-[13px]">
+                <button className="btn-brutal-secondary w-full py-3 text-sm">
                   ← Раздел
                 </button>
               </Link>
@@ -216,7 +235,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
           <div className="flex-1">
             <div className="flex justify-between items-center mb-1">
               <span
-                style={{ fontFamily: 'var(--font-body)', fontSize: '11px', color: 'var(--ink-muted)', fontWeight: 700 }}
+                style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink-muted)', fontWeight: 700 }}
               >
                 §{paragraphId} · Вопрос {questionIndex + 1} из {questions.length}
               </span>
@@ -245,7 +264,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
           className="parchment-card p-4 text-center"
         >
           <h1
-            style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)', fontSize: '17px', fontWeight: 800 }}
+            style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)', fontSize: '20px', fontWeight: 800 }}
           >
             {para.title}
           </h1>
@@ -281,10 +300,10 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                     boxShadow: 'var(--shadow-sm)',
                   }}
                 >
-                  <span style={{ fontFamily: 'var(--font-body)', fontSize: '10px', color: 'var(--ink)', fontWeight: 800, letterSpacing: '0.08em' }}>
+                  <span style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--ink)', fontWeight: 800, letterSpacing: '0.08em' }}>
                     ✨ ТЫ ЗНАЛ?
                   </span>
-                  <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--ink)', marginTop: 4, lineHeight: 1.5 }}>
+                  <p style={{ fontFamily: 'var(--font-body)', fontSize: '14px', color: 'var(--ink)', marginTop: 4, lineHeight: 1.5 }}>
                     {funFact}
                   </p>
                 </motion.div>
@@ -306,7 +325,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                 <div
                   style={{
                     fontFamily: 'var(--font-body)',
-                    fontSize: '10px',
+                    fontSize: '12px',
                     color: 'rgba(255,255,255,0.7)',
                     letterSpacing: '0.1em',
                     fontWeight: 800,
@@ -331,7 +350,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                 )}
               </div>
               <p
-                style={{ fontFamily: 'var(--font-heading)', color: '#FFFFFF', fontSize: '15px', lineHeight: 1.6, fontWeight: 600 }}
+                style={{ fontFamily: 'var(--font-heading)', color: '#FFFFFF', fontSize: '18px', lineHeight: 1.6, fontWeight: 600 }}
               >
                 {currentQuestion}
               </p>
@@ -350,7 +369,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                     className="text-center py-4"
                   >
                     <div style={{ fontSize: 28 }}>🤔</div>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink-muted)', marginTop: 8, fontWeight: 600 }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '15px', color: 'var(--ink-muted)', marginTop: 8, fontWeight: 600 }}>
                       Проверяю твой ответ...
                     </p>
                   </motion.div>
@@ -369,7 +388,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                       boxShadow: 'var(--shadow-sm)',
                     }}
                   >
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--ink)', fontWeight: 700 }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '15px', color: 'var(--ink)', fontWeight: 700 }}>
                       Не удалось проверить ответ. Попробуй ещё раз.
                     </p>
                     <button

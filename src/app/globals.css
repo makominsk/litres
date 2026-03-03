@@ -115,7 +115,7 @@
 
   html {
     scroll-behavior: smooth;
-    font-size: 18px;
+    font-size: 20px;
   }
 
   body {
@@ -133,7 +133,7 @@
 
 @media (max-width: 640px) {
   html {
-    font-size: 17px;
+    font-size: 19px;
   }
 }
 

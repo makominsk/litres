@@ -115,6 +115,7 @@
 
   html {
     scroll-behavior: smooth;
+    font-size: 18px;
   }
 
   body {
@@ -127,6 +128,12 @@
   h1, h2, h3, h4 {
     font-family: var(--font-heading);
     color: var(--ink);
+  }
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 17px;
   }
 }
 

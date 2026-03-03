@@ -76,10 +76,10 @@ export function TextbookModal() {
             style={{ borderColor: 'var(--border-color)', background: 'var(--bg-dark)' }}
           >
             <div className="flex items-center justify-between gap-2">
-              <h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }} className="text-base sm:text-lg font-extrabold">
+              <h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }} className="text-lg sm:text-xl font-extrabold">
                 Учебник
               </h2>
-              <button onClick={closeTextbook} className="btn-brutal-secondary px-3 py-1.5 text-xs sm:text-sm">
+              <button onClick={closeTextbook} className="btn-brutal-secondary px-3 py-2 text-sm sm:text-base">
                 ✕ Закрыть
               </button>
             </div>
@@ -90,7 +90,7 @@ export function TextbookModal() {
                   type="button"
                   onClick={prevPage}
                   disabled={currentPage <= 1}
-                  className="btn-brutal-secondary px-3 py-2 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="btn-brutal-secondary px-3 py-2 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   ← Пред.
                 </button>
@@ -98,11 +98,11 @@ export function TextbookModal() {
                   type="button"
                   onClick={nextPage}
                   disabled={currentPage >= totalPages}
-                  className="btn-brutal-secondary px-3 py-2 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="btn-brutal-secondary px-3 py-2 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   След. →
                 </button>
-                <span style={{ color: 'var(--ink)', fontFamily: 'var(--font-body)' }} className="text-xs sm:text-sm font-bold">
+                <span style={{ color: 'var(--ink)', fontFamily: 'var(--font-body)' }} className="text-sm sm:text-base font-bold">
                   Стр. {currentPage} / {totalPages}
                 </span>
               </div>
@@ -114,7 +114,7 @@ export function TextbookModal() {
                   max={totalPages}
                   value={pageInput}
                   onChange={(e) => setPageInput(e.target.value)}
-                  className="w-24 px-2 py-2 text-xs sm:text-sm font-bold rounded-md"
+                  className="w-24 px-2 py-2 text-sm sm:text-base font-bold rounded-md"
                   style={{
                     background: '#fff',
                     color: 'var(--ink)',
@@ -122,7 +122,7 @@ export function TextbookModal() {
                     fontFamily: 'var(--font-body)',
                   }}
                 />
-                <button type="submit" className="btn-brutal-secondary px-3 py-2 text-xs sm:text-sm">
+                <button type="submit" className="btn-brutal-secondary px-3 py-2 text-sm sm:text-base">
                   Перейти
                 </button>
               </form>
@@ -133,7 +133,7 @@ export function TextbookModal() {
                   onChange={(e) =>
                     setSelectedParagraphId(e.target.value ? Number(e.target.value) : null)
                   }
-                  className="min-w-40 px-2 py-2 text-xs sm:text-sm font-bold rounded-md"
+                  className="min-w-40 px-2 py-2 text-sm sm:text-base font-bold rounded-md"
                   style={{
                     background: '#fff',
                     color: 'var(--ink)',
@@ -154,7 +154,7 @@ export function TextbookModal() {
                   type="button"
                   onClick={handleParagraphGo}
                   disabled={!selectedParagraphId}
-                  className="btn-brutal-secondary px-3 py-2 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="btn-brutal-secondary px-3 py-2 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   К §
                 </button>
@@ -172,7 +172,7 @@ export function TextbookModal() {
               }}
               src={`/textbook.pdf#page=${currentPage}&zoom=page-width`}
             />
-            <p style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)' }} className="text-[11px] mt-2 font-semibold">
+            <p style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)' }} className="text-xs sm:text-sm mt-2 font-semibold">
               Файл должен лежать в <code>/public/textbook.pdf</code>
             </p>
           </div>

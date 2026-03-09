@@ -8,6 +8,7 @@ import { VoiceInput } from '@/components/paragraph/voice-input'
 import { ExplanationCard } from '@/components/paragraph/explanation-card'
 import { HintButton, HintDisplay } from '@/components/paragraph/hint-button'
 import { EventMap } from '@/components/paragraph/event-map'
+import { TimelineStrip } from '@/components/paragraph/timeline-strip'
 import { TextbookModal } from '@/components/textbook/textbook-modal'
 import { useAppStore } from '@/stores/app-store'
 import { useTextbookStore } from '@/stores/textbook-store'
@@ -438,6 +439,11 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
             📖 Читать этот § в учебнике
           </button>
         </motion.div>
+
+        {/* Лента времени */}
+        {(para.dates as { date: string; event: string }[] | undefined)?.length ? (
+          <TimelineStrip dates={para.dates as { date: string; event: string }[]} />
+        ) : null}
 
         {/* Карта событий */}
         {para.mapMarkers && (para.mapMarkers as { lat: number; lng: number; name: string; description: string }[]).length > 0 && (

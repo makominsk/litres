@@ -1,5 +1,5 @@
 'use client'
-import { use, useState } from 'react'
+import { use, useState, useRef, useEffect } from 'react'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -11,6 +11,8 @@ import { EventMap } from '@/components/paragraph/event-map'
 import { TextbookModal } from '@/components/textbook/textbook-modal'
 import { useAppStore } from '@/stores/app-store'
 import { useTextbookStore } from '@/stores/textbook-store'
+import { useToast } from '@/components/ui/toast'
+import { checkAchievements, ACHIEVEMENTS } from '@/lib/achievements'
 import textbook from '@/data/textbook.json'
 import textbookPages from '@/data/textbook-pages.json'
 
@@ -41,10 +43,30 @@ const FUN_FACTS: Record<string, string[]> = {
   ],
 }
 
+const EVAL_STEPS = ['Отправляю', 'Анализирую', 'Готовлю ответ']
+
 export default function ParagraphPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const student = useAppStore((s) => s.student)
   const saveAnswer = useAppStore((s) => s.saveAnswer)
+  const addXp = useAppStore((s) => s.addXp)
+  const unlockAchievement = useAppStore((s) => s.unlockAchievement)
+  const { showToast } = useToast()
+
+  function checkAndUnlockAchievements() {
+    const state = useAppStore.getState()
+    const newIds = checkAchievements({
+      answers: state.answers,
+      quizResults: state.quizResults,
+      xp: state.xp,
+      achievements: state.achievements,
+    })
+    for (const id of newIds) {
+      unlockAchievement(id)
+      const def = ACHIEVEMENTS.find((a) => a.id === id)
+      if (def) showToast(`${def.emoji} ${def.name}`, 'success')
+    }
+  }
 
   const paragraphId = parseInt(id)
   if (isNaN(paragraphId) || paragraphId < 1 || paragraphId > 31) notFound()
@@ -70,12 +92,18 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
   const [questionIndex, setQuestionIndex] = useState(firstUnanswered)
   const [result, setResult] = useState<EvaluateResult | null>(null)
   const [isEvaluating, setIsEvaluating] = useState(false)
+  const [evalStep, setEvalStep] = useState(0)
   const [evalError, setEvalError] = useState(false)
   const [hintLevel, setHintLevel] = useState(0)
   const [hintText, setHintText] = useState('')
   const [hintLoading, setHintLoading] = useState(false)
   const [done, setDone] = useState(allAnswered)
   const [showFunFact, setShowFunFact] = useState(true)
+  const [progressPulse, setProgressPulse] = useState(false)
+  const [xpPopup, setXpPopup] = useState<{ amount: number; key: number } | null>(null)
+
+  const resultRef = useRef<HTMLDivElement>(null)
+  const evalStepTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   const questions = para.questions
   const currentQuestion = questions[questionIndex]
@@ -84,9 +112,34 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
   const funFacts = FUN_FACTS[sectionId] ?? FUN_FACTS['ancient-greece']
   const funFact = funFacts[questionIndex % funFacts.length]
 
+  // Авто-скролл к результату
+  useEffect(() => {
+    if (result && resultRef.current) {
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 200)
+    }
+  }, [result])
+
+  // Очистка таймера при unmount
+  useEffect(() => {
+    return () => {
+      if (evalStepTimerRef.current) clearInterval(evalStepTimerRef.current)
+    }
+  }, [])
+
   async function handleAnswerSubmit(answerText: string) {
     setIsEvaluating(true)
+    setEvalStep(0)
     setShowFunFact(false)
+
+    // Шаговый прогресс
+    let step = 0
+    evalStepTimerRef.current = setInterval(() => {
+      step++
+      if (step < EVAL_STEPS.length) setEvalStep(step)
+    }, 1500)
+
     try {
       const res = await fetch('/api/evaluate', {
         method: 'POST',
@@ -102,12 +155,40 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
       const data: EvaluateResult = await res.json()
       setResult(data)
 
+      // Тактильный feedback
+      if (data.isCorrect) {
+        navigator.vibrate?.(100)
+      } else {
+        navigator.vibrate?.([50, 50, 50])
+      }
+
       saveAnswer({
         paragraphId,
         questionIndex,
         isCorrect: data.isCorrect,
         hintLevel,
       })
+
+      // Начисление XP после сохранения ответа
+      let earnedXp = 0
+      if (data.isCorrect) {
+        earnedXp += 10
+      }
+      if (data.isCorrect && data.score >= 80 && hintLevel === 0) {
+        earnedXp += 20
+      }
+      if (earnedXp > 0) {
+        addXp(earnedXp)
+        setXpPopup({ amount: earnedXp, key: Date.now() })
+        setTimeout(() => setXpPopup(null), 1500)
+      }
+
+      // Пульс прогресс-бара
+      setProgressPulse(true)
+      setTimeout(() => setProgressPulse(false), 500)
+
+      // Проверка достижений (после saveAnswer и addXp)
+      setTimeout(checkAndUnlockAchievements, 100)
 
       if (student) {
         fetch('/api/progress', {
@@ -127,13 +208,20 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
     } catch (err) {
       console.error(err)
       setEvalError(true)
+      showToast('Ошибка сети. Попробуй ещё раз.', 'error')
     } finally {
+      if (evalStepTimerRef.current) clearInterval(evalStepTimerRef.current)
       setIsEvaluating(false)
     }
   }
 
   function handleNext() {
     if (isLast) {
+      addXp(50) // бонус за завершение параграфа
+      setXpPopup({ amount: 50, key: Date.now() })
+      setTimeout(() => setXpPopup(null), 1500)
+      showToast('+50 XP за параграф!', 'success')
+      setTimeout(checkAndUnlockAchievements, 100)
       setDone(true)
     } else {
       setResult(null)
@@ -194,6 +282,11 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                   📝 Тест по датам
                 </button>
               </Link>
+              <Link href={`/paragraph/${paragraphId}/cards`} className="col-span-2">
+                <button className="btn-brutal-indigo w-full py-3 text-sm">
+                  🃏 Карточки (термины и даты)
+                </button>
+              </Link>
               <button
                 onClick={handleRestart}
                 className="btn-brutal-secondary w-full py-3 text-sm col-span-2"
@@ -251,9 +344,13 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                 §{paragraphId} · Вопрос {questionIndex + 1} из {questions.length}
               </span>
             </div>
-            <div
+            <motion.div
               className="h-2.5 rounded-full overflow-hidden"
               style={{ background: 'var(--bg-dark)', border: '1.5px solid var(--border-color)' }}
+              animate={{
+                boxShadow: progressPulse ? '0 0 12px var(--indigo)' : '0 0 0px transparent',
+              }}
+              transition={{ duration: 0.5 }}
             >
               <motion.div
                 className="h-full rounded-full"
@@ -261,10 +358,38 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                 animate={{ width: `${((questionIndex + (result ? 1 : 0)) / questions.length) * 100}%` }}
                 transition={{ duration: 0.4 }}
               />
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
+
+      {/* XP popup */}
+      <AnimatePresence>
+        {xpPopup && (
+          <motion.div
+            key={xpPopup.key}
+            initial={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 0, y: -40 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: 'easeOut' }}
+            style={{
+              position: 'fixed',
+              top: 60,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 100,
+              fontFamily: 'var(--font-heading)',
+              fontSize: '18px',
+              fontWeight: 800,
+              color: 'var(--yellow)',
+              textShadow: '1px 1px 0px var(--ink)',
+              pointerEvents: 'none',
+            }}
+          >
+            +{xpPopup.amount} XP
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <main className="flex-1 px-4 py-5 max-w-2xl mx-auto w-full space-y-5">
 
@@ -382,14 +507,48 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
 
                 {isEvaluating && (
                   <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-center py-4"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{
+                      background: 'var(--card-bg)',
+                      border: '2.5px solid var(--border-color)',
+                      borderRadius: '14px',
+                      padding: '16px',
+                      boxShadow: 'var(--shadow-sm)',
+                    }}
                   >
-                    <div style={{ fontSize: 28 }}>🤔</div>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '15px', color: 'var(--ink-muted)', marginTop: 8, fontWeight: 600 }}>
-                      Проверяю твой ответ...
-                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <span className="brutal-spinner--dark brutal-spinner" style={{ width: 22, height: 22 }} />
+                      <div style={{ flex: 1 }}>
+                        <div style={{
+                          display: 'flex',
+                          gap: 4,
+                          marginBottom: 8,
+                        }}>
+                          {EVAL_STEPS.map((step, i) => (
+                            <div
+                              key={step}
+                              style={{
+                                flex: 1,
+                                height: 4,
+                                borderRadius: 2,
+                                background: i <= evalStep ? 'var(--indigo)' : 'var(--bg-dark)',
+                                transition: 'background 0.3s',
+                              }}
+                            />
+                          ))}
+                        </div>
+                        <p style={{
+                          fontFamily: 'var(--font-body)',
+                          fontSize: '13px',
+                          color: 'var(--ink)',
+                          fontWeight: 700,
+                          margin: 0,
+                        }}>
+                          {EVAL_STEPS[evalStep]}<span className="loading-dots" />
+                        </p>
+                      </div>
+                    </div>
                   </motion.div>
                 )}
 
@@ -432,11 +591,13 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
 
             {/* Результат */}
             {result && (
-              <ExplanationCard
-                result={result}
-                onNext={handleNext}
-                isLast={isLast}
-              />
+              <div ref={resultRef}>
+                <ExplanationCard
+                  result={result}
+                  onNext={handleNext}
+                  isLast={isLast}
+                />
+              </div>
             )}
           </motion.div>
         </AnimatePresence>

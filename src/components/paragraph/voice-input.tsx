@@ -1,6 +1,7 @@
 'use client'
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useToast } from '@/components/ui/toast'
 
 interface VoiceInputProps {
   onSubmit: (text: string) => void
@@ -9,14 +10,26 @@ interface VoiceInputProps {
 
 type RecordingState = 'idle' | 'recording' | 'transcribing'
 
+function getStoredMode(): 'voice' | 'text' {
+  if (typeof window === 'undefined') return 'voice'
+  return (localStorage.getItem('input-mode') as 'voice' | 'text') ?? 'voice'
+}
+
 export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
+  const { showToast } = useToast()
   const [editableText, setEditableText] = useState('')
   const [recordingState, setRecordingState] = useState<RecordingState>('idle')
   const [error, setError] = useState('')
   const [mode, setMode] = useState<'voice' | 'text'>('voice')
+  const [highlight, setHighlight] = useState(false)
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
+
+  // Восстановить режим из localStorage
+  useEffect(() => {
+    setMode(getStoredMode())
+  }, [])
 
   const startRecording = useCallback(async () => {
     setError('')
@@ -25,6 +38,9 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
       const mediaRecorder = new MediaRecorder(stream)
       mediaRecorderRef.current = mediaRecorder
       chunksRef.current = []
+
+      // Тактильный feedback при начале записи
+      navigator.vibrate?.(50)
 
       mediaRecorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunksRef.current.push(e.data)
@@ -43,11 +59,16 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
           const data = await res.json()
           if (data.text) {
             setEditableText(data.text)
+            // Подсветка textarea после транскрибации
+            setHighlight(true)
+            setTimeout(() => setHighlight(false), 1500)
           } else {
             setError('Не удалось распознать речь. Попробуй ещё раз.')
+            showToast('Не удалось распознать речь', 'error')
           }
         } catch {
           setError('Ошибка при распознавании. Попробуй ещё раз.')
+          showToast('Ошибка сети при распознавании', 'error')
         } finally {
           setRecordingState('idle')
         }
@@ -57,8 +78,9 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
       setRecordingState('recording')
     } catch {
       setError('Нет доступа к микрофону. Разреши доступ в браузере.')
+      showToast('Нет доступа к микрофону', 'error')
     }
-  }, [])
+  }, [showToast])
 
   const stopRecording = useCallback(() => {
     mediaRecorderRef.current?.stop()
@@ -82,6 +104,15 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
     if (recordingState === 'recording') stopRecording()
     setMode(m)
     setError('')
+    localStorage.setItem('input-mode', m)
+  }
+
+  // Ctrl+Enter / Cmd+Enter для отправки
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault()
+      handleSubmit()
+    }
   }
 
   const isRecording = recordingState === 'recording'
@@ -154,19 +185,32 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
             }}
           >
             {isTranscribing
-              ? <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ opacity: 0.7 }}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+              ? <span className="brutal-spinner--dark brutal-spinner" />
               : isRecording
               ? <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
               : <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
             }
           </motion.button>
-          <p style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-muted)', fontSize: 11, textAlign: 'center', lineHeight: 1.4, fontWeight: 600 }}>
-            {isRecording
-              ? '🔴 Говори… когда закончишь, нажми Стоп'
-              : isTranscribing
-              ? 'Распознаю речь...'
-              : 'Нажми Старт для записи ответа. Когда всё скажешь, нажми Стоп'}
-          </p>
+
+          {/* Состояние под кнопкой */}
+          <div style={{ textAlign: 'center', minHeight: 36 }}>
+            {isTranscribing ? (
+              <div className="flex flex-col items-center gap-1">
+                <div className="sound-bars">
+                  <span /><span /><span /><span />
+                </div>
+                <p style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-muted)', fontSize: 11, fontWeight: 600 }}>
+                  Распознаю речь<span className="loading-dots" />
+                </p>
+              </div>
+            ) : (
+              <p style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-muted)', fontSize: 11, lineHeight: 1.4, fontWeight: 600 }}>
+                {isRecording
+                  ? '🔴 Говори… когда закончишь, нажми Стоп'
+                  : 'Нажми Старт для записи ответа. Когда всё скажешь, нажми Стоп'}
+              </p>
+            )}
+          </div>
         </div>
       )}
 
@@ -185,34 +229,56 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
       </AnimatePresence>
 
       {/* Текстовое поле */}
-      <textarea
-        value={editableText}
-        onChange={(e) => setEditableText(e.target.value)}
-        placeholder={
-          mode === 'voice'
-            ? 'Нажми на микрофон и говори — ответ появится здесь...'
-            : 'Напиши свой ответ здесь...'
-        }
-        rows={4}
-        disabled={disabled || isTranscribing}
-        style={{
-          width: '100%',
-          background: 'var(--card-bg)',
-          border: `2.5px solid var(--border-color)`,
-          borderRadius: '12px',
-          fontFamily: 'var(--font-body)',
-          color: 'var(--ink)',
-          padding: '10px 14px',
-          fontSize: '14px',
-          lineHeight: 1.6,
-          resize: 'vertical',
-          outline: 'none',
-          transition: 'box-shadow 0.15s',
-          opacity: disabled || isTranscribing ? 0.6 : 1,
-          boxShadow: editableText ? 'var(--shadow-sm)' : 'inset 2px 2px 0px rgba(0,0,0,0.05)',
-          fontWeight: 500,
-        }}
-      />
+      <div className="relative">
+        <textarea
+          value={editableText}
+          onChange={(e) => setEditableText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={
+            mode === 'voice'
+              ? 'Нажми на микрофон и говори — ответ появится здесь...'
+              : 'Напиши свой ответ здесь...'
+          }
+          rows={4}
+          disabled={disabled || isTranscribing}
+          className={highlight ? 'textarea-highlight' : ''}
+          style={{
+            width: '100%',
+            background: highlight ? 'var(--yellow-light)' : 'var(--card-bg)',
+            border: `2.5px solid var(--border-color)`,
+            borderRadius: '12px',
+            fontFamily: 'var(--font-body)',
+            color: 'var(--ink)',
+            padding: '10px 14px',
+            fontSize: '14px',
+            lineHeight: 1.6,
+            resize: 'vertical',
+            outline: 'none',
+            transition: 'box-shadow 0.15s, background-color 0.5s',
+            opacity: disabled || isTranscribing ? 0.6 : 1,
+            boxShadow: editableText ? 'var(--shadow-sm)' : 'inset 2px 2px 0px rgba(0,0,0,0.05)',
+            fontWeight: 500,
+          }}
+        />
+        {/* Счётчик символов + подсказка Ctrl+Enter */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            fontFamily: 'var(--font-body)',
+            fontSize: '10px',
+            color: 'var(--ink-muted)',
+            marginTop: 4,
+            padding: '0 4px',
+            fontWeight: 600,
+          }}
+        >
+          <span>{editableText.length > 0 ? `${editableText.length} симв.` : ''}</span>
+          {mode === 'text' && editableText.trim() && (
+            <span>Ctrl+Enter для отправки</span>
+          )}
+        </div>
+      </div>
 
       {/* Кнопка отправки */}
       <button
@@ -222,9 +288,21 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
         style={{
           opacity: disabled || !editableText.trim() || isTranscribing ? 0.5 : 1,
           cursor: disabled || !editableText.trim() || isTranscribing ? 'not-allowed' : 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
         }}
       >
-        Проверить ответ →
+        {disabled ? (
+          <>
+            <span className="brutal-spinner" style={{ width: 16, height: 16, borderWidth: 2 }} />
+            Проверяю ответ
+            <span className="loading-dots" />
+          </>
+        ) : (
+          'Проверить ответ →'
+        )}
       </button>
     </div>
   )

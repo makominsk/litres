@@ -1,5 +1,5 @@
 'use client'
-import { use, useState, useEffect } from 'react'
+import { use, useState } from 'react'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -7,6 +7,8 @@ import { Header } from '@/components/ui/header'
 import { buildQuiz, QuizQuestion } from '@/lib/quiz-data'
 import textbook from '@/data/textbook.json'
 import { useAppStore } from '@/stores/app-store'
+import { useToast } from '@/components/ui/toast'
+import { checkAchievements, ACHIEVEMENTS } from '@/lib/achievements'
 
 function getMedalInfo(score: number): { emoji: string; label: string; color: string } {
   if (score >= 90) return { emoji: '🥇', label: 'Золото!', color: 'var(--yellow)' }
@@ -16,38 +18,49 @@ function getMedalInfo(score: number): { emoji: string; label: string; color: str
 
 export default function QuizPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
+  const paragraphId = parseInt(id)
   const student = useAppStore((s) => s.student)
   const saveQuizResult = useAppStore((s) => s.saveQuizResult)
   const clearQuizResult = useAppStore((s) => s.clearQuizResult)
+  const addXp = useAppStore((s) => s.addXp)
+  const unlockAchievement = useAppStore((s) => s.unlockAchievement)
+  const savedQuiz = useAppStore((s) => s.quizResults.find((r) => r.paragraphId === paragraphId) ?? null)
+  const { showToast } = useToast()
 
-  const paragraphId = parseInt(id)
+  function checkAndUnlockAchievements() {
+    const state = useAppStore.getState()
+    const newIds = checkAchievements({
+      answers: state.answers,
+      quizResults: state.quizResults,
+      xp: state.xp,
+      achievements: state.achievements,
+    })
+    for (const id of newIds) {
+      unlockAchievement(id)
+      const def = ACHIEVEMENTS.find((a) => a.id === id)
+      if (def) showToast(`${def.emoji} ${def.name}`, 'success')
+    }
+  }
+
   if (isNaN(paragraphId) || paragraphId < 1 || paragraphId > 31) notFound()
 
   const para = textbook.paragraphs[id as keyof typeof textbook.paragraphs]
   if (!para) notFound()
 
-  const [questions, setQuestions] = useState<QuizQuestion[]>([])
+  const [questions, setQuestions] = useState<QuizQuestion[]>(() => buildQuiz(paragraphId))
   const [current, setCurrent] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
   const [answered, setAnswered] = useState(false)
   const [correctCount, setCorrectCount] = useState(0)
   const [totalCount, setTotalCount] = useState(0)
   const [done, setDone] = useState(false)
-  const [restartKey, setRestartKey] = useState(0)
+  const [hasRestarted, setHasRestarted] = useState(false)
 
-  useEffect(() => {
-    if (restartKey === 0) {
-      const saved = useAppStore.getState().getQuizResult(paragraphId)
-      if (saved) {
-        setCorrectCount(saved.correctCount)
-        setTotalCount(saved.totalCount)
-        setDone(true)
-      }
-    }
-    setQuestions(buildQuiz(paragraphId))
-  }, [paragraphId, restartKey])
+  const effectiveDone = !hasRestarted && savedQuiz ? true : done
+  const effectiveCorrectCount = !hasRestarted && savedQuiz ? savedQuiz.correctCount : correctCount
+  const effectiveTotalCount = !hasRestarted && savedQuiz ? savedQuiz.totalCount : totalCount
 
-  if (questions.length === 0 && !done) {
+  if (questions.length === 0 && !effectiveDone) {
     return (
       <div className="min-h-dvh flex flex-col">
         <Header />
@@ -76,8 +89,8 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
   }
 
   const q = questions[current]
-  const displayTotal = done ? totalCount : questions.length
-  const score = displayTotal > 0 ? Math.round((correctCount / displayTotal) * 100) : 0
+  const displayTotal = effectiveDone ? effectiveTotalCount : questions.length
+  const score = displayTotal > 0 ? Math.round((effectiveCorrectCount / displayTotal) * 100) : 0
   const medal = getMedalInfo(score)
 
   function handleSelect(idx: number) {
@@ -108,6 +121,9 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
       const finalTotal = questions.length
       setTotalCount(finalTotal)
       saveQuizResult({ paragraphId, correctCount, totalCount: finalTotal })
+      addXp(100)
+      showToast('+100 XP за квиз!', 'success')
+      setTimeout(checkAndUnlockAchievements, 100)
       setDone(true)
     } else {
       setCurrent((c) => c + 1)
@@ -124,11 +140,12 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
     setCorrectCount(0)
     setTotalCount(0)
     setDone(false)
-    setRestartKey((k) => k + 1)
+    setHasRestarted(true)
+    setQuestions(buildQuiz(paragraphId))
   }
 
   // ─── Done screen ────────────────────────────────────────────
-  if (done) {
+  if (effectiveDone) {
     return (
       <div className="min-h-dvh flex flex-col">
         <Header />
@@ -157,7 +174,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                 style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)', marginTop: 6 }}
                 className="text-sm font-bold"
               >
-                {correctCount} из {displayTotal} верных ответов ({score}%)
+                {effectiveCorrectCount} из {displayTotal} верных ответов ({score}%)
               </p>
             </div>
 
@@ -243,7 +260,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                   padding: '1px 6px',
                 }}
               >
-                ✓ {correctCount}
+                ✓ {effectiveCorrectCount}
               </span>
             </div>
             <div className="h-2.5 rounded-full overflow-hidden" style={{

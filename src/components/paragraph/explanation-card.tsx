@@ -86,11 +86,11 @@ export function ExplanationCard({ result, onNext, isLast }: ExplanationCardProps
           opacity: isError ? 0.8 : 1,
         }}
       >
-        <span style={{ fontSize: 20 }}>
-          {isLoading ? '⏳' : isPlaying ? '⏸️' : isError ? '⚠️' : '🔊'}
+        <span style={{ fontSize: 20, display: 'flex', alignItems: 'center' }}>
+          {isLoading ? <span className="brutal-spinner" style={{ width: 18, height: 18, borderWidth: 2.5 }} /> : isPlaying ? '⏸️' : isError ? '⚠️' : '🔊'}
         </span>
         {isLoading
-          ? 'Загружаю аудио...'
+          ? <span>Загружаю аудио<span className="loading-dots" /></span>
           : isPlaying
           ? 'Пауза'
           : isError

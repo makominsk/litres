@@ -37,10 +37,11 @@ export function ParagraphList({ paragraphs }: ParagraphListProps) {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.35, delay: i * 0.06 }}
+            className="flex items-stretch gap-2"
           >
-            <Link href={`/paragraph/${para.id}`}>
+            <Link href={`/paragraph/${para.id}`} className="flex-1">
               <div
-                className="p-4 flex items-center gap-3 group cursor-pointer"
+                className="p-4 flex items-center gap-3 group cursor-pointer h-full"
                 style={{
                   background: 'var(--card-bg)',
                   border: '2.5px solid var(--border-color)',
@@ -100,6 +101,31 @@ export function ParagraphList({ paragraphs }: ParagraphListProps) {
                 >
                   →
                 </span>
+              </div>
+            </Link>
+
+            <Link href={`/paragraph/${para.id}/cards`}>
+              <div
+                className="h-full px-3 flex items-center justify-center group cursor-pointer"
+                style={{
+                  background: 'var(--yellow-light)',
+                  border: '2.5px solid var(--border-color)',
+                  borderRadius: '1rem',
+                  boxShadow: 'var(--shadow-sm)',
+                  transition: 'transform 0.1s, box-shadow 0.1s',
+                  minWidth: 48,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translate(-2px, -2px)'
+                  e.currentTarget.style.boxShadow = 'var(--shadow-md)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = ''
+                  e.currentTarget.style.boxShadow = 'var(--shadow-sm)'
+                }}
+                title="Карточки"
+              >
+                <span style={{ fontSize: 18 }} aria-hidden="true">🃏</span>
               </div>
             </Link>
           </motion.div>

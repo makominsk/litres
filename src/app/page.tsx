@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Header } from '@/components/ui/header'
 import { SectionCard } from '@/components/home/section-card'
@@ -222,11 +223,50 @@ export default function HomePage() {
           })}
         </div>
 
+        {/* Достижения */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mt-4"
+        >
+          <Link href="/achievements">
+            <div
+              style={{
+                background: 'var(--card-bg)',
+                border: '2.5px solid var(--border-color)',
+                borderRadius: 'var(--radius)',
+                padding: '12px 16px',
+                boxShadow: 'var(--shadow-sm)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                cursor: 'pointer',
+                transition: 'transform 0.1s, box-shadow 0.1s',
+              }}
+              className="hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-md"
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 24 }}>🏅</span>
+                <div>
+                  <div style={{ fontFamily: 'var(--font-heading)', fontSize: '14px', fontWeight: 800, color: 'var(--ink)' }}>
+                    Достижения
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-body)', fontSize: '11px', fontWeight: 700, color: 'var(--ink-muted)' }}>
+                    Собирай бейджи за успехи
+                  </div>
+                </div>
+              </div>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 800, color: 'var(--ink-muted)' }}>→</span>
+            </div>
+          </Link>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45 }}
-          className="mt-5"
+          className="mt-4"
         >
           <RandomHistoryFact />
         </motion.div>

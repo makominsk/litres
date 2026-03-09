@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Rubik, Nunito } from 'next/font/google'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { ToastProvider } from '@/components/ui/toast'
+import { OfflineBanner } from '@/components/ui/offline-banner'
 import './globals.css'
 
 const rubik = Rubik({
@@ -32,7 +34,10 @@ export default function RootLayout({
     <html lang="ru" className={`${rubik.variable} ${nunito.variable}`}>
       <body className="antialiased">
         <TooltipProvider delayDuration={300}>
-          {children}
+          <ToastProvider>
+            <OfflineBanner />
+            {children}
+          </ToastProvider>
         </TooltipProvider>
       </body>
     </html>

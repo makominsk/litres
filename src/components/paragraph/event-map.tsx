@@ -37,7 +37,7 @@ export function EventMap({ markers }: EventMapProps) {
 
       const map = L.map(mapRef.current, {
         center,
-        zoom: markers.length === 1 ? 6 : 4,
+        zoom: markers.length === 1 ? 10 : 7,
         zoomControl: true,
         scrollWheelZoom: false,
       })
@@ -50,10 +50,10 @@ export function EventMap({ markers }: EventMapProps) {
       // Fix z-index for sticky header overlap
       const panes = map.getPanes()
       if (panes) {
-        panes.tooltipPane.style.zIndex = '20'
-        panes.popupPane.style.zIndex = '20'
-        panes.markerPane.style.zIndex = '30'
-        panes.overlayPane.style.zIndex = '30'
+        panes.tooltipPane.style.zIndex = '700'
+        panes.popupPane.style.zIndex = '700'
+        panes.markerPane.style.zIndex = '800'
+        panes.overlayPane.style.zIndex = '800'
       }
 
       // Inject label styles once
@@ -61,17 +61,19 @@ export function EventMap({ markers }: EventMapProps) {
         const style = document.createElement('style')
         style.id = 'leaflet-label-style'
         style.textContent = `
-          .map-label {
-            background: rgba(253,246,236,0.92) !important;
+          .map-label, .leaflet-tooltip.map-label, .leaflet-tooltip-pane .leaflet-tooltip {
+            background: rgba(253,246,236,0.95) !important;
             border: 1.5px solid #C75B39 !important;
             border-radius: 6px !important;
             color: #3D2B1F !important;
             font-family: 'PT Serif', serif !important;
             font-size: 11px !important;
             font-weight: 700 !important;
-            padding: 2px 7px !important;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.18) !important;
+            padding: 4px 8px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25) !important;
             white-space: nowrap !important;
+            z-index: 900 !important;
+            max-width: none !important;
           }
           .map-label.battle-label {
             border-color: #8B1A1A !important;
@@ -80,53 +82,68 @@ export function EventMap({ markers }: EventMapProps) {
             border-color: #5C7A3E !important;
           }
           .map-label::before { display: none !important; }
+          .leaflet-tooltip-pane { z-index: 900 !important; }
+          .leaflet-marker-icon {
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            z-index: 800 !important;
+          }
+          .leaflet-marker-pane { z-index: 800 !important; }
         `
         document.head.appendChild(style)
       }
 
       const cityIcon = L.divIcon({
-        className: '',
+        className: 'custom-marker',
         html: `<div style="
-          width:28px;height:28px;
-          background:#C75B39;
-          border:2px solid #FDF6EC;
-          border-radius:50% 50% 50% 0;
-          transform:rotate(-45deg);
-          box-shadow:0 2px 6px rgba(0,0,0,0.3);
+          width:24px;height:24px !important;
+          background:#C75B39 !important;
+          border:2px solid #FDF6EC !important;
+          border-radius:50% 50% 50% 0 !important;
+          transform:rotate(-45deg) !important;
+          box-shadow:0 3px 8px rgba(0,0,0,0.35) !important;
+          position: relative !important;
+          z-index: 10 !important;
         "></div>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 28],
-        popupAnchor: [0, -30],
+        iconSize: [24, 24],
+        iconAnchor: [12, 24],
+        popupAnchor: [0, -28],
       })
 
       const battleIcon = L.divIcon({
-        className: '',
+        className: 'custom-marker',
         html: `<div style="
-          width:30px;height:30px;
-          display:flex;align-items:center;justify-content:center;
-          background:#8B1A1A;
-          border:2px solid #FDF6EC;
-          border-radius:4px;
-          transform:rotate(45deg);
-          box-shadow:0 2px 6px rgba(0,0,0,0.4);
-          font-size:13px;line-height:1;
-        "><span style="transform:rotate(-45deg);display:block;">⚔</span></div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 15],
+          width:26px;height:26px !important;
+          display:flex;align-items:center;justify-content:center !important;
+          background:#8B1A1A !important;
+          border:2px solid #FDF6EC !important;
+          border-radius:4px !important;
+          transform:rotate(45deg) !important;
+          box-shadow:0 3px 8px rgba(0,0,0,0.45) !important;
+          font-size:12px !important;
+          line-height:1 !important;
+          position: relative !important;
+          z-index: 10 !important;
+        "><span style="transform:rotate(-45deg);display:block; color: #FDF6EC !important;">⚔</span></div>`,
+        iconSize: [26, 26],
+        iconAnchor: [13, 13],
         popupAnchor: [0, -20],
       })
 
       const siteIcon = L.divIcon({
-        className: '',
+        className: 'custom-marker',
         html: `<div style="
-          width:26px;height:26px;
-          background:#5C7A3E;
-          border:2px solid #FDF6EC;
-          border-radius:50%;
-          box-shadow:0 2px 6px rgba(0,0,0,0.3);
+          width:22px;height:22px !important;
+          background:#5C7A3E !important;
+          border:2px solid #FDF6EC !important;
+          border-radius:50% !important;
+          box-shadow:0 3px 8px rgba(0,0,0,0.35) !important;
+          position: relative !important;
+          z-index: 10 !important;
         "></div>`,
-        iconSize: [26, 26],
-        iconAnchor: [13, 13],
+        iconSize: [22, 22],
+        iconAnchor: [11, 11],
         popupAnchor: [0, -18],
       })
 
@@ -142,11 +159,17 @@ export function EventMap({ markers }: EventMapProps) {
           .bindTooltip(m.name + typeLabel, {
             permanent: true,
             direction: 'top',
-            offset: [0, isBattle ? -20 : -30],
+            offset: [0, isBattle ? -25 : -35],
             className: labelClass,
           })
           .bindPopup(`<strong>${m.name}</strong>${isBattle ? ' <span style="color:#8B1A1A">⚔ битва</span>' : ''}<br/><span style="font-size:12px">${m.description}</span>`)
       })
+
+      const bounds = L.latLngBounds(
+        markers.map((m) => L.latLng(m.lat, m.lng))
+      )
+
+      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12, animate: false })
 
       mapInstanceRef.current = map
     })
@@ -184,7 +207,7 @@ export function EventMap({ markers }: EventMapProps) {
       >
         🗺️ Карта событий параграфа
       </div>
-      <div ref={mapRef} style={{ height: '220px', width: '100%', position: 'relative', zIndex: 1 }} />
+      <div ref={mapRef} style={{ height: '240px', width: '100%', position: 'relative', zIndex: 1, overflow: 'visible' }} />
     </div>
   )
 }

@@ -44,7 +44,7 @@ export function TimelineStrip({ dates }: TimelineStripProps) {
         }}
       >
         <div
-          className="flex gap-3 pb-1"
+          className="flex justify-center gap-3 pb-1"
           style={{
             minWidth: 'max-content',
             position: 'relative',
@@ -89,14 +89,14 @@ export function TimelineStrip({ dates }: TimelineStripProps) {
               />
               <div
                 style={{
-                  background: 'var(--indigo)',
-                  color: '#FFFFFF',
+                  background: '#FF69B4',
+                  color: '#000000',
                   border: '2px solid var(--border-color)',
                   borderRadius: '10px',
                   padding: '5px 10px',
                   boxShadow: '2px 2px 0px var(--shadow-color)',
                   fontFamily: 'var(--font-heading)',
-                  fontSize: '13px',
+                  fontSize: '16px',
                   fontWeight: 800,
                   textAlign: 'center',
                   marginBottom: 7,

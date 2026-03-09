@@ -567,15 +567,18 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                             />
                           ))}
                         </div>
-                        <p style={{
+                        <motion.p
+                          animate={{ scale: [1, 1.01, 1], opacity: [0.65, 1, 0.65] }}
+                          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                          style={{
                           fontFamily: 'var(--font-body)',
                           fontSize: '13px',
                           color: 'var(--ink)',
                           fontWeight: 700,
                           margin: 0,
                         }}>
-                          {EVAL_STEPS[Math.min(evalStep, EVAL_STEPS.length - 1)]}<span className="loading-dots" />
-                        </p>
+                          {EVAL_STEPS[Math.min(evalStep, EVAL_STEPS.length - 1)]}
+                        </motion.p>
                       </div>
                     </div>
                   </motion.div>

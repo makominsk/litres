@@ -297,11 +297,11 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
       >
         {disabled ? (
           <motion.span
-            animate={{ scale: [1, 1.04, 1], opacity: [0.75, 1, 0.75] }}
-            transition={{ duration: 1.1, repeat: Infinity, ease: 'easeInOut' }}
+            animate={{ scale: [1, 1.02, 1], opacity: [0.65, 1, 0.65] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             style={{ display: 'inline-flex', alignItems: 'center' }}
           >
-            Проверяю ответ<span className="loading-dots" />
+            Проверяю ответ
           </motion.span>
         ) : (
           'Проверить ответ →'

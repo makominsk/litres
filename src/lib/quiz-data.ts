@@ -7,6 +7,31 @@ export interface QuizQuestion {
   correctIndex: number
 }
 
+function normalizeForCompare(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[.,:;!?()«»"']/g, ' ')
+    .replace(/[—–-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function tokenOverlap(a: string, b: string): number {
+  const ta = new Set(normalizeForCompare(a).split(' ').filter((w) => w.length > 3))
+  const tb = new Set(normalizeForCompare(b).split(' ').filter((w) => w.length > 3))
+  if (ta.size === 0 || tb.size === 0) return 0
+  let common = 0
+  for (const w of ta) {
+    if (tb.has(w)) common++
+  }
+  return common / Math.min(ta.size, tb.size)
+}
+
+function isTooSimilar(a: string, b: string): boolean {
+  if (normalizeForCompare(a) === normalizeForCompare(b)) return true
+  return tokenOverlap(a, b) >= 0.5
+}
+
 // Clean up PDF-extracted event text
 function cleanEvent(raw: string): string {
   // Strip PDF artifacts (e.g. "ЂР", "ЂД", "Ђ" followed by letter)
@@ -76,6 +101,10 @@ export function buildQuiz(paragraphId: number): QuizQuestion[] {
   const p = textbook.paragraphs[String(paragraphId) as keyof typeof textbook.paragraphs]
   if (!p?.dates || p.dates.length < 2) return []
 
+  const localCorrectEvents = p.dates
+    .map((d: { date: string; event: string }) => cleanEvent(d.event))
+    .filter((e) => e.length >= 20)
+
   const questions: QuizQuestion[] = []
 
   p.dates.forEach((d: { date: string; event: string }) => {
@@ -83,7 +112,12 @@ export function buildQuiz(paragraphId: number): QuizQuestion[] {
     if (correct.length < 20) return
 
     // Pool: expanding ring of adjacent same-section paragraphs (±1, ±2, ±3, ±4)
-    const pool = shuffle(getAdjacentPool(paragraphId, correct))
+    const pool = shuffle(getAdjacentPool(paragraphId, correct)).filter((candidate) => {
+      if (isTooSimilar(candidate, correct)) return false
+      return !localCorrectEvents.some((localCorrect) => (
+        localCorrect !== correct && isTooSimilar(candidate, localCorrect)
+      ))
+    })
 
     // Take 3 unique distractors
     const distractors = pool.slice(0, 3)

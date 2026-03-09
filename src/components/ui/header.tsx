@@ -6,6 +6,7 @@ export function Header() {
   const student = useAppStore((s) => s.student)
   const xp = useAppStore((s) => s.xp)
   const level = getLevel(xp)
+  const profileButtonWidth = 144
 
   return (
     <header
@@ -46,7 +47,7 @@ export function Header() {
           </div>
         </Link>
 
-        {/* Правая часть: XP + ученик */}
+        {/* Правая часть: XP + достижения + ученик */}
         <div className="flex items-center gap-2">
           {/* XP бейдж */}
           {xp > 0 && (
@@ -112,6 +113,27 @@ export function Header() {
             </div>
           )}
 
+          <Link
+            href="/achievements"
+            style={{
+              background: '#FFFFFF',
+              border: '2px solid var(--border-color)',
+              borderRadius: '10px',
+              padding: '4px 12px',
+              minHeight: 34,
+              width: profileButtonWidth,
+              boxShadow: '2px 2px 0px var(--shadow-color)',
+              color: 'var(--ink)',
+              fontFamily: 'var(--font-body)',
+              fontSize: '0.875rem',
+              fontWeight: 700,
+              whiteSpace: 'nowrap',
+            }}
+            className="flex items-center justify-center transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5"
+          >
+            Достижения
+          </Link>
+
           {/* Ученик */}
           {student ? (
             <div
@@ -120,14 +142,16 @@ export function Header() {
                 border: '2px solid var(--border-color)',
                 borderRadius: '10px',
                 padding: '4px 12px',
+                minHeight: 34,
+                width: profileButtonWidth,
                 boxShadow: '2px 2px 0px var(--shadow-color)',
               }}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2"
             >
               <span className="text-base">⭐</span>
               <span
                 style={{ color: 'var(--ink)', fontFamily: 'var(--font-body)' }}
-                className="text-sm font-bold"
+                className="text-sm font-bold truncate max-w-[92px]"
               >
                 {student.nickname}
               </span>
@@ -140,8 +164,10 @@ export function Header() {
                 border: '2px solid rgba(255,255,255,0.3)',
                 borderRadius: '10px',
                 padding: '4px 12px',
+                minHeight: 34,
+                width: profileButtonWidth,
               }}
-              className="text-xs font-bold"
+              className="text-xs font-bold flex items-center justify-center"
             >
               5 класс
             </div>

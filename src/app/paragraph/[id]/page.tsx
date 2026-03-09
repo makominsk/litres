@@ -282,11 +282,6 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                   📝 Тест по датам
                 </button>
               </Link>
-              <Link href={`/paragraph/${paragraphId}/cards`} className="col-span-2">
-                <button className="btn-brutal-indigo w-full py-3 text-sm">
-                  🃏 Карточки (термины и даты)
-                </button>
-              </Link>
               <button
                 onClick={handleRestart}
                 className="btn-brutal-secondary w-full py-3 text-sm col-span-2"

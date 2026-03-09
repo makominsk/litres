@@ -104,30 +104,6 @@ export function ParagraphList({ paragraphs }: ParagraphListProps) {
               </div>
             </Link>
 
-            <Link href={`/paragraph/${para.id}/cards`}>
-              <div
-                className="h-full px-3 flex items-center justify-center group cursor-pointer"
-                style={{
-                  background: 'var(--yellow-light)',
-                  border: '2.5px solid var(--border-color)',
-                  borderRadius: '1rem',
-                  boxShadow: 'var(--shadow-sm)',
-                  transition: 'transform 0.1s, box-shadow 0.1s',
-                  minWidth: 48,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translate(-2px, -2px)'
-                  e.currentTarget.style.boxShadow = 'var(--shadow-md)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = ''
-                  e.currentTarget.style.boxShadow = 'var(--shadow-sm)'
-                }}
-                title="Карточки"
-              >
-                <span style={{ fontSize: 18 }} aria-hidden="true">🃏</span>
-              </div>
-            </Link>
           </motion.div>
         )
       })}

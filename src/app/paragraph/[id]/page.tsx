@@ -44,8 +44,8 @@ const FUN_FACTS: Record<string, string[]> = {
 }
 
 const EVAL_STEPS = ['Отправляю', 'Анализирую', 'Готовлю ответ']
-const EVAL_SEGMENTS_COUNT = 10
-const MIN_EVAL_VISUAL_MS = 1600
+const EVAL_SEGMENTS_COUNT = 30
+const MIN_EVAL_VISUAL_MS = 2800
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -140,7 +140,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
   async function handleAnswerSubmit(answerText: string) {
     setIsEvaluating(true)
     setEvalStep(0)
-    setEvalProgress(8)
+    setEvalProgress(3)
     setEvalError(false)
     setShowFunFact(false)
     const startedAt = Date.now()
@@ -150,13 +150,15 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
     evalStepTimerRef.current = setInterval(() => {
       step++
       if (step < EVAL_STEPS.length) setEvalStep(step)
-    }, 1200)
+    }, 1400)
     evalProgressTimerRef.current = setInterval(() => {
       setEvalProgress((prev) => {
-        if (prev >= 90) return prev
-        return prev < 50 ? Math.min(prev + 7, 90) : Math.min(prev + 4, 90)
+        if (prev >= 92) return prev
+        if (prev < 40) return Math.min(prev + 2.2, 92)
+        if (prev < 70) return Math.min(prev + 1.4, 92)
+        return Math.min(prev + 0.8, 92)
       })
-    }, 220)
+    }, 260)
 
     try {
       const res = await fetch('/api/evaluate', {
@@ -545,7 +547,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                       <div style={{ flex: 1 }}>
                         <div style={{
                           display: 'flex',
-                          gap: 4,
+                          gap: 3,
                           justifyContent: 'center',
                           marginBottom: 8,
                         }}>
@@ -553,11 +555,11 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                             <div
                               key={i}
                               style={{
-                                width: 8,
+                                width: 5,
                                 height: 4,
                                 borderRadius: 99,
                                 background:
-                                  i < Math.round((evalProgress / 100) * EVAL_SEGMENTS_COUNT)
+                                  i < Math.floor((evalProgress / 100) * EVAL_SEGMENTS_COUNT)
                                     ? 'var(--indigo)'
                                     : 'rgba(0,0,0,0.12)',
                                 transition: 'background 0.2s ease',

@@ -44,6 +44,12 @@ const FUN_FACTS: Record<string, string[]> = {
 }
 
 const EVAL_STEPS = ['Отправляю', 'Анализирую', 'Готовлю ответ']
+const EVAL_SEGMENTS_COUNT = 10
+const MIN_EVAL_VISUAL_MS = 1600
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 export default function ParagraphPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -93,6 +99,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
   const [result, setResult] = useState<EvaluateResult | null>(null)
   const [isEvaluating, setIsEvaluating] = useState(false)
   const [evalStep, setEvalStep] = useState(0)
+  const [evalProgress, setEvalProgress] = useState(0)
   const [evalError, setEvalError] = useState(false)
   const [hintLevel, setHintLevel] = useState(0)
   const [hintText, setHintText] = useState('')
@@ -104,6 +111,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
 
   const resultRef = useRef<HTMLDivElement>(null)
   const evalStepTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const evalProgressTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   const questions = para.questions
   const currentQuestion = questions[questionIndex]
@@ -125,20 +133,30 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
   useEffect(() => {
     return () => {
       if (evalStepTimerRef.current) clearInterval(evalStepTimerRef.current)
+      if (evalProgressTimerRef.current) clearInterval(evalProgressTimerRef.current)
     }
   }, [])
 
   async function handleAnswerSubmit(answerText: string) {
     setIsEvaluating(true)
     setEvalStep(0)
+    setEvalProgress(8)
+    setEvalError(false)
     setShowFunFact(false)
+    const startedAt = Date.now()
 
     // Шаговый прогресс
     let step = 0
     evalStepTimerRef.current = setInterval(() => {
       step++
       if (step < EVAL_STEPS.length) setEvalStep(step)
-    }, 1500)
+    }, 1200)
+    evalProgressTimerRef.current = setInterval(() => {
+      setEvalProgress((prev) => {
+        if (prev >= 90) return prev
+        return prev < 50 ? Math.min(prev + 7, 90) : Math.min(prev + 4, 90)
+      })
+    }, 220)
 
     try {
       const res = await fetch('/api/evaluate', {
@@ -153,6 +171,12 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
       })
       if (!res.ok) throw new Error('Evaluate failed')
       const data: EvaluateResult = await res.json()
+      const elapsed = Date.now() - startedAt
+      const remain = Math.max(0, MIN_EVAL_VISUAL_MS - elapsed)
+      if (remain > 0) await sleep(remain)
+      setEvalStep(EVAL_STEPS.length - 1)
+      setEvalProgress(100)
+      await sleep(140)
       setResult(data)
 
       // Тактильный feedback
@@ -206,11 +230,16 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
         }).catch(console.error)
       }
     } catch (err) {
+      const elapsed = Date.now() - startedAt
+      const remain = Math.max(0, MIN_EVAL_VISUAL_MS - elapsed)
+      if (remain > 0) await sleep(remain)
       console.error(err)
       setEvalError(true)
       showToast('Ошибка сети. Попробуй ещё раз.', 'error')
     } finally {
       if (evalStepTimerRef.current) clearInterval(evalStepTimerRef.current)
+      if (evalProgressTimerRef.current) clearInterval(evalProgressTimerRef.current)
+      setEvalProgress(0)
       setIsEvaluating(false)
     }
   }
@@ -513,22 +542,25 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <span className="brutal-spinner--dark brutal-spinner" style={{ width: 22, height: 22 }} />
                       <div style={{ flex: 1 }}>
                         <div style={{
                           display: 'flex',
-                          gap: 4,
+                          gap: 5,
+                          justifyContent: 'center',
                           marginBottom: 8,
                         }}>
-                          {EVAL_STEPS.map((step, i) => (
+                          {Array.from({ length: EVAL_SEGMENTS_COUNT }).map((_, i) => (
                             <div
-                              key={step}
+                              key={i}
                               style={{
-                                flex: 1,
-                                height: 4,
-                                borderRadius: 2,
-                                background: i <= evalStep ? 'var(--indigo)' : 'var(--bg-dark)',
-                                transition: 'background 0.3s',
+                                width: 12,
+                                height: 5,
+                                borderRadius: 99,
+                                background:
+                                  i < Math.round((evalProgress / 100) * EVAL_SEGMENTS_COUNT)
+                                    ? 'var(--indigo)'
+                                    : 'rgba(0,0,0,0.12)',
+                                transition: 'background 0.2s ease',
                               }}
                             />
                           ))}
@@ -540,7 +572,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                           fontWeight: 700,
                           margin: 0,
                         }}>
-                          {EVAL_STEPS[evalStep]}<span className="loading-dots" />
+                          {EVAL_STEPS[Math.min(evalStep, EVAL_STEPS.length - 1)]}<span className="loading-dots" />
                         </p>
                       </div>
                     </div>

@@ -28,22 +28,6 @@ function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
-// Get events from specific paragraph ids
-function getEventsFromParagraphs(paraIds: number[], excludeParagraphId?: number): string[] {
-  const events: string[] = []
-  for (const id of paraIds) {
-    if (id === excludeParagraphId) continue
-    const p = textbook.paragraphs[String(id) as keyof typeof textbook.paragraphs]
-    if (p?.dates) {
-      p.dates.forEach((d: { date: string; event: string }) => {
-        const clean = cleanEvent(d.event)
-        if (clean.length > 20) events.push(clean)
-      })
-    }
-  }
-  return events
-}
-
 // Find which section a paragraph belongs to
 function getSectionParaIds(paragraphId: number): number[] {
   for (const section of textbook.sections) {
@@ -52,22 +36,6 @@ function getSectionParaIds(paragraphId: number): number[] {
     }
   }
   return []
-}
-
-// Get all events from all paragraphs
-function getAllEvents(excludeParagraphId?: number): string[] {
-  const events: string[] = []
-  for (let i = 1; i <= 31; i++) {
-    if (i === excludeParagraphId) continue
-    const p = textbook.paragraphs[String(i) as keyof typeof textbook.paragraphs]
-    if (p?.dates) {
-      p.dates.forEach((d: { date: string; event: string }) => {
-        const clean = cleanEvent(d.event)
-        if (clean.length > 20) events.push(clean)
-      })
-    }
-  }
-  return events
 }
 
 // Get events from an expanding ring of adjacent same-section paragraphs

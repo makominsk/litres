@@ -29,7 +29,11 @@ interface UseSpeechRecognitionReturn {
 export function useSpeechRecognition(): UseSpeechRecognitionReturn {
   const [isListening, setIsListening] = useState(false)
   const [transcript, setTranscript] = useState('')
-  const [isSupported, setIsSupported] = useState(false)
+  const [isSupported] = useState(() => {
+    if (typeof window === 'undefined') return false
+    const w = window as unknown as Record<string, unknown>
+    return Boolean(w['SpeechRecognition'] || w['webkitSpeechRecognition'])
+  })
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
 
   useEffect(() => {
@@ -37,7 +41,6 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
     const SpeechRecognitionCtor = (w['SpeechRecognition'] || w['webkitSpeechRecognition']) as (new () => SpeechRecognitionInstance) | undefined
     const SpeechRecognition = SpeechRecognitionCtor
     if (SpeechRecognition) {
-      setIsSupported(true)
       const recognition = new SpeechRecognition()
       recognition.lang = 'ru-RU'
       recognition.continuous = false

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs')
 
 // Fix PDF hyphenation artifacts: 'сло- во' -> 'слово'

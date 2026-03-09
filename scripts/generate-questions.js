@@ -2,6 +2,7 @@
  * Regenerates questions for all paragraphs in textbook.json using Gemini.
  * Run: node scripts/generate-questions.js
  */
+/* eslint-disable @typescript-eslint/no-require-imports */
 
 const fs = require('fs')
 const path = require('path')

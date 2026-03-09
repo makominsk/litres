@@ -2,6 +2,7 @@
  * Sets proper educational questions for all 31 paragraphs.
  * Run: node scripts/set-questions.js
  */
+/* eslint-disable @typescript-eslint/no-require-imports */
 
 const fs = require('fs')
 const path = require('path')

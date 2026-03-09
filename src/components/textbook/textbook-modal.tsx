@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import textbook from '@/data/textbook.json'
 import textbookPages from '@/data/textbook-pages.json'
 import { useTextbookStore } from '@/stores/textbook-store'
@@ -32,13 +32,7 @@ export function TextbookModal() {
   const setSelectedParagraphId = useTextbookStore((s) => s.setSelectedParagraphId)
 
   const textbookPage = pdfToTextbookPage(currentPage)
-  const [pageInput, setPageInput] = useState(
-    textbookPage ? String(textbookPage) : String(FIRST_TEXTBOOK_PAGE)
-  )
-
-  useEffect(() => {
-    setPageInput(textbookPage ? String(textbookPage) : String(FIRST_TEXTBOOK_PAGE))
-  }, [textbookPage])
+  const pageInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!isOpen) return
@@ -64,7 +58,8 @@ export function TextbookModal() {
 
   function handlePageSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const textbookPageToGo = Number(pageInput)
+    const raw = pageInputRef.current?.value ?? String(textbookPage ?? FIRST_TEXTBOOK_PAGE)
+    const textbookPageToGo = Number(raw)
     if (!Number.isFinite(textbookPageToGo)) return
     const pdfPage = textbookToPdfPage(textbookPageToGo)
     if (!pdfPage) return
@@ -129,11 +124,12 @@ export function TextbookModal() {
 
               <form onSubmit={handlePageSubmit} className="flex items-center gap-2">
                 <input
+                  key={textbookPage ?? FIRST_TEXTBOOK_PAGE}
+                  ref={pageInputRef}
                   type="number"
                   min={FIRST_TEXTBOOK_PAGE}
                   max={LAST_TEXTBOOK_PAGE}
-                  value={pageInput}
-                  onChange={(e) => setPageInput(e.target.value)}
+                  defaultValue={textbookPage ? String(textbookPage) : String(FIRST_TEXTBOOK_PAGE)}
                   className="w-24 px-2 py-2 text-sm sm:text-base font-bold rounded-md"
                   style={{
                     background: '#fff',

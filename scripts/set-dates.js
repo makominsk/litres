@@ -2,6 +2,7 @@
  * Adds historical dates to all paragraphs in textbook.json
  * Run: node scripts/set-dates.js
  */
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs'), path = require('path')
 
 const DATES = {

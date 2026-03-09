@@ -47,6 +47,15 @@ export function EventMap({ markers }: EventMapProps) {
         maxZoom: 10,
       }).addTo(map)
 
+      // Fix z-index for sticky header overlap
+      const panes = map.getPanes()
+      if (panes) {
+        panes.tooltipPane.style.zIndex = '20'
+        panes.popupPane.style.zIndex = '20'
+        panes.markerPane.style.zIndex = '30'
+        panes.overlayPane.style.zIndex = '30'
+      }
+
       // Inject label styles once
       if (!document.getElementById('leaflet-label-style')) {
         const style = document.createElement('style')
@@ -155,6 +164,8 @@ export function EventMap({ markers }: EventMapProps) {
   return (
     <div
       style={{
+        position: 'relative',
+        zIndex: 10,
         borderRadius: '12px',
         overflow: 'hidden',
         border: '1.5px solid var(--parchment-deep)',
@@ -173,7 +184,7 @@ export function EventMap({ markers }: EventMapProps) {
       >
         🗺️ Карта событий параграфа
       </div>
-      <div ref={mapRef} style={{ height: '220px', width: '100%' }} />
+      <div ref={mapRef} style={{ height: '220px', width: '100%', position: 'relative', zIndex: 1 }} />
     </div>
   )
 }

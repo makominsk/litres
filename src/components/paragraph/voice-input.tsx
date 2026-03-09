@@ -118,6 +118,7 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
   const isRecording = recordingState === 'recording'
   const isTranscribing = recordingState === 'transcribing'
   const busyNotRecording = (isTranscribing || !!disabled)
+  const submitDisabled = disabled || !editableText.trim() || isTranscribing
 
   return (
     <div className="space-y-3">
@@ -283,11 +284,11 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
       {/* Кнопка отправки */}
       <button
         onClick={handleSubmit}
-        disabled={disabled || !editableText.trim() || isTranscribing}
+        disabled={submitDisabled}
         className="btn-terracotta w-full py-3 text-sm"
         style={{
-          opacity: disabled || !editableText.trim() || isTranscribing ? 0.5 : 1,
-          cursor: disabled || !editableText.trim() || isTranscribing ? 'not-allowed' : 'pointer',
+          opacity: submitDisabled ? (disabled ? 0.9 : 0.5) : 1,
+          cursor: submitDisabled ? 'not-allowed' : 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -295,11 +296,13 @@ export function VoiceInput({ onSubmit, disabled }: VoiceInputProps) {
         }}
       >
         {disabled ? (
-          <>
-            <span className="brutal-spinner" style={{ width: 16, height: 16, borderWidth: 2 }} />
-            Проверяю ответ
-            <span className="loading-dots" />
-          </>
+          <motion.span
+            animate={{ scale: [1, 1.04, 1], opacity: [0.75, 1, 0.75] }}
+            transition={{ duration: 1.1, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ display: 'inline-flex', alignItems: 'center' }}
+          >
+            Проверяю ответ<span className="loading-dots" />
+          </motion.span>
         ) : (
           'Проверить ответ →'
         )}

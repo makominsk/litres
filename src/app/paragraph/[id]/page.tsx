@@ -545,7 +545,7 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                       <div style={{ flex: 1 }}>
                         <div style={{
                           display: 'flex',
-                          gap: 5,
+                          gap: 4,
                           justifyContent: 'center',
                           marginBottom: 8,
                         }}>
@@ -553,8 +553,8 @@ export default function ParagraphPage({ params }: { params: Promise<{ id: string
                             <div
                               key={i}
                               style={{
-                                width: 12,
-                                height: 5,
+                                width: 8,
+                                height: 4,
                                 borderRadius: 99,
                                 background:
                                   i < Math.round((evalProgress / 100) * EVAL_SEGMENTS_COUNT)

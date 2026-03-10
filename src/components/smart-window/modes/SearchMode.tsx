@@ -10,6 +10,19 @@ interface Props {
   onModeSwitch: (target: string, params: ModeParams) => void
 }
 
+function cleanSearchText(text: string): string {
+  return text
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '')          // markdown images
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')          // markdown links → just text
+    .replace(/^#{1,4}\s+(Источники?|Sources?)[:\s]*$/gim, '') // "### Источники:" header
+    .replace(/^[-*]\s+https?:\/\/\S+$/gm, '')         // bullet URL lines
+    .replace(/^#{1,4}\s+/gm, '')                      // ### headers → plain
+    .replace(/\*\*([^*]+)\*\*/g, '$1')                // **bold** → plain
+    .replace(/\*([^*]+)\*/g, '$1')                    // *italic* → plain
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
 
 function SourceCard({ source, index }: { source: SearchSource; index: number }) {
   const domain = (() => {
@@ -228,6 +241,19 @@ export function SearchMode({ initialQuery, onModeSwitch }: Props) {
                   animate={{ opacity: 1, y: 0 }}
                   className="space-y-3"
                 >
+                  {/* Answer text */}
+                  {msg.content && (
+                    <div
+                      className="p-3 bg-white border-2 border-[var(--ink)] rounded-xl text-sm leading-relaxed whitespace-pre-wrap"
+                      style={{ boxShadow: '3px 3px 0px var(--ink)' }}
+                    >
+                      {cleanSearchText(msg.content)}
+                      {msg.isStreaming && (
+                        <span className="inline-block w-1.5 h-4 bg-[var(--ink)] ml-1 animate-pulse rounded-sm" />
+                      )}
+                    </div>
+                  )}
+
                   {/* Images grid */}
                   {msg.images && msg.images.length > 0 && (
                     <div className="space-y-1.5">
@@ -263,19 +289,6 @@ export function SearchMode({ initialQuery, onModeSwitch }: Props) {
                       {msg.sources.map((s, i) => (
                         <SourceCard key={i} source={s} index={i} />
                       ))}
-                    </div>
-                  )}
-
-                  {/* Answer text */}
-                  {msg.content && (
-                    <div
-                      className="p-3 bg-white border-2 border-[var(--ink)] rounded-xl text-sm leading-relaxed whitespace-pre-wrap"
-                      style={{ boxShadow: '3px 3px 0px var(--ink)' }}
-                    >
-                      {msg.content.replace(/!\[([^\]]*)\]\([^)]+\)/g, '').replace(/\n{3,}/g, '\n\n').trim()}
-                      {msg.isStreaming && (
-                        <span className="inline-block w-1.5 h-4 bg-[var(--ink)] ml-1 animate-pulse rounded-sm" />
-                      )}
                     </div>
                   )}
 

@@ -327,35 +327,37 @@ export function DiscussionMode({ initialMessage, paragraphTitle, paragraphId, se
           </p>
         )}
         <div className="flex gap-2 items-end">
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Напиши вопрос или скажи «напиши реферат»..."
-            rows={1}
-            className="flex-1 resize-none rounded-xl border-2 border-[var(--ink)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--indigo)] bg-[var(--bg)] min-h-[40px] max-h-[120px] overflow-y-auto"
-            style={{ fieldSizing: 'content' } as React.CSSProperties}
-            disabled={isLoading || recState !== 'idle'}
-          />
-          <button
-            onClick={toggleRecording}
-            disabled={isLoading || recState === 'transcribing'}
-            title={recState === 'recording' ? 'Остановить запись' : 'Надиктовать сообщение'}
-            className="w-10 h-10 rounded-xl border-2 border-[var(--ink)] text-white flex items-center justify-center disabled:opacity-40 transition-colors shrink-0"
-            style={{
-              background: recState === 'recording' ? '#DC2626' : '#4338CA',
-              boxShadow: '3px 3px 0px var(--ink)',
-            }}
-          >
-            {recState === 'transcribing' ? (
-              <Loader2 size={15} className="animate-spin" />
-            ) : recState === 'recording' ? (
-              <Square size={12} className="fill-white" />
-            ) : (
-              <Mic size={15} />
-            )}
-          </button>
+          <div className="relative flex-1">
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Напиши вопрос или надиктуй..."
+              rows={1}
+              className="w-full resize-none rounded-xl border-2 border-[var(--ink)] px-3 py-2 pr-10 text-sm focus:outline-none focus:border-[var(--indigo)] bg-[var(--bg)] min-h-[40px] max-h-[120px] overflow-y-auto"
+              style={{ fieldSizing: 'content' } as React.CSSProperties}
+              disabled={isLoading || recState !== 'idle'}
+            />
+            <button
+              onClick={toggleRecording}
+              disabled={isLoading || recState === 'transcribing'}
+              title={recState === 'recording' ? 'Остановить запись' : 'Надиктовать сообщение'}
+              className="absolute bottom-2 right-2 w-7 h-7 rounded-lg border-2 border-[var(--ink)] flex items-center justify-center disabled:opacity-40 transition-colors"
+              style={{
+                background: recState === 'recording' ? '#DC2626' : '#4338CA',
+                boxShadow: '1.5px 1.5px 0px var(--ink)',
+              }}
+            >
+              {recState === 'transcribing' ? (
+                <Loader2 size={13} className="text-white animate-spin" />
+              ) : recState === 'recording' ? (
+                <Square size={11} className="text-white fill-white" />
+              ) : (
+                <Mic size={13} className="text-white" />
+              )}
+            </button>
+          </div>
           <button
             onClick={sendMessage}
             disabled={!input.trim() || isLoading || recState !== 'idle'}

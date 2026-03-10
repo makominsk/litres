@@ -171,7 +171,7 @@ export function SearchMode({ initialQuery, onModeSwitch }: Props) {
         <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4">
           <div
             className="w-16 h-16 rounded-2xl border-2 border-[var(--ink)] flex items-center justify-center"
-            style={{ background: '#FF69B4', boxShadow: '4px 4px 0px var(--ink)' }}
+            style={{ background: '#1B6CA8', boxShadow: '4px 4px 0px var(--ink)' }}
           >
             <Globe size={28} />
           </div>
@@ -324,7 +324,7 @@ export function SearchMode({ initialQuery, onModeSwitch }: Props) {
             onClick={() => doSearch(query)}
             disabled={!query.trim() || isLoading}
             className="w-10 h-10 rounded-xl border-2 border-[var(--ink)] flex items-center justify-center disabled:opacity-40 hover:opacity-80 transition-opacity shrink-0"
-            style={{ background: '#FF69B4', boxShadow: '3px 3px 0px var(--ink)' }}
+            style={{ background: '#1B6CA8', boxShadow: '3px 3px 0px var(--ink)' }}
           >
             <Search size={16} />
           </button>

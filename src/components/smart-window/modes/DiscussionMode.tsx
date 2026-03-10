@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, Globe, ExternalLink } from 'lucide-react'
+import { Send, Globe, ExternalLink, Trash2 } from 'lucide-react'
 import type { ChatMessage, ModeParams, SearchSource, ImageItem, SSEEvent } from '@/types/smart-window'
+import { useSmartWindowStore } from '@/stores/smart-window-store'
 
 interface Props {
   initialMessage?: string
@@ -23,14 +24,14 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
           К
         </div>
       )}
-      <div className={`max-w-[85%] space-y-2`}>
+      <div className="max-w-[85%] space-y-2">
         <div
           className={`px-3 py-2 rounded-xl border-2 border-[var(--ink)] text-sm leading-relaxed whitespace-pre-wrap ${
             isUser
               ? 'bg-[var(--indigo)] text-white rounded-br-sm'
               : 'bg-white text-[var(--ink)] rounded-bl-sm'
           }`}
-          style={{ boxShadow: isUser ? '3px 3px 0px var(--ink)' : '3px 3px 0px var(--ink)' }}
+          style={{ boxShadow: '3px 3px 0px var(--ink)' }}
         >
           {msg.content}
           {msg.isStreaming && (
@@ -85,20 +86,31 @@ function ThinkingIndicator({ text }: { text: string }) {
   )
 }
 
+const WELCOME_ID = 'welcome'
+
+function makeWelcome(paragraphTitle?: string): ChatMessage {
+  return {
+    id: WELCOME_ID,
+    role: 'assistant',
+    content: paragraphTitle
+      ? `Привет! Я Клио — муза истории из древнегреческой мифологии. Именно я вдохновляла летописцев и историков на великие труды! Сейчас изучаем тему «${paragraphTitle}». Что хочешь узнать или обсудить? Могу искать информацию в интернете, помочь с рефератом или подготовить тебя к зачёту!`
+      : 'Привет! Я Клио — муза истории из древнегреческой мифологии. Именно я вдохновляла летописцев и историков на великие труды! Задай любой вопрос по истории Древнего мира. Могу искать информацию в интернете, помочь с рефератом или подготовить тебя к зачёту!',
+  }
+}
+
 export function DiscussionMode({ initialMessage, paragraphTitle, paragraphId, sectionTitle, onModeSwitch }: Props) {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'welcome',
-      role: 'assistant',
-      content: paragraphTitle
-        ? `Привет! Я Клио — муза истории из древнегреческой мифологии. Именно я вдохновляла летописцев и историков на великие труды! Сейчас изучаем тему «${paragraphTitle}». Что хочешь узнать или обсудить? Могу искать информацию в интернете, помочь с рефератом или подготовить тебя к зачёту!`
-        : 'Привет! Я Клио — муза истории из древнегреческой мифологии. Именно я вдохновляла летописцев и историков на великие труды! Задай любой вопрос по истории Древнего мира. Могу искать информацию в интернете, помочь с рефератом или подготовить тебя к зачёту!',
-    },
-  ])
+  const { messages, setMessages, updateMessage } = useSmartWindowStore()
+
+  // Инициализируем приветствие один раз если история пустая
+  useEffect(() => {
+    if (messages.length === 0) {
+      setMessages([makeWelcome(paragraphTitle)])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const [input, setInput] = useState(initialMessage ?? '')
   const [thinking, setThinking] = useState('')
-  const [pendingSources, setPendingSources] = useState<SearchSource[]>([])
-  const [pendingImages, setPendingImages] = useState<ImageItem[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -115,20 +127,18 @@ export function DiscussionMode({ initialMessage, paragraphTitle, paragraphId, se
     setInput('')
     setIsLoading(true)
     setThinking('')
-    setPendingSources([])
-    setPendingImages([])
 
     const userMsg: ChatMessage = { id: `u-${Date.now()}`, role: 'user', content: text }
     const assistantId = `a-${Date.now()}`
     const assistantPlaceholder: ChatMessage = { id: assistantId, role: 'assistant', content: '', isStreaming: true }
 
-    setMessages((prev) => [...prev, userMsg, assistantPlaceholder])
+    // Snapshot текущих сообщений для API (до добавления placeholder)
+    const currentMessages = useSmartWindowStore.getState().messages
+    setMessages([...currentMessages, userMsg, assistantPlaceholder])
 
-    // Build API messages (exclude welcome + streaming placeholder)
-    const apiMessages = [...messages, userMsg].map((m) => ({
-      role: m.role,
-      content: m.content,
-    }))
+    const apiMessages = [...currentMessages, userMsg]
+      .filter((m) => m.id !== WELCOME_ID) // welcome не отправляем в API
+      .map((m) => ({ role: m.role, content: m.content }))
 
     abortRef.current = new AbortController()
 
@@ -166,46 +176,32 @@ export function DiscussionMode({ initialMessage, paragraphTitle, paragraphId, se
 
             if (event.type === 'text') {
               accContent += event.content
-              setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === assistantId ? { ...m, content: accContent, isStreaming: true } : m
-                )
-              )
+              updateMessage(assistantId, { content: accContent, isStreaming: true })
             } else if (event.type === 'thinking') {
               setThinking(event.content)
             } else if (event.type === 'sources') {
               msgSources = event.items
-              setPendingSources(event.items)
             } else if (event.type === 'images') {
               msgImages = event.items
-              setPendingImages(event.items)
             } else if (event.type === 'mode_switch') {
-              setMessages((prev) => prev.filter((m) => m.id !== assistantId))
+              // Убираем пустой placeholder перед переключением
+              const store = useSmartWindowStore.getState()
+              setMessages(store.messages.filter((m) => m.id !== assistantId))
               onModeSwitch(event.target, event.params)
               return
             } else if (event.type === 'done') {
-              setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === assistantId
-                    ? {
-                        ...m,
-                        content: accContent,
-                        isStreaming: false,
-                        sources: msgSources.length > 0 ? msgSources : undefined,
-                        images: msgImages.length > 0 ? msgImages : undefined,
-                      }
-                    : m
-                )
-              )
+              updateMessage(assistantId, {
+                content: accContent,
+                isStreaming: false,
+                sources: msgSources.length > 0 ? msgSources : undefined,
+                images: msgImages.length > 0 ? msgImages : undefined,
+              })
               setThinking('')
             } else if (event.type === 'error') {
-              setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === assistantId
-                    ? { ...m, content: 'Произошла ошибка. Попробуй ещё раз.', isStreaming: false }
-                    : m
-                )
-              )
+              updateMessage(assistantId, {
+                content: 'Произошла ошибка. Попробуй ещё раз.',
+                isStreaming: false,
+              })
             }
           } catch {
             // skip malformed event
@@ -214,27 +210,26 @@ export function DiscussionMode({ initialMessage, paragraphTitle, paragraphId, se
       }
     } catch (err: unknown) {
       if (err instanceof Error && err.name !== 'AbortError') {
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === assistantId
-              ? { ...m, content: 'Не удалось получить ответ. Проверь подключение.', isStreaming: false }
-              : m
-          )
-        )
+        updateMessage(assistantId, {
+          content: 'Не удалось получить ответ. Проверь подключение.',
+          isStreaming: false,
+        })
       }
     } finally {
       setIsLoading(false)
       setThinking('')
-      void pendingSources
-      void pendingImages
     }
-  }, [input, isLoading, messages, paragraphTitle, paragraphId, sectionTitle, onModeSwitch, pendingSources, pendingImages])
+  }, [input, isLoading, paragraphTitle, paragraphId, sectionTitle, onModeSwitch, setMessages, updateMessage])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       sendMessage()
     }
+  }
+
+  const clearHistory = () => {
+    setMessages([makeWelcome(paragraphTitle)])
   }
 
   return (
@@ -263,7 +258,7 @@ export function DiscussionMode({ initialMessage, paragraphTitle, paragraphId, se
         <div ref={bottomRef} />
       </div>
 
-      {/* Quick suggestions */}
+      {/* Quick suggestions — только если только приветствие */}
       {messages.length <= 1 && (
         <div className="px-3 pb-2 flex flex-wrap gap-1.5">
           {['Расскажи о Древней Греции', 'Напиши реферат', 'Проверь мои знания'].map((s) => (
@@ -300,6 +295,16 @@ export function DiscussionMode({ initialMessage, paragraphTitle, paragraphId, se
           >
             <Send size={16} />
           </button>
+          {messages.length > 1 && (
+            <button
+              onClick={clearHistory}
+              title="Очистить историю"
+              className="w-10 h-10 rounded-xl border-2 border-[var(--ink)] bg-[var(--bg-dark)] flex items-center justify-center hover:bg-[var(--pink-light)] transition-colors shrink-0"
+              style={{ boxShadow: '3px 3px 0px var(--ink)' }}
+            >
+              <Trash2 size={15} />
+            </button>
+          )}
         </div>
       </div>
     </div>

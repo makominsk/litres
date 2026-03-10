@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { GraduationCap, CheckCircle, XCircle, RotateCcw, Loader2, ChevronRight, Lightbulb, Mic, Square } from 'lucide-react'
 import type { ExamQuestion } from '@/app/api/generate-exam/route'
@@ -152,21 +152,16 @@ function ParagraphSelector({
 }
 
 export function ExamMode({ initialSectionId, initialParagraphIds }: Props) {
+  const hasInitialSelection = Boolean(initialSectionId || (initialParagraphIds && initialParagraphIds.length > 0))
   const [phase, setPhase] = useState<'setup' | 'loading' | 'quiz' | 'results'>(
-    initialSectionId || (initialParagraphIds && initialParagraphIds.length > 0) ? 'loading' : 'setup'
+    hasInitialSelection ? 'loading' : 'setup'
   )
   const [questions, setQuestions] = useState<ExamQuestion[]>([])
   const [current, setCurrent] = useState(0)
   const [states, setStates] = useState<Record<string, QuestionState>>({})
   const [loadError, setLoadError] = useState('')
   const [score, setScore] = useState({ correct: 0, total: 0 })
-
-  // Auto-load if params provided
-  useState(() => {
-    if (phase === 'loading') {
-      loadQuestions(initialParagraphIds ?? [], initialSectionId)
-    }
-  })
+  const didAutoLoadRef = useRef(false)
 
   const loadQuestions = useCallback(
     async (paragraphIds: number[], sectionId?: string) => {
@@ -193,6 +188,13 @@ export function ExamMode({ initialSectionId, initialParagraphIds }: Props) {
     },
     []
   )
+
+  // Auto-load once when mode opens with preselected params from the assistant.
+  useEffect(() => {
+    if (didAutoLoadRef.current || !hasInitialSelection) return
+    didAutoLoadRef.current = true
+    loadQuestions(initialParagraphIds ?? [], initialSectionId)
+  }, [hasInitialSelection, initialParagraphIds, initialSectionId, loadQuestions])
 
   async function submitAnswer(q: ExamQuestion, answer: string) {
     if (states[q.id]?.submitted) return

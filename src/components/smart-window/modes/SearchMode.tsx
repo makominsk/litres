@@ -176,7 +176,7 @@ export function SearchMode({ initialQuery, onModeSwitch }: Props) {
             className="w-16 h-16 rounded-2xl border-2 border-[var(--ink)] flex items-center justify-center"
             style={{ background: '#1B6CA8', boxShadow: '4px 4px 0px var(--ink)' }}
           >
-            <Globe size={28} />
+            <Globe size={28} className="text-white" />
           </div>
           <h2 className="text-lg font-bold text-[var(--ink)]">Свободный поиск</h2>
           <p className="text-sm text-[var(--ink-muted)] text-center">
@@ -205,7 +205,10 @@ export function SearchMode({ initialQuery, onModeSwitch }: Props) {
       {hasSearched && (
         <div className="flex-1 overflow-y-auto p-3 space-y-4 min-h-0">
           <AnimatePresence initial={false}>
-            {messages.map((msg) => {
+            {messages.map((msg, idx) => {
+              const isLastAssistant =
+                msg.role === 'assistant' &&
+                !messages.slice(idx + 1).some((m) => m.role === 'assistant')
               if (msg.role === 'user') {
                 return (
                   <motion.div
@@ -283,7 +286,7 @@ export function SearchMode({ initialQuery, onModeSwitch }: Props) {
                   )}
 
                   {/* Switch to report */}
-                  {!msg.isStreaming && msg.content && (
+                  {isLastAssistant && !msg.isStreaming && msg.content && (
                     <button
                       onClick={() =>
                         onModeSwitch('report', { topic: messages.find((m) => m.role === 'user')?.content })

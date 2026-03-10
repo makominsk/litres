@@ -153,6 +153,23 @@ function buildSystemPrompt(mode: AgentMode, context: AgentContext): string {
 
 // ─── Tool executors ───────────────────────────────────────────────────────────
 
+// Domains that are not authoritative for history/education
+const BLOCKED_DOMAINS = [
+  'pikabu.ru', 'dzen.ru', 'zen.yandex.ru', 'otvet.mail.ru', 'mail.ru',
+  'fishki.net', 'vk.com', 'ok.ru', 'twitter.com', 'facebook.com',
+  'instagram.com', 'tiktok.com', 'livejournal.com', 'liveinternet.ru',
+  'otzovik.com', 'irecommend.ru', 'fanfics.me', 'ficbook.net',
+]
+
+function isReliableSource(url: string): boolean {
+  try {
+    const host = new URL(url).hostname.replace('www.', '')
+    return !BLOCKED_DOMAINS.some((d) => host === d || host.endsWith('.' + d))
+  } catch {
+    return true
+  }
+}
+
 async function executeWebSearch(query: string): Promise<{ text: string; sources: unknown[] }> {
   const url = new URL('/api/web-search', 'https://placeholder.internal')
   // Use direct Tavily call to avoid self-referencing in edge
@@ -166,8 +183,9 @@ async function executeWebSearch(query: string): Promise<{ text: string; sources:
       api_key: apiKey,
       query,
       search_depth: 'basic',
-      max_results: 5,
+      max_results: 8,
       include_answer: true,
+      exclude_domains: BLOCKED_DOMAINS,
     }),
   })
   void url
@@ -175,11 +193,14 @@ async function executeWebSearch(query: string): Promise<{ text: string; sources:
   if (!res.ok) return { text: 'Поиск не дал результатов', sources: [] }
 
   const data = await res.json()
-  const sources = (data.results ?? []).map((r: { title: string; url: string; content: string }) => ({
-    title: r.title,
-    url: r.url,
-    snippet: r.content?.slice(0, 300) ?? '',
-  }))
+  const sources = (data.results ?? [])
+    .filter((r: { url: string }) => isReliableSource(r.url))
+    .slice(0, 5)
+    .map((r: { title: string; url: string; content: string }) => ({
+      title: r.title,
+      url: r.url,
+      snippet: r.content?.slice(0, 300) ?? '',
+    }))
 
   const parts: string[] = []
   if (data.answer) parts.push(`Краткий ответ: ${data.answer}`)

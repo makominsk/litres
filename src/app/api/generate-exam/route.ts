@@ -143,16 +143,41 @@ ${contextBlocks.join('\n\n')}
     const paraMap = Object.fromEntries(paragraphs.map((p) => [p.id, p]))
     const questions: ExamQuestion[] = (parsed as Array<Record<string, unknown>>)
       .filter((q) => q.question && q.correctAnswer)
-      .map((q, i) => ({
-        id: `q-${Date.now()}-${i}`,
-        type: (q.type as ExamQuestion['type']) ?? 'open',
-        question: String(q.question),
-        correctAnswer: String(q.correctAnswer),
-        options: Array.isArray(q.options) ? q.options.map(String) : undefined,
-        hint: q.hint ? String(q.hint) : undefined,
-        paragraphId: Number(q.paragraphId) || paragraphs[0].id,
-        paragraphTitle: paraMap[Number(q.paragraphId)]?.title ?? paragraphs[0].title,
-      }))
+      .map((q, i) => {
+        const options = Array.isArray(q.options) ? q.options.map(String) : undefined
+        let correctAnswer = String(q.correctAnswer)
+
+        // For multiple choice: ensure correctAnswer exactly matches one of the options
+        // GPT sometimes generates slightly different phrasings for option vs correctAnswer
+        if (options && options.length > 0) {
+          const norm = (s: string) => s.toLowerCase().replace(/[.,!?]/g, '').trim()
+          const exact = options.find((o) => norm(o) === norm(correctAnswer))
+          if (exact) {
+            correctAnswer = exact
+          } else {
+            // fallback: pick the option with most overlap
+            const best = options.reduce<{ opt: string; score: number }>(
+              (acc, o) => {
+                const score = norm(o).split(' ').filter((w) => norm(correctAnswer).includes(w)).length
+                return score > acc.score ? { opt: o, score } : acc
+              },
+              { opt: options[0], score: 0 }
+            )
+            if (best.score > 0) correctAnswer = best.opt
+          }
+        }
+
+        return {
+          id: `q-${Date.now()}-${i}`,
+          type: (q.type as ExamQuestion['type']) ?? 'open',
+          question: String(q.question),
+          correctAnswer,
+          options,
+          hint: q.hint ? String(q.hint) : undefined,
+          paragraphId: Number(q.paragraphId) || paragraphs[0].id,
+          paragraphTitle: paraMap[Number(q.paragraphId)]?.title ?? paragraphs[0].title,
+        }
+      })
 
     return Response.json({ questions })
   } catch (error) {

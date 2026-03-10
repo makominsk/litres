@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { GraduationCap, CheckCircle, XCircle, RotateCcw, Loader2, ChevronRight, Lightbulb } from 'lucide-react'
+import { GraduationCap, CheckCircle, XCircle, RotateCcw, Loader2, ChevronRight, Lightbulb, Mic, Square } from 'lucide-react'
 import type { ExamQuestion } from '@/app/api/generate-exam/route'
 import textbookData from '@/data/textbook.json'
 
@@ -197,9 +197,10 @@ export function ExamMode({ initialSectionId, initialParagraphIds }: Props) {
   async function submitAnswer(q: ExamQuestion, answer: string) {
     if (states[q.id]?.submitted) return
 
-    // For multiple choice — instant evaluation
+    // For multiple choice — instant evaluation (normalize to handle minor GPT phrasing mismatches)
     if (q.type === 'multiple') {
-      const isCorrect = answer === q.correctAnswer
+      const norm = (s: string) => s.toLowerCase().replace(/[.,!?]/g, '').trim()
+      const isCorrect = norm(answer) === norm(q.correctAnswer)
       setStates((prev) => ({
         ...prev,
         [q.id]: {
@@ -490,20 +491,89 @@ export function ExamMode({ initialSectionId, initialParagraphIds }: Props) {
 
 function OpenAnswer({ onSubmit, disabled }: { onSubmit: (answer: string) => void; disabled: boolean }) {
   const [value, setValue] = useState('')
+  const [recState, setRecState] = useState<'idle' | 'recording' | 'transcribing'>('idle')
+  const mediaRef = useRef<MediaRecorder | null>(null)
+  const chunksRef = useRef<Blob[]>([])
+
+  async function toggleRecording() {
+    if (recState === 'recording') {
+      mediaRef.current?.stop()
+      return
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const recorder = new MediaRecorder(stream)
+      chunksRef.current = []
+      mediaRef.current = recorder
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data)
+      }
+
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop())
+        setRecState('transcribing')
+        try {
+          const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
+          const form = new FormData()
+          form.append('audio', blob, 'recording.webm')
+          const res = await fetch('/api/transcribe', { method: 'POST', body: form })
+          const data = await res.json()
+          if (data.text) setValue((prev) => (prev ? prev + ' ' + data.text : data.text))
+        } catch {
+          // ignore transcription errors
+        } finally {
+          setRecState('idle')
+        }
+      }
+
+      recorder.start()
+      setRecState('recording')
+    } catch {
+      setRecState('idle')
+    }
+  }
 
   return (
     <div className="space-y-2">
-      <textarea
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        placeholder="Напиши свой ответ..."
-        rows={3}
-        disabled={disabled}
-        className="w-full px-3 py-2 border-2 border-[var(--ink)] rounded-xl text-sm resize-none focus:outline-none focus:border-[var(--indigo)] bg-[var(--bg)]"
-      />
+      <div className="relative">
+        <textarea
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder="Напиши или надиктуй свой ответ..."
+          rows={3}
+          disabled={disabled || recState !== 'idle'}
+          className="w-full px-3 py-2 pr-10 border-2 border-[var(--ink)] rounded-xl text-sm resize-none focus:outline-none focus:border-[var(--indigo)] bg-[var(--bg)]"
+        />
+        <button
+          onClick={toggleRecording}
+          disabled={disabled || recState === 'transcribing'}
+          title={recState === 'recording' ? 'Остановить запись' : 'Надиктовать ответ'}
+          className="absolute bottom-2 right-2 w-7 h-7 rounded-lg border-2 border-[var(--ink)] flex items-center justify-center transition-colors disabled:opacity-40"
+          style={{
+            background: recState === 'recording' ? '#DC2626' : '#065F46',
+            boxShadow: '1.5px 1.5px 0px var(--ink)',
+          }}
+        >
+          {recState === 'transcribing' ? (
+            <Loader2 size={13} className="text-white animate-spin" />
+          ) : recState === 'recording' ? (
+            <Square size={11} className="text-white fill-white" />
+          ) : (
+            <Mic size={13} className="text-white" />
+          )}
+        </button>
+      </div>
+      {recState === 'recording' && (
+        <p className="text-xs text-[#DC2626] flex items-center gap-1 animate-pulse">
+          <span className="w-2 h-2 bg-[#DC2626] rounded-full inline-block" />
+          Запись... нажми кнопку чтобы остановить
+        </p>
+      )}
       <button
         onClick={() => onSubmit(value)}
-        disabled={!value.trim() || disabled}
+        disabled={!value.trim() || disabled || recState !== 'idle'}
         className="w-full py-2 text-white border-2 border-[var(--ink)] rounded-xl font-bold text-sm disabled:opacity-40"
         style={{ background: '#065F46', boxShadow: '3px 3px 0px var(--ink)' }}
       >

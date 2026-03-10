@@ -3,6 +3,7 @@ import { Rubik, Nunito } from 'next/font/google'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { ToastProvider } from '@/components/ui/toast'
 import { OfflineBanner } from '@/components/ui/offline-banner'
+import { SmartWindowProvider } from '@/components/smart-window/SmartWindowProvider'
 import './globals.css'
 
 const rubik = Rubik({
@@ -37,6 +38,7 @@ export default function RootLayout({
           <ToastProvider>
             <OfflineBanner />
             {children}
+            <SmartWindowProvider />
           </ToastProvider>
         </TooltipProvider>
       </body>

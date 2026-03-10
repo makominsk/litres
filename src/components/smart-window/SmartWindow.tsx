@@ -48,8 +48,8 @@ const MODES: Array<{
     label: 'Поиск',
     shortLabel: 'Поиск',
     icon: Globe,
-    color: '#0E7490',
-    bg: '#E0F2FE',
+    color: '#FF69B4',
+    bg: '#FFE4F0',
   },
 ]
 

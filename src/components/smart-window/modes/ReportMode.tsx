@@ -16,6 +16,23 @@ interface ReportSection {
   content: string
 }
 
+// Извлекает ключевые слова из темы, убирая инструкции вроде "15 предложений на тему"
+function extractKeywords(text: string): string {
+  return text
+    .replace(/\d+\s*(предложений|слов|абзацев|страниц)/gi, '')
+    .replace(/\b(напиши|сделай|составь|расскажи|реферат|доклад|на тему|про|о том|краткий|подробный)\b/gi, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+}
+
+// Убирает markdown-разметку из текста для показа во время стриминга
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/^#{1,3}\s+/gm, '')   // ### заголовки
+    .replace(/\*\*(.+?)\*\*/g, '$1') // **жирный**
+    .replace(/\*(.+?)\*/g, '$1')     // *курсив*
+}
+
 export function ReportMode({ initialTopic, chatContext }: Props) {
   const [topic, setTopic] = useState(initialTopic ?? '')
   const [isGenerating, setIsGenerating] = useState(false)
@@ -47,11 +64,12 @@ export function ReportMode({ initialTopic, chatContext }: Props) {
     setImages([])
     setStreamingText('')
 
-    // Search images in parallel
+    // Search images in parallel — используем ключевые слова, не инструкцию
+    const imageQuery = extractKeywords(reportTopic)
     fetch('/api/image-search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: `${reportTopic} ancient history`, limit: 6 }),
+      body: JSON.stringify({ query: imageQuery, limit: 6 }),
     })
       .then((r) => r.json())
       .then((data) => setImages(data.images ?? []))
@@ -241,9 +259,9 @@ export function ReportMode({ initialTopic, chatContext }: Props) {
             )}
           </AnimatePresence>
 
-          {/* Streaming text */}
+          {/* Streaming text — без markdown-значков */}
           <div className="brutal-card p-3 text-sm leading-relaxed whitespace-pre-wrap text-[var(--ink)]">
-            {streamingText}
+            {stripMarkdown(streamingText)}
             <span className="inline-block w-1.5 h-4 bg-[var(--indigo)] ml-1 animate-pulse rounded-sm" />
           </div>
           <div ref={bottomRef} />
@@ -310,7 +328,7 @@ export function ReportMode({ initialTopic, chatContext }: Props) {
             <RotateCcw size={14} /> Новый
           </button>
           <a
-            href={`https://ru.wikipedia.org/wiki/${encodeURIComponent(topic)}`}
+            href={`https://ru.wikipedia.org/w/index.php?search=${encodeURIComponent(extractKeywords(topic))}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1 px-3 py-2 bg-[var(--sky)] border-2 border-[var(--ink)] rounded-xl text-sm hover:opacity-80 transition-opacity"

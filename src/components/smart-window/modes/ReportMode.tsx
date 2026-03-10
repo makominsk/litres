@@ -113,14 +113,21 @@ export function ReportMode({ initialTopic, chatContext }: Props) {
       ? `Контекст из предыдущей беседы: ${chatContext.slice(0, 500)}\n\n`
       : ''
 
-    const prompt = `${systemContext}Напиши структурированный реферат на тему: "${reportTopic}".
+    // Вытащить ограничение объёма ("10 предложений", "5 абзацев", "200 слов") если есть
+    const sizeMatch = reportTopic.match(/(\d+)\s*(предложений|слов|абзацев|страниц)/i)
+    const cleanTopic = extractKeywords(reportTopic)
+    const volumeReq = sizeMatch
+      ? `~${sizeMatch[1]} ${sizeMatch[2].toLowerCase()}`
+      : '~500-700 слов'
+
+    const prompt = `${systemContext}Напиши структурированный реферат на тему: "${cleanTopic}".
 
 Структура:
-1. Введение (2-3 абзаца)
-2. Основная часть (3-4 раздела с подзаголовками)
-3. Заключение (1-2 абзаца)
+1. Введение
+2. Основная часть (2-3 раздела с подзаголовками)
+3. Заключение
 
-Требования: язык понятный для 5 класса, факты точные, каждый раздел с подзаголовком, объём ~500-700 слов.`
+Требования: язык понятный для 5 класса, факты точные, каждый раздел начинать с ### заголовка, объём ${volumeReq}.`
 
     try {
       const res = await fetch('/api/agent-chat', {

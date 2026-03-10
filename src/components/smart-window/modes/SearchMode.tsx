@@ -10,12 +10,6 @@ interface Props {
   onModeSwitch: (target: string, params: ModeParams) => void
 }
 
-interface SearchResult {
-  query: string
-  answer: string
-  sources: SearchSource[]
-  images: ImageItem[]
-}
 
 function SourceCard({ source, index }: { source: SearchSource; index: number }) {
   const domain = (() => {
@@ -278,7 +272,7 @@ export function SearchMode({ initialQuery, onModeSwitch }: Props) {
                       className="p-3 bg-white border-2 border-[var(--ink)] rounded-xl text-sm leading-relaxed whitespace-pre-wrap"
                       style={{ boxShadow: '3px 3px 0px var(--ink)' }}
                     >
-                      {msg.content}
+                      {msg.content.replace(/!\[([^\]]*)\]\([^)]+\)/g, '').replace(/\n{3,}/g, '\n\n').trim()}
                       {msg.isStreaming && (
                         <span className="inline-block w-1.5 h-4 bg-[var(--ink)] ml-1 animate-pulse rounded-sm" />
                       )}

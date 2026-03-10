@@ -4,25 +4,12 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, Globe, ExternalLink, Image, FileText } from 'lucide-react'
 import type { SearchSource, ImageItem, ChatMessage, SSEEvent, ModeParams } from '@/types/smart-window'
+import { toPlainAssistantText } from '@/lib/plain-text'
 
 interface Props {
   initialQuery?: string
   onModeSwitch: (target: string, params: ModeParams) => void
 }
-
-function cleanSearchText(text: string): string {
-  return text
-    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '')          // markdown images
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')          // markdown links → just text
-    .replace(/^#{1,4}\s+(Источники?|Sources?)[:\s]*$/gim, '') // "### Источники:" header
-    .replace(/^[-*]\s+https?:\/\/\S+$/gm, '')         // bullet URL lines
-    .replace(/^#{1,4}\s+/gm, '')                      // ### headers → plain
-    .replace(/\*\*([^*]+)\*\*/g, '$1')                // **bold** → plain
-    .replace(/\*([^*]+)\*/g, '$1')                    // *italic* → plain
-    .replace(/\n{3,}/g, '\n\n')
-    .trim()
-}
-
 
 function SourceCard({ source, index }: { source: SearchSource; index: number }) {
   const domain = (() => {
@@ -247,7 +234,7 @@ export function SearchMode({ initialQuery, onModeSwitch }: Props) {
                       className="p-3 bg-white border-2 border-[var(--ink)] rounded-xl text-sm leading-relaxed whitespace-pre-wrap"
                       style={{ boxShadow: '3px 3px 0px var(--ink)' }}
                     >
-                      {cleanSearchText(msg.content)}
+                      {toPlainAssistantText(msg.content)}
                       {msg.isStreaming && (
                         <span className="inline-block w-1.5 h-4 bg-[var(--ink)] ml-1 animate-pulse rounded-sm" />
                       )}

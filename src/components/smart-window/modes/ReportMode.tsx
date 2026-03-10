@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FileText, Image, Copy, Check, RotateCcw, ExternalLink } from 'lucide-react'
 import type { ImageItem, SSEEvent } from '@/types/smart-window'
+import { toPlainAssistantText } from '@/lib/plain-text'
 
 interface Props {
   initialTopic?: string
@@ -23,14 +24,6 @@ function extractKeywords(text: string): string {
     .replace(/\b(напиши|сделай|составь|расскажи|реферат|доклад|на тему|про|о том|краткий|подробный)\b/gi, '')
     .replace(/\s{2,}/g, ' ')
     .trim()
-}
-
-// Убирает markdown-разметку из текста для показа во время стриминга
-function stripMarkdown(text: string): string {
-  return text
-    .replace(/^#{1,3}\s+/gm, '')   // ### заголовки
-    .replace(/\*\*(.+?)\*\*/g, '$1') // **жирный**
-    .replace(/\*(.+?)\*/g, '$1')     // *курсив*
 }
 
 export function ReportMode({ initialTopic, chatContext }: Props) {
@@ -261,7 +254,7 @@ export function ReportMode({ initialTopic, chatContext }: Props) {
 
           {/* Streaming text — без markdown-значков */}
           <div className="brutal-card p-3 text-sm leading-relaxed whitespace-pre-wrap text-[var(--ink)]">
-            {stripMarkdown(streamingText)}
+            {toPlainAssistantText(streamingText)}
             <span className="inline-block w-1.5 h-4 bg-[var(--indigo)] ml-1 animate-pulse rounded-sm" />
           </div>
           <div ref={bottomRef} />
@@ -298,10 +291,12 @@ export function ReportMode({ initialTopic, chatContext }: Props) {
               <div key={s.id} className="space-y-1">
                 {s.title !== 'Текст' && s.title !== 'Реферат' && (
                   <h3 className="font-bold text-sm text-[var(--indigo)] border-b border-[var(--indigo)] pb-0.5">
-                    {s.title}
+                    {toPlainAssistantText(s.title)}
                   </h3>
                 )}
-                <p className="text-sm leading-relaxed text-[var(--ink)] whitespace-pre-wrap">{s.content}</p>
+                <p className="text-sm leading-relaxed text-[var(--ink)] whitespace-pre-wrap">
+                  {toPlainAssistantText(s.content)}
+                </p>
               </div>
             ))}
           </div>

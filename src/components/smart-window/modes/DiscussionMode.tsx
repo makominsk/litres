@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Send, Globe, ExternalLink, Trash2 } from 'lucide-react'
 import type { ChatMessage, ModeParams, SearchSource, ImageItem, SSEEvent } from '@/types/smart-window'
 import { useSmartWindowStore } from '@/stores/smart-window-store'
+import { toPlainAssistantText } from '@/lib/plain-text'
 
 interface Props {
   initialMessage?: string
@@ -16,6 +17,7 @@ interface Props {
 
 function MessageBubble({ msg }: { msg: ChatMessage }) {
   const isUser = msg.role === 'user'
+  const visibleContent = isUser ? msg.content : toPlainAssistantText(msg.content)
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} gap-2`}>
@@ -33,7 +35,7 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
           }`}
           style={{ boxShadow: '3px 3px 0px var(--ink)' }}
         >
-          {msg.content}
+          {visibleContent}
           {msg.isStreaming && (
             <span className="inline-block w-1.5 h-4 bg-current ml-1 animate-pulse rounded-sm" />
           )}

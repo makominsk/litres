@@ -287,7 +287,7 @@ export function ExamMode({ initialSectionId, initialParagraphIds }: Props) {
         <div className="flex-1 flex flex-col items-center justify-center gap-3 p-6">
           <Loader2 size={32} className="animate-spin" style={{ color: '#065F46' }} />
           <p className="text-sm font-bold text-[var(--ink)]">Составляю вопросы...</p>
-          <p className="text-xs text-[var(--ink-muted)]">AI читает параграфы и придумывает задания</p>
+          <p className="text-xs text-[var(--ink-muted)]">Клио читает параграфы и придумывает задания</p>
         </div>
       )}
 

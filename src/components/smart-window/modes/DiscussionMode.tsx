@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, Globe, ExternalLink, Trash2 } from 'lucide-react'
+import { Send, Globe, ExternalLink, Trash2, Mic, Square, Loader2 } from 'lucide-react'
 import type { ChatMessage, ModeParams, SearchSource, ImageItem, SSEEvent } from '@/types/smart-window'
 import { useSmartWindowStore } from '@/stores/smart-window-store'
 import { toPlainAssistantText } from '@/lib/plain-text'
@@ -114,9 +114,12 @@ export function DiscussionMode({ initialMessage, paragraphTitle, paragraphId, se
   const [input, setInput] = useState(initialMessage ?? '')
   const [thinking, setThinking] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [recState, setRecState] = useState<'idle' | 'recording' | 'transcribing'>('idle')
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const abortRef = useRef<AbortController | null>(null)
+  const mediaRef = useRef<MediaRecorder | null>(null)
+  const chunksRef = useRef<Blob[]>([])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -234,6 +237,46 @@ export function DiscussionMode({ initialMessage, paragraphTitle, paragraphId, se
     setMessages([makeWelcome(paragraphTitle)])
   }
 
+  async function toggleRecording() {
+    if (recState === 'recording') {
+      mediaRef.current?.stop()
+      return
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const recorder = new MediaRecorder(stream)
+      chunksRef.current = []
+      mediaRef.current = recorder
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data)
+      }
+
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop())
+        setRecState('transcribing')
+        try {
+          const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
+          const form = new FormData()
+          form.append('audio', blob, 'recording.webm')
+          const res = await fetch('/api/transcribe', { method: 'POST', body: form })
+          const data = await res.json()
+          if (data.text) setInput((prev) => (prev ? prev + ' ' + data.text : data.text))
+        } catch {
+          // ignore
+        } finally {
+          setRecState('idle')
+          inputRef.current?.focus()
+        }
+      }
+
+      recorder.start()
+      setRecState('recording')
+    } catch {
+      setRecState('idle')
+    }
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* Messages */}
@@ -277,6 +320,12 @@ export function DiscussionMode({ initialMessage, paragraphTitle, paragraphId, se
 
       {/* Input */}
       <div className="p-3 border-t-2 border-[var(--ink)] bg-white">
+        {recState === 'recording' && (
+          <p className="text-xs text-[#DC2626] flex items-center gap-1 animate-pulse mb-2">
+            <span className="w-2 h-2 bg-[#DC2626] rounded-full inline-block" />
+            Запись... нажми кнопку чтобы остановить
+          </p>
+        )}
         <div className="flex gap-2 items-end">
           <textarea
             ref={inputRef}
@@ -287,11 +336,29 @@ export function DiscussionMode({ initialMessage, paragraphTitle, paragraphId, se
             rows={1}
             className="flex-1 resize-none rounded-xl border-2 border-[var(--ink)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--indigo)] bg-[var(--bg)] min-h-[40px] max-h-[120px] overflow-y-auto"
             style={{ fieldSizing: 'content' } as React.CSSProperties}
-            disabled={isLoading}
+            disabled={isLoading || recState !== 'idle'}
           />
           <button
+            onClick={toggleRecording}
+            disabled={isLoading || recState === 'transcribing'}
+            title={recState === 'recording' ? 'Остановить запись' : 'Надиктовать сообщение'}
+            className="w-10 h-10 rounded-xl border-2 border-[var(--ink)] text-white flex items-center justify-center disabled:opacity-40 transition-colors shrink-0"
+            style={{
+              background: recState === 'recording' ? '#DC2626' : '#4338CA',
+              boxShadow: '3px 3px 0px var(--ink)',
+            }}
+          >
+            {recState === 'transcribing' ? (
+              <Loader2 size={15} className="animate-spin" />
+            ) : recState === 'recording' ? (
+              <Square size={12} className="fill-white" />
+            ) : (
+              <Mic size={15} />
+            )}
+          </button>
+          <button
             onClick={sendMessage}
-            disabled={!input.trim() || isLoading}
+            disabled={!input.trim() || isLoading || recState !== 'idle'}
             className="w-10 h-10 rounded-xl border-2 border-[var(--ink)] bg-[var(--indigo)] text-white flex items-center justify-center disabled:opacity-40 hover:bg-[var(--indigo-dark)] transition-colors shrink-0"
             style={{ boxShadow: '3px 3px 0px var(--ink)' }}
           >

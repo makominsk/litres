@@ -83,7 +83,7 @@ function ParagraphSelector({
             <button
               key={s.id}
               onClick={() => setSelectedSection(s.id)}
-              className={`w-full p-3 rounded-xl border-2 border-[var(--ink)] text-left transition-all ${
+              className={`w-full p-3 rounded-xl border-2 border-[var(--ink)] text-center transition-all ${
                 selectedSection === s.id ? 'text-white' : 'bg-white text-[var(--ink)] hover:opacity-80'
               }`}
               style={{

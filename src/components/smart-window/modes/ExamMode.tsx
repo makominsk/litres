@@ -27,6 +27,15 @@ interface QuestionState {
 
 const SECTIONS = (textbookData as { sections: Section[] }).sections
 
+function pluralParagraph(n: number) {
+  const mod10 = n % 10
+  const mod100 = n % 100
+  if (mod100 >= 11 && mod100 <= 14) return `${n} параграфов`
+  if (mod10 === 1) return `${n} параграф`
+  if (mod10 >= 2 && mod10 <= 4) return `${n} параграфа`
+  return `${n} параграфов`
+}
+
 function ParagraphSelector({
   onStart,
 }: {
@@ -92,7 +101,7 @@ function ParagraphSelector({
               }}
             >
               <p className="font-bold text-sm">{s.title}</p>
-              <p className="text-xs opacity-70">{s.paragraphs.length} параграфов</p>
+              <p className="text-xs opacity-70">{pluralParagraph(s.paragraphs.length)}</p>
             </button>
           ))}
           <button

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import textbook from '@/data/textbook.json'
 import textbookPages from '@/data/textbook-pages.json'
 import { useTextbookStore } from '@/stores/textbook-store'
@@ -33,6 +33,11 @@ export function TextbookModal() {
 
   const textbookPage = pdfToTextbookPage(currentPage)
   const pageInputRef = useRef<HTMLInputElement>(null)
+  const [iframeLoading, setIframeLoading] = useState(true)
+
+  useEffect(() => {
+    setIframeLoading(true)
+  }, [currentPage])
 
   useEffect(() => {
     if (!isOpen) return
@@ -179,15 +184,32 @@ export function TextbookModal() {
           </div>
 
           <div className="flex-1 p-2 sm:p-3">
-            <iframe
-              title="Учебник PDF"
-              className="w-full h-full rounded-md"
-              style={{
-                background: '#fff',
-                border: '2px solid var(--border-color)',
-              }}
-              src={`/textbook.pdf#page=${currentPage}&zoom=page-width`}
-            />
+            <div className="relative w-full h-full">
+              {iframeLoading && (
+                <div
+                  className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-md z-10"
+                  style={{ background: 'var(--bg-dark)', border: '2px solid var(--border-color)' }}
+                >
+                  <div
+                    className="w-10 h-10 rounded-full border-4 border-[var(--indigo)] border-t-transparent animate-spin"
+                  />
+                  <p style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-muted)' }} className="text-sm font-bold">
+                    Загружаю учебник...
+                  </p>
+                </div>
+              )}
+              <iframe
+                title="Учебник PDF"
+                className="w-full h-full rounded-md"
+                style={{
+                  background: '#fff',
+                  border: '2px solid var(--border-color)',
+                  opacity: iframeLoading ? 0 : 1,
+                }}
+                src={`/textbook.pdf#page=${currentPage}&zoom=page-width`}
+                onLoad={() => setIframeLoading(false)}
+              />
+            </div>
             <p style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-body)' }} className="text-xs sm:text-sm mt-2 font-semibold">
               Поле страницы работает по нумерации учебника (стр. 4-134).
             </p>

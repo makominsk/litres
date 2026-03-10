@@ -1,11 +1,43 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FileText, Image, Copy, Check, ExternalLink, Trash2 } from 'lucide-react'
 import type { SSEEvent } from '@/types/smart-window'
 import { toPlainAssistantText } from '@/lib/plain-text'
 import { useSmartWindowReportStore } from '@/stores/smart-window-report-store'
+
+// Рендерит текст с кликабельными ссылками [текст](url)
+function renderTextWithLinks(text: string): React.ReactNode[] {
+  const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g
+  const parts: React.ReactNode[] = []
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+
+  while ((match = linkRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index))
+    }
+    parts.push(
+      <a
+        key={match.index}
+        href={match[2]}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-[var(--indigo)] underline hover:opacity-70"
+      >
+        {match[1]}
+      </a>
+    )
+    lastIndex = match.index + match[0].length
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex))
+  }
+
+  return parts.length > 0 ? parts : [text]
+}
 import type { ReportSection } from '@/stores/smart-window-report-store'
 
 interface Props {
@@ -313,7 +345,7 @@ export function ReportMode({ initialTopic, chatContext }: Props) {
                   </h3>
                 )}
                 <p className="text-sm leading-relaxed text-[var(--ink)] whitespace-pre-wrap">
-                  {toPlainAssistantText(s.content)}
+                  {renderTextWithLinks(toPlainAssistantText(s.content))}
                 </p>
               </div>
             ))}

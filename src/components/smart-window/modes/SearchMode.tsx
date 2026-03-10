@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Globe, ExternalLink, Image, FileText } from 'lucide-react'
+import { Search, Globe, ExternalLink, Image, FileText, Trash2 } from 'lucide-react'
 import type { SearchSource, ImageItem, ChatMessage, SSEEvent, ModeParams } from '@/types/smart-window'
 import { toPlainAssistantText } from '@/lib/plain-text'
+import { useSmartWindowSearchStore } from '@/stores/smart-window-search-store'
 
 interface Props {
   initialQuery?: string
@@ -39,18 +40,19 @@ function SourceCard({ source, index }: { source: SearchSource; index: number }) 
 
 export function SearchMode({ initialQuery, onModeSwitch }: Props) {
   const [query, setQuery] = useState(initialQuery ?? '')
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const { messages, hasSearched, setMessages, setHasSearched, clearSearch } = useSmartWindowSearchStore()
   const [thinking, setThinking] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [hasSearched, setHasSearched] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const autoRunRef = useRef<string | null>(null)
 
   useEffect(() => {
-    if (initialQuery && !hasSearched) {
-      doSearch(initialQuery)
-    }
+    const prepared = initialQuery?.trim()
+    if (!prepared || autoRunRef.current === prepared) return
+    autoRunRef.current = prepared
+    doSearch(prepared)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [initialQuery])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -77,10 +79,11 @@ export function SearchMode({ initialQuery, onModeSwitch }: Props) {
       isStreaming: true,
     }
 
-    setMessages((prev) => [...prev, userMsg, placeholder])
+    const currentMessages = useSmartWindowSearchStore.getState().messages
+    setMessages([...currentMessages, userMsg, placeholder])
     setQuery('')
 
-    const apiMessages = [...messages, userMsg].map((m) => ({
+    const apiMessages = [...currentMessages, userMsg].map((m) => ({
       role: m.role,
       content: m.content,
     }))
@@ -328,6 +331,21 @@ export function SearchMode({ initialQuery, onModeSwitch }: Props) {
           >
             <Search size={16} />
           </button>
+          {hasSearched && (
+            <button
+              onClick={() => {
+                clearSearch()
+                setQuery('')
+                setThinking('')
+              }}
+              title="Очистить поиск"
+              className="w-10 h-10 rounded-xl border-2 border-[var(--ink)] bg-[var(--bg-dark)] flex items-center justify-center hover:bg-[var(--pink-light)] transition-colors shrink-0"
+              style={{ boxShadow: '3px 3px 0px var(--ink)' }}
+              disabled={isLoading}
+            >
+              <Trash2 size={15} />
+            </button>
+          )}
         </div>
       </div>
     </div>

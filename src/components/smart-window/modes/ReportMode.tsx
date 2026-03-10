@@ -2,19 +2,15 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FileText, Image, Copy, Check, RotateCcw, ExternalLink } from 'lucide-react'
-import type { ImageItem, SSEEvent } from '@/types/smart-window'
+import { FileText, Image, Copy, Check, ExternalLink, Trash2 } from 'lucide-react'
+import type { SSEEvent } from '@/types/smart-window'
 import { toPlainAssistantText } from '@/lib/plain-text'
+import { useSmartWindowReportStore } from '@/stores/smart-window-report-store'
+import type { ReportSection } from '@/stores/smart-window-report-store'
 
 interface Props {
   initialTopic?: string
   chatContext?: string // Context from discussion to seed the report
-}
-
-interface ReportSection {
-  id: string
-  title: string
-  content: string
 }
 
 // Извлекает ключевые слова из темы, убирая инструкции вроде "15 предложений на тему"
@@ -27,22 +23,34 @@ function extractKeywords(text: string): string {
 }
 
 export function ReportMode({ initialTopic, chatContext }: Props) {
-  const [topic, setTopic] = useState(initialTopic ?? '')
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [sections, setSections] = useState<ReportSection[]>([])
-  const [images, setImages] = useState<ImageItem[]>([])
-  const [streamingText, setStreamingText] = useState('')
-  const [phase, setPhase] = useState<'idle' | 'generating' | 'done'>('idle')
+  const {
+    topic,
+    isGenerating,
+    sections,
+    images,
+    streamingText,
+    phase,
+    setTopic,
+    setIsGenerating,
+    setSections,
+    setImages,
+    setStreamingText,
+    setPhase,
+    clearReport,
+  } = useSmartWindowReportStore()
   const [copied, setCopied] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const autoRunRef = useRef<string | null>(null)
 
-  // Auto-start if topic provided from discussion
+  // Auto-start when discussion sends a topic.
   useEffect(() => {
-    if (initialTopic && phase === 'idle') {
-      generateReport(initialTopic)
-    }
+    const prepared = initialTopic?.trim()
+    if (!prepared || isGenerating || autoRunRef.current === prepared) return
+    autoRunRef.current = prepared
+    setTopic(prepared)
+    generateReport(prepared)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [initialTopic, isGenerating, setTopic])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -194,6 +202,16 @@ export function ReportMode({ initialTopic, chatContext }: Props) {
           <p className="text-sm text-[var(--ink-muted)] text-center">
             Введи тему — я найду иллюстрации и напишу структурированный текст
           </p>
+          {topic && (
+            <button
+              onClick={clearReport}
+              title="Очистить реферат"
+              className="self-end w-10 h-10 rounded-xl border-2 border-[var(--ink)] bg-[var(--bg-dark)] flex items-center justify-center hover:bg-[var(--pink-light)] transition-colors"
+              style={{ boxShadow: '3px 3px 0px var(--ink)' }}
+            >
+              <Trash2 size={15} />
+            </button>
+          )}
           <div className="w-full space-y-3">
             <input
               value={topic}
@@ -316,11 +334,12 @@ export function ReportMode({ initialTopic, chatContext }: Props) {
             {copied ? 'Скопировано!' : 'Скопировать'}
           </button>
           <button
-            onClick={() => { setPhase('idle'); setSections([]); setImages([]); setTopic('') }}
-            className="flex items-center gap-1 px-3 py-2 bg-[var(--bg-dark)] border-2 border-[var(--ink)] rounded-xl text-sm hover:bg-[var(--bg)] transition-colors"
+            onClick={clearReport}
+            title="Удалить реферат"
+            className="px-3 py-2 bg-[var(--bg-dark)] border-2 border-[var(--ink)] rounded-xl text-sm hover:bg-[var(--pink-light)] transition-colors"
             style={{ boxShadow: '3px 3px 0px var(--ink)' }}
           >
-            <RotateCcw size={14} /> Новый
+            <Trash2 size={14} />
           </button>
           <a
             href={`https://ru.wikipedia.org/w/index.php?search=${encodeURIComponent(extractKeywords(topic))}`}

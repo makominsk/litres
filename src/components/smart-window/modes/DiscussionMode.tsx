@@ -186,9 +186,9 @@ export function DiscussionMode({ initialMessage, paragraphTitle, paragraphId, se
             } else if (event.type === 'images') {
               msgImages = event.items
             } else if (event.type === 'mode_switch') {
-              // Убираем пустой placeholder перед переключением
+              // Убираем placeholder и команду переключения, чтобы она не триггерила повторный mode_switch.
               const store = useSmartWindowStore.getState()
-              setMessages(store.messages.filter((m) => m.id !== assistantId))
+              setMessages(store.messages.filter((m) => m.id !== assistantId && m.id !== userMsg.id))
               onModeSwitch(event.target, event.params)
               return
             } else if (event.type === 'done') {

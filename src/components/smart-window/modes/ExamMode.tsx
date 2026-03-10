@@ -67,8 +67,9 @@ function ParagraphSelector({
             key={t.key}
             onClick={() => setMode(t.key as 'section' | 'paragraphs')}
             className={`flex-1 py-1.5 text-sm font-bold rounded-xl border-2 border-[var(--ink)] transition-colors ${
-              mode === t.key ? 'bg-[var(--indigo)] text-white' : 'bg-[var(--bg-dark)] text-[var(--ink)]'
+              mode === t.key ? 'text-white' : 'bg-[var(--bg-dark)] text-[var(--ink)]'
             }`}
+            style={mode === t.key ? { background: '#065F46' } : undefined}
           >
             {t.label}
           </button>
@@ -283,7 +284,7 @@ export function ExamMode({ initialSectionId, initialParagraphIds }: Props) {
       {/* Loading */}
       {phase === 'loading' && (
         <div className="flex-1 flex flex-col items-center justify-center gap-3 p-6">
-          <Loader2 size={32} className="animate-spin text-[var(--indigo)]" />
+          <Loader2 size={32} className="animate-spin" style={{ color: '#065F46' }} />
           <p className="text-sm font-bold text-[var(--ink)]">Составляю вопросы...</p>
           <p className="text-xs text-[var(--ink-muted)]">AI читает параграфы и придумывает задания</p>
         </div>
@@ -300,7 +301,8 @@ export function ExamMode({ initialSectionId, initialParagraphIds }: Props) {
             </div>
             <div className="h-2 bg-[var(--bg-dark)] rounded-full border border-[var(--ink)] overflow-hidden">
               <motion.div
-                className="h-full bg-[var(--indigo)] rounded-full"
+                className="h-full rounded-full"
+                style={{ background: '#065F46' }}
                 initial={false}
                 animate={{ width: `${((current + 1) / questions.length) * 100}%` }}
                 transition={{ duration: 0.3 }}
@@ -319,7 +321,7 @@ export function ExamMode({ initialSectionId, initialParagraphIds }: Props) {
                 className="brutal-card p-3 space-y-3"
               >
                 <div className="flex items-start gap-2">
-                  <span className="text-xs px-2 py-0.5 bg-[var(--indigo)] text-white rounded-full border border-[var(--ink)] shrink-0 mt-0.5">
+                  <span className="text-xs px-2 py-0.5 text-white rounded-full border border-[var(--ink)] shrink-0 mt-0.5" style={{ background: '#065F46' }}>
                     {q.type === 'open' ? 'Открытый' : q.type === 'multiple' ? 'Выбор' : q.type === 'date' ? 'Дата' : 'Термин'}
                   </span>
                   <p className="text-sm font-bold text-[var(--ink)] leading-snug">{q.question}</p>
@@ -425,8 +427,8 @@ export function ExamMode({ initialSectionId, initialParagraphIds }: Props) {
             <button
               onClick={goNext}
               disabled={!state?.submitted || isEvaluating}
-              className="w-full py-2.5 bg-[var(--indigo)] text-white border-2 border-[var(--ink)] rounded-xl font-bold text-sm disabled:opacity-40 flex items-center justify-center gap-1"
-              style={{ boxShadow: '3px 3px 0px var(--ink)' }}
+              className="w-full py-2.5 text-white border-2 border-[var(--ink)] rounded-xl font-bold text-sm disabled:opacity-40 flex items-center justify-center gap-1"
+              style={{ background: '#065F46', boxShadow: '3px 3px 0px var(--ink)' }}
             >
               {current < questions.length - 1 ? (
                 <><ChevronRight size={16} /> Следующий вопрос</>
@@ -502,8 +504,8 @@ function OpenAnswer({ onSubmit, disabled }: { onSubmit: (answer: string) => void
       <button
         onClick={() => onSubmit(value)}
         disabled={!value.trim() || disabled}
-        className="w-full py-2 bg-[var(--indigo)] text-white border-2 border-[var(--ink)] rounded-xl font-bold text-sm disabled:opacity-40"
-        style={{ boxShadow: '3px 3px 0px var(--ink)' }}
+        className="w-full py-2 text-white border-2 border-[var(--ink)] rounded-xl font-bold text-sm disabled:opacity-40"
+        style={{ background: '#065F46', boxShadow: '3px 3px 0px var(--ink)' }}
       >
         Проверить
       </button>

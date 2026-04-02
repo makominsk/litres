@@ -244,7 +244,10 @@ export function DiscussionMode({ initialMessage, paragraphTitle, paragraphId, se
     }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const recorder = new MediaRecorder(stream)
+      const mimeType = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', ''].find(
+        (t) => t === '' || MediaRecorder.isTypeSupported(t)
+      ) ?? ''
+      const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream)
       chunksRef.current = []
       mediaRef.current = recorder
 
@@ -256,9 +259,11 @@ export function DiscussionMode({ initialMessage, paragraphTitle, paragraphId, se
         stream.getTracks().forEach((t) => t.stop())
         setRecState('transcribing')
         try {
-          const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
+          const actualType = recorder.mimeType || 'audio/webm'
+          const ext = actualType.includes('mp4') ? 'mp4' : 'webm'
+          const blob = new Blob(chunksRef.current, { type: actualType })
           const form = new FormData()
-          form.append('audio', blob, 'recording.webm')
+          form.append('audio', blob, `recording.${ext}`)
           const res = await fetch('/api/transcribe', { method: 'POST', body: form })
           const data = await res.json()
           if (data.text) setInput((prev) => (prev ? prev + ' ' + data.text : data.text))
